@@ -1,0 +1,107 @@
+{
+  "nav": {
+    "home": "Start",
+    "about": "Über mich",
+    "projects": "Projekte",
+    "photos": "Fotos",
+    "season": "Saison",
+    "contact": "Kontakt",
+    "main": "Hauptnavigation",
+    "footer": "Rechtliches",
+    "menu": "Menü",
+    "skip": "Zum Inhalt springen",
+    "breadcrumb": "Brotkrumennavigation"
+  },
+  "language": {
+    "label": "Sprache wählen",
+    "de": "Deutsch",
+    "en": "English",
+    "onlyGerman": "Dieser Inhalt ist nur auf Deutsch verfügbar."
+  },
+  "theme": {
+    "dark": "Dunkles Design"
+  },
+  "home": {
+    "ctaProjects": "Projekte ansehen",
+    "ctaSeason": "Zur Saison",
+    "seasonHeading": "Saison {season}",
+    "nextGame": "Nächstes Spiel",
+    "lastResult": "Letztes Ergebnis",
+    "standing": "Tabelle",
+    "noUpcoming": "Aktuell ist kein Spiel angesetzt.",
+    "noResult": "Noch keine Ergebnisse.",
+    "projectsHeading": "Ausgewählte Projekte",
+    "allProjects": "Alle Projekte",
+    "photosHeading": "Aus der Galerie",
+    "allPhotos": "Alle Fotos",
+    "contactHeading": "Lust auf Austausch?",
+    "contactText": "Ob Projektidee, Presseanfrage oder Fragen zum Verein – schreib mir gern.",
+    "contactCta": "Kontakt aufnehmen"
+  },
+  "projects": {
+    "title": "Projekte",
+    "description": "Eine Auswahl meiner Projekte – mit Hintergründen, Rolle und Ergebnissen.",
+    "lead": "Eine Auswahl dessen, woran ich arbeite und gearbeitet habe.",
+    "back": "Alle Projekte",
+    "links": "Links",
+    "role": "Rolle",
+    "date": "Datum",
+    "tags": "Schlagworte",
+    "empty": "Noch keine Projekte veröffentlicht."
+  },
+  "photos": {
+    "title": "Fotos",
+    "description": "Bilder aus Spielen, Training und Projekten.",
+    "lead": "Momente aus Spielen, Training und Projekten.",
+    "count": "{count, plural, one {# Foto} other {# Fotos}}",
+    "open": "vergrößern",
+    "close": "Schließen",
+    "previous": "Vorheriges Foto",
+    "next": "Nächstes Foto",
+    "position": "Foto {current} von {total}",
+    "empty": "Noch keine Fotos veröffentlicht."
+  },
+  "season": {
+    "title": "Saison",
+    "description": "Spielplan, Ergebnisse, Tabellenplatz und meine Statistik der laufenden Saison.",
+    "heading": "Saison {season}",
+    "standing": "Tabellenplatz",
+    "standingValue": "{position}. von {teams}",
+    "points": "{points} Punkte",
+    "stats": "Meine Statistik",
+    "fixtures": "Spielplan & Ergebnisse",
+    "fixturesCaption": "Alle Spiele der Saison {season}",
+    "date": "Datum",
+    "match": "Begegnung",
+    "competition": "Wettbewerb",
+    "result": "Ergebnis",
+    "home": "Heim",
+    "away": "Auswärts",
+    "win": "Sieg",
+    "draw": "Unentschieden",
+    "loss": "Niederlage",
+    "open": "offen",
+    "archive": "Frühere Saisons",
+    "none": "Für diese Saison sind noch keine Informationen hinterlegt.",
+    "noFixtures": "Noch keine Spiele eingetragen."
+  },
+  "contact": {
+    "title": "Kontakt",
+    "description": "So erreichst du mich – per E-Mail oder über meine Profile.",
+    "lead": "Am schnellsten erreichst du mich per E-Mail. Ich melde mich in der Regel innerhalb weniger Tage.",
+    "email": "E-Mail",
+    "profiles": "Profile",
+    "team": "Verein",
+    "teamLink": "Zur Website des Vereins"
+  },
+  "footer": {
+    "legal": "Impressum",
+    "privacy": "Datenschutz",
+    "version": "Version"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "text": "Diese Seite gibt es nicht (mehr). Vielleicht hilft dir die Startseite weiter.",
+    "back": "Zur Startseite"
+  }
+}

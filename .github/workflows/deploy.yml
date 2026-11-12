@@ -1,0 +1,250 @@
+# Workflow 2 – Deployment.
+#
+# Push auf main:
+#   1. Checks (ci.yml)                → bei Fehler passiert nichts weiter
+#   2. Docker-Image bauen und nach ghcr.io pushen (Tags: latest + Commit-SHA)
+#   3. Per SSH auf den Server: docker-compose.yml + start.sh kopieren,
+#      start.sh <sha> → docker compose pull && docker compose up -d
+#   4. Healthcheck auf die Live-URL: /api/health muss genau diesen Commit
+#      melden, sonst schlägt der Workflow fehl
+#
+# Rollback: „Run workflow“ mit einem früheren Commit-SHA starten. Dann wird
+# nichts gebaut, sondern das vorhandene Image dieses Commits ausgerollt.
+#
+# Zugangsdaten nur als GitHub Secrets – siehe README.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Rollback: Commit-SHA eines früheren Deployments (kurz oder lang). Leer lassen = aktuellen Stand von main bauen und ausrollen."
+        required: false
+        default: ""
+        type: string
+
+# Nie zwei Deployments gleichzeitig; ein laufendes wird nicht abgebrochen.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  # Ausgeschrieben und klein (Registrys verlangen Kleinschreibung).
+  # MUSS zum image: in docker-compose.yml und IMAGE in start.sh passen.
+  IMAGE: metisfy/marcel-richter
+
+jobs:
+  checks:
+    name: Checks
+    if: ${{ !inputs.tag }}
+    uses: ./.github/workflows/ci.yml
+
+  image:
+    name: Docker-Image bauen & pushen
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: An ghcr.io anmelden
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bauen und pushen
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          build-args: |
+            SITE_URL=${{ vars.SITE_URL }}
+            GIT_SHA=${{ github.sha }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          # Bewusst kein GHA-Cache (cache-from/cache-to: type=gha): ein
+          # volllaufender Repo-Cache hat bei Nachbarprojekten Builds ohne
+          # erkennbaren Fehler abbrechen lassen. Der Build dauert ohnehin
+          # nur wenige Minuten.
+
+  deploy:
+    name: Auf Server ausrollen
+    needs: image
+    # Normal: nach erfolgreichem Image-Build. Rollback: Checks und Build
+    # werden übersprungen, ausgerollt wird das vorhandene Image.
+    if: ${{ !cancelled() && (needs.image.result == 'success' || (inputs.tag != '' && needs.image.result == 'skipped')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || 'marcel-richter' }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      # Eingaben nie direkt in Skripte einsetzen, sondern über env übergeben.
+      REQUESTED_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # volle Historie, um beim Rollback kurze SHAs aufzulösen
+          fetch-depth: 0
+
+      - name: Konfiguration prüfen
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          missing=()
+          [ -n "$SSH_HOST" ] || missing+=("Secret SSH_HOST")
+          [ -n "$SSH_USER" ] || missing+=("Secret SSH_USER")
+          [ -n "$SSH_PRIVATE_KEY" ] || missing+=("Secret SSH_PRIVATE_KEY")
+          [ -n "$SITE_URL" ] || missing+=("Variable SITE_URL")
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error title=Deployment nicht eingerichtet::Es fehlt: ${missing[*]}. Siehe README, Abschnitt „GitHub Secrets & Variablen“."
+            exit 1
+          fi
+
+      - name: Auszurollenden Commit bestimmen
+        id: tag
+        run: |
+          if [ -z "$REQUESTED_TAG" ]; then
+            tag="$GITHUB_SHA"
+          else
+            tag="$(git rev-parse --verify --quiet "${REQUESTED_TAG}^{commit}" || true)"
+            if [ -z "$tag" ]; then
+              echo "::error::Commit „${REQUESTED_TAG}“ gibt es in diesem Repository nicht."
+              exit 1
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Ausgerollt wird: $tag ($(git log -1 --format='%s' "$tag"))"
+
+      - name: An ghcr.io anmelden
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prüfen, ob das Image existiert
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          if ! docker manifest inspect "$REGISTRY/$IMAGE:$TAG" > /dev/null; then
+            echo "::error::Image $REGISTRY/$IMAGE:$TAG existiert nicht – wurde dieser Commit je auf main gebaut?"
+            exit 1
+          fi
+
+      - name: SSH einrichten
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::SSH_KNOWN_HOSTS ist nicht gesetzt – der Host-Key wird ungeprüft per ssh-keyscan übernommen. Bitte nachtragen (siehe README)."
+            ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" > ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host deploy-target
+            HostName $SSH_HOST
+            User $SSH_USER
+            Port $SSH_PORT
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+            ServerAliveInterval 30
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: docker-compose.yml und start.sh auf den Server kopieren
+        run: |
+          ssh deploy-target "mkdir -p '$DEPLOY_PATH'"
+          scp -q docker-compose.yml start.sh "deploy-target:$DEPLOY_PATH/"
+          ssh deploy-target "chmod +x '$DEPLOY_PATH/start.sh'"
+
+      - name: Server an ghcr.io anmelden
+        env:
+          GHCR_USER: ${{ secrets.GHCR_USER || github.repository_owner }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+        run: |
+          if [ -z "$GHCR_TOKEN" ]; then
+            echo "Kein GHCR_TOKEN gesetzt – das Paket muss dann öffentlich sein."
+            exit 0
+          fi
+          # Token über stdin, damit er weder in der Prozessliste noch im Log steht.
+          printf '%s' "$GHCR_TOKEN" | ssh deploy-target "docker login ghcr.io -u '$GHCR_USER' --password-stdin" > /dev/null
+          echo "✓ angemeldet als $GHCR_USER"
+
+      - name: Ausrollen (docker compose pull && up -d)
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: ssh deploy-target "cd '$DEPLOY_PATH' && ./start.sh '$TAG'"
+
+      - name: Healthcheck auf die Live-URL
+        env:
+          EXPECTED: ${{ steps.tag.outputs.tag }}
+        run: |
+          base="${SITE_URL%/}"
+          for i in $(seq 1 24); do
+            version="$(curl -fsS --max-time 10 "$base/api/health" 2>/dev/null | jq -r '.version // empty' 2>/dev/null || true)"
+            if [ "$version" = "$EXPECTED" ]; then
+              if curl -fsS --max-time 15 -o /dev/null "$base/"; then
+                echo "✓ $base läuft mit $EXPECTED"
+                exit 0
+              fi
+            fi
+            echo "… Versuch $i/24: Live-Version „${version:-keine Antwort}“, erwartet $EXPECTED"
+            sleep 5
+          done
+          echo "::error title=Healthcheck fehlgeschlagen::$base/api/health meldet nicht die Version $EXPECTED."
+          exit 1
+
+      - name: Zusammenfassung
+        if: always()
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          {
+            echo "### Deployment: $JOB_STATUS"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Commit | \`${TAG:-–}\` |"
+            echo "| Image | \`$REGISTRY/$IMAGE:${TAG:-–}\` |"
+            echo "| URL | ${SITE_URL:-–} |"
+            if [ -n "$REQUESTED_TAG" ]; then echo "| Art | Rollback (manuell ausgelöst) |"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: SSH-Schlüssel entfernen
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

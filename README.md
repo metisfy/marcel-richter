@@ -1,0 +1,422 @@
+# Marcel Richter – Website
+
+Persönliche Website mit Projekten, Fotos und Saison-Infos. Zweisprachig (Deutsch als Standard,
+Englisch unter `/en`), vollständig statisch generiert, ausgeliefert als Docker-Container.
+
+- **Stack:** Next.js 16 (App Router), TypeScript, Tailwind CSS 4, next-intl, MDX/YAML-Inhalte
+- **Betrieb:** Docker-Image in der GitHub Container Registry, Deployment per GitHub Actions + SSH
+- **Qualität:** Lighthouse (mobil) 97–100 in allen Kategorien, WCAG AA, helles/dunkles Design,
+  strukturierte Daten (Person, SportsTeam, SportsEvent, CreativeWork), OG-Bilder je Seite
+
+> **Alle Inhalte und Bilder sind Platzhalter.** Was du ersetzen musst, steht unter
+> [Vor dem Livegang](#vor-dem-livegang).
+
+---
+
+## Inhalt
+
+1. [Lokal entwickeln](#lokal-entwickeln)
+2. [Inhalte pflegen](#inhalte-pflegen)
+3. [Seiten und URLs](#seiten-und-urls)
+4. [Deployment](#deployment)
+5. [GitHub Secrets & Variablen](#github-secrets--variablen)
+6. [Rollback](#rollback)
+7. [Reverse Proxy](#reverse-proxy)
+8. [Technische Hinweise](#technische-hinweise)
+9. [Vor dem Livegang](#vor-dem-livegang)
+
+---
+
+## Lokal entwickeln
+
+Voraussetzung: Node.js 24 (siehe `.nvmrc`).
+
+```bash
+npm ci            # Abhängigkeiten installieren
+npm run dev       # Entwicklungsserver auf http://localhost:3000
+npm run lint      # ESLint
+npm run typecheck # TypeScript
+npm run build     # Produktions-Build (genau wie in der Pipeline)
+```
+
+Den fertigen Standalone-Server lokal starten (so läuft er auch im Container):
+
+```bash
+npm run build
+cp -R public .next/standalone/ && cp -R .next/static .next/standalone/.next/
+npm start         # http://localhost:3000
+```
+
+Das Docker-Image lokal bauen und starten:
+
+```bash
+docker build --build-arg SITE_URL=http://localhost:3100 -t marcel-richter:local .
+docker run --rm -p 3100:3000 marcel-richter:local
+```
+
+---
+
+## Inhalte pflegen
+
+Alle Inhalte liegen im Ordner **`content/`** als YAML- und MDX-Dateien. Code musst du dafür
+nicht anfassen. Ändern, committen, pushen: Nach wenigen Minuten ist die Änderung live.
+
+Am einfachsten geht das direkt auf GitHub: Datei öffnen → Stift-Symbol → bearbeiten → „Commit
+changes“. Neue Bilder lädst du über „Add file → Upload files“ in den passenden Ordner unter
+`public/images/` hoch.
+
+**Fehler werden vor dem Livegang abgefangen.** Jede Inhaltsdatei wird beim Build geprüft. Fehlt
+ein Pflichtfeld, stimmt ein Datum nicht oder existiert ein Bild nicht, schlägt der Check fehl und
+nennt Datei und Feld, z. B.:
+
+```
+Ungültiger Inhalt in content/saison/2026-27.yaml:
+✖ Ergebnis als "Heim:Gast", z. B. "3:1"
+  → at fixtures[9].result
+```
+
+Die Live-Seite bleibt dann unverändert.
+
+### Zweisprachige Texte
+
+Überall in den YAML-Dateien kann ein Text entweder für beide Sprachen gelten oder je Sprache
+angegeben werden. Fehlt `en`, wird der deutsche Text angezeigt.
+
+```yaml
+name: Marcel Richter                 # gilt für beide Sprachen
+tagline:
+  de: Ich baue digitale Produkte …
+  en: I build digital products …
+label: { de: Tore, en: Goals }       # Kurzschreibweise
+```
+
+### Stammdaten: `content/site.yaml`
+
+Name, Berufsbezeichnung, Kurzvorstellung, E-Mail, Porträt, Social-Profile und Verein
+(Name, Sportart, Liga, Position, Rückennummer, Logo). Diese Angaben stehen auf der Startseite, in
+der Fußzeile, auf der Kontaktseite und in den strukturierten Daten für Suchmaschinen.
+
+### Projekte: `content/projekte/<slug>/de.mdx` (+ `en.mdx`)
+
+Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/vereins-app`,
+`/en/projects/vereins-app`), also nur Kleinbuchstaben, Ziffern und Bindestriche verwenden.
+
+```mdx
+---
+title: Vereins-App für den SV Musterstadt
+summary: Ein Satz für Übersicht, Suchmaschinen und Vorschaubild.
+date: 2026-05-01                        # sortiert die Liste (neueste zuerst)
+cover: /images/projekte/vereins-app.jpg
+coverAlt: Beschreibung des Titelbilds für Screenreader
+role: Konzept & Entwicklung             # optional
+tags: [Next.js, PWA]                    # optional
+featured: true                          # optional: bevorzugt auf der Startseite
+draft: false                            # optional: true = nur lokal sichtbar
+links:                                  # optional
+  - label: Zur App
+    url: https://example.com
+---
+
+Hier steht der Text in **Markdown**. Überschriften mit `##`, Listen mit `-`.
+
+<Figure src="/images/projekte/screenshot.jpg" alt="…" caption="Optionale Bildunterschrift" />
+```
+
+- **`en.mdx`** braucht nur, was sich unterscheidet (meist `title`, `summary`, `coverAlt` und den
+  Text). Alles andere übernimmt es aus `de.mdx`.
+- **Ohne `en.mdx`** zeigt die englische Seite den deutschen Text mit dem Hinweis „only available in
+  German“. Ein Beispiel dafür ist `saison-in-bildern`.
+- Für Bilder im Text `<Figure … />` verwenden. Die Bilder werden dann automatisch in passenden
+  Größen und modernen Formaten (AVIF/WebP) ausgeliefert.
+
+### Fotos: `content/fotos.yaml`
+
+Alben mit Fotos. Neueste Alben (nach `date`) stehen oben. Die ersten sechs Fotos erscheinen auch auf
+der Startseite.
+
+```yaml
+albums:
+  - slug: hinrunde-2026-27
+    date: 2026-11-08
+    title: { de: Hinrunde 2026/27, en: First half of 2026/27 }
+    description: { de: …, en: … }       # optional
+    photos:
+      - src: /images/fotos/spiel-01.jpg
+        alt: { de: Zweikampf im Mittelfeld, en: Midfield duel }   # Pflicht
+        caption: { de: Heimspiel gegen …, en: Home game against … } # optional
+```
+
+Bilder vorher auf etwa 2000 px Kantenlänge verkleinern. Die Website rechnet sie zwar selbst
+herunter, große Originale verlangsamen aber den ersten Aufruf.
+
+### Saison: `content/saison/<JJJJ-JJ>.yaml`
+
+Eine Datei pro Saison. **Die Datei mit dem höchsten Namen ist die aktuelle Saison**, alle anderen
+erscheinen unter „Frühere Saisons“. Für eine neue Saison die alte Datei kopieren, z. B.
+`2027-28.yaml`, und anpassen.
+
+```yaml
+season: "2026/27"
+league: { de: Bezirksliga Musterland, en: District league Musterland }
+summary: { de: …, en: … }                # optional
+standing: { position: 3, teams: 16, points: 17 }   # optional
+stats:                                   # optional, beliebig viele Kacheln
+  - label: { de: Tore, en: Goals }
+    value: 4
+fixtures:
+  - date: "2026-11-15 14:30"             # deutsche Ortszeit, Uhrzeit optional
+    opponent: SG Wiesental
+    home: true                           # Heimspiel?
+    venue: Sportpark Musterstadt         # optional
+    competition: { de: Liga, en: League }  # optional
+    result: "2:1"                        # IMMER Heim:Gast – leer = noch nicht gespielt
+    note: { de: nach Verlängerung, en: after extra time }  # optional
+```
+
+- **„Nächstes Spiel“** auf der Startseite ist das erste Spiel ohne `result`. Nach dem Spiel also
+  einfach das Ergebnis eintragen.
+- Sieg, Unentschieden und Niederlage werden aus `result` und `home` berechnet.
+- Datum und Ergebnis in Anführungszeichen setzen (`"2:1"`), wie im Beispiel.
+
+### Einzelseiten: `content/seiten/`
+
+`ueber-mich`, `impressum` und `datenschutz` jeweils als `<name>.de.mdx` und `<name>.en.mdx`, mit
+`title` und `description` im Kopf und Markdown-Text darunter.
+
+### Oberflächentexte: `messages/de.json`, `messages/en.json`
+
+Navigation, Buttons, Überschriften und Hinweise. Beide Dateien müssen dieselben Schlüssel haben,
+sonst schlägt der Typecheck fehl.
+
+### Bilder
+
+Alle Bilder liegen unter `public/images/` und werden in den Inhalten mit `/images/…` angegeben.
+Erlaubt sind `.jpg`, `.png`, `.webp`, `.avif` und `.svg`. Jedes Bild braucht einen
+Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen ist.
+
+---
+
+## Seiten und URLs
+
+| Seite       | Deutsch                | Englisch                   |
+| ----------- | ---------------------- | -------------------------- |
+| Start       | `/`                    | `/en`                      |
+| Über mich   | `/ueber-mich`          | `/en/about`                |
+| Projekte    | `/projekte`            | `/en/projects`             |
+| Projekt     | `/projekte/<slug>`     | `/en/projects/<slug>`      |
+| Fotos       | `/fotos`               | `/en/photos`               |
+| Saison      | `/saison`              | `/en/season`               |
+| Kontakt     | `/kontakt`             | `/en/contact`              |
+| Impressum   | `/impressum`           | `/en/legal-notice`         |
+| Datenschutz | `/datenschutz`         | `/en/privacy`              |
+
+Außerdem: `/sitemap.xml`, `/robots.txt`, `/api/health` (Healthcheck), `/og/<sprache>/<seite>`
+(Open-Graph-Bilder). Die Sprache wird nie automatisch umgestellt, `/` ist immer Deutsch. Der
+Umschalter im Kopf führt jeweils zur selben Seite in der anderen Sprache. Die Seite setzt keine
+Cookies.
+
+---
+
+## Deployment
+
+```
+Pull Request ──► Checks (Install, Lint, Typecheck, Build) ──► Merge nur wenn grün
+                                                                     │
+Push auf main ──► Checks ──► Docker-Image bauen ──► ghcr.io (:latest + :<commit-sha>)
+                                                                     │
+                     SSH auf den Server: docker-compose.yml + start.sh kopieren,
+                     ./start.sh <sha>  →  docker compose pull && docker compose up -d
+                                                                     │
+                     Healthcheck: <SITE_URL>/api/health muss <sha> melden ──► ✓ / ✗
+```
+
+| Workflow | Datei | Auslöser |
+| --- | --- | --- |
+| **Checks** | `.github/workflows/ci.yml` | jeder Pull Request, jeder Push auf andere Branches als `main` |
+| **Deploy** | `.github/workflows/deploy.yml` | Push auf `main`, manuell („Run workflow“, auch für Rollbacks) |
+
+Pushes auf `main` prüft der Deploy-Workflow selbst: Er ruft als ersten Schritt genau den
+Checks-Workflow auf. So wird nichts doppelt geprüft, und ohne grüne Checks wird nichts gebaut oder
+ausgerollt.
+
+**Der Live-Healthcheck vergleicht die Version.** `/api/health` liefert den Commit-SHA des
+laufenden Images. Der Workflow ist erst grün, wenn die Live-URL genau den gerade ausgerollten
+Commit meldet. Ein alter Container, der noch antwortet, zählt also nicht als Erfolg. Der SHA steht
+auch klein in der Fußzeile.
+
+**Automatischer Rollback auf dem Server.** Wird die neue Fassung im Container nicht „healthy“,
+startet `start.sh` sofort wieder die vorherige und beendet sich mit Fehler. Damit schlägt auch der
+Workflow fehl.
+
+### Einmalige Einrichtung
+
+**1. Server vorbereiten** (Linux mit Docker und Docker Compose v2):
+
+```bash
+# Eigener Deploy-Benutzer mit Docker-Rechten (empfohlen)
+sudo adduser --disabled-password deploy
+sudo usermod -aG docker deploy
+
+# SSH-Schlüssel nur für GitHub Actions erzeugen (lokal, ohne Passphrase)
+ssh-keygen -t ed25519 -C "github-actions-marcel-richter" -f ./deploy_key -N ""
+# Öffentlichen Teil auf den Server:
+ssh-copy-id -i ./deploy_key.pub deploy@<server>
+```
+
+Den Ordner auf dem Server legt der Workflow selbst an (Standard: `~/marcel-richter` des
+Deploy-Benutzers). `docker-compose.yml` und `start.sh` werden bei jedem Deployment dorthin kopiert.
+
+**2. Secrets und Variablen anlegen**, siehe nächster Abschnitt.
+
+**3. Reverse Proxy einrichten**, siehe [Reverse Proxy](#reverse-proxy).
+
+**4. Merge nur bei grünen Checks erzwingen.** Unter *Settings → Rules → Rulesets → New branch
+ruleset*:
+- Target: Default branch (`main`)
+- ☑ *Require a pull request before merging*
+- ☑ *Require status checks to pass* → Check **`Lint, Typecheck & Build`** hinzufügen. Er taucht
+  in der Auswahl auf, sobald er einmal in einem Pull Request gelaufen ist.
+- ☑ *Block force pushes*
+
+> Rulesets bzw. Branch-Schutz gibt es bei **privaten** Repositories erst ab GitHub Pro/Team. Bei
+> öffentlichen Repositories sind sie kostenlos.
+
+**5. Ersten Deploy auslösen:** auf `main` pushen oder *Actions → Deploy → Run workflow*.
+
+**6. GHCR-Paket prüfen:** Nach dem ersten Lauf erscheint das Paket unter *Profil → Packages →
+marcel-richter*. Ist es privat, braucht der Server `GHCR_TOKEN` (siehe unten). Ist es
+öffentlich, geht es ohne.
+
+---
+
+## GitHub Secrets & Variablen
+
+Anlegen unter *Settings → Secrets and variables → Actions*. Zugangsdaten stehen **nur** in
+Secrets, nie im Code. Nicht geheime Einstellungen sind Variablen.
+
+### Secrets (Tab „Secrets“)
+
+| Name | Pflicht | Inhalt |
+| --- | --- | --- |
+| `SSH_HOST` | ✅ | Hostname oder IP des Servers |
+| `SSH_USER` | ✅ | SSH-Benutzer auf dem Server, z. B. `deploy` (muss Docker nutzen dürfen) |
+| `SSH_PRIVATE_KEY` | ✅ | Inhalt von `deploy_key` (privater Schlüssel, inkl. `-----BEGIN …-----`-Zeilen) |
+| `SSH_KNOWN_HOSTS` | empfohlen | Ausgabe von `ssh-keyscan -p <port> <server>`. Pinnt den Host-Key gegen Man-in-the-Middle. Fehlt er, übernimmt der Workflow den Key ungeprüft und warnt. |
+| `SSH_PORT` | – | SSH-Port, Standard `22` |
+| `GHCR_TOKEN` | bei privatem Paket | Personal Access Token (classic) mit nur **`read:packages`**. Damit meldet sich der Server bei ghcr.io an. |
+| `GHCR_USER` | – | GitHub-Benutzer zum Token, Standard ist der Repo-Besitzer |
+
+Zum **Pushen** des Images braucht es kein eigenes Token. Der Workflow nutzt dafür das automatische
+`GITHUB_TOKEN`.
+
+### Variablen (Tab „Variables“)
+
+| Name | Pflicht | Inhalt |
+| --- | --- | --- |
+| `SITE_URL` | ✅ | Öffentliche Adresse ohne Schrägstrich am Ende, z. B. `https://www.marcel-richter.de`. Wird ins Image gebaut (Canonical, hreflang, Sitemap, OG-Bilder) und für den Healthcheck genutzt. |
+| `DEPLOY_PATH` | – | Ordner auf dem Server, absolut oder relativ zum Home-Verzeichnis. Standard `marcel-richter` |
+
+Fehlt ein Pflichtwert, bricht der Deploy-Job mit einer Meldung ab, die genau den fehlenden Wert
+nennt.
+
+---
+
+## Rollback
+
+Jedes Image ist mit seinem Commit-SHA getaggt. Ein Rollback startet einfach das Image eines
+früheren Commits. Gebaut wird dabei nichts.
+
+**Variante 1 – über GitHub (empfohlen):**
+*Actions → Deploy → Run workflow* → im Feld **„Rollback: Commit-SHA …“** den Commit eintragen
+(kurz `a1b2c3d` oder lang) → *Run workflow*. Checks und Build werden übersprungen. Der Workflow
+prüft, ob es das Image gibt, rollt es aus und macht den Live-Healthcheck.
+
+Den passenden Commit findest du unter *Actions → Deploy* (frühere erfolgreiche Läufe) oder mit
+`git log --oneline`.
+
+**Variante 2 – direkt auf dem Server:**
+
+```bash
+cd ~/marcel-richter
+./start.sh --list                 # aktive und lokal vorhandene Fassungen
+./start.sh <voller-commit-sha>    # diese Fassung starten
+```
+
+`start.sh` schreibt den Tag nach `.env` (`IMAGE_TAG=…`). Die Fassung bleibt also auch nach einem
+Server-Neustart aktiv. Die letzten fünf Fassungen bleiben lokal liegen und starten deshalb auch
+ohne Registry sofort.
+
+**Danach:** Der nächste Push auf `main` rollt wieder den neuesten Stand aus. Soll der fehlerhafte
+Stand nicht zurückkommen, den Commit per `git revert` rückgängig machen und pushen.
+
+---
+
+## Reverse Proxy
+
+Der Container lauscht auf `127.0.0.1:3100` (änderbar über `HOST_PORT` in der `.env` auf dem
+Server). Er ist also nur über den Reverse Proxy erreichbar.
+
+- **Nginx/Caddy auf dem Host:** Beispiel in `deploy/nginx.conf.example` (HTTPS, Weiterleitung auf
+  `www`, HSTS, Proxy-Header).
+- **Traefik als Container:** In `docker-compose.yml` den `ports:`-Block durch die
+  auskommentierten `labels`/`networks` ersetzen und Domain sowie Netzwerknamen anpassen.
+
+Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel enthalten).
+
+---
+
+## Technische Hinweise
+
+- **Statisch:** Alle Seiten, OG-Bilder, Sitemap und robots.txt entstehen beim Build. Zur Laufzeit
+  rendert der Server praktisch nichts. Nur `src/proxy.ts` ordnet jede Anfrage einer Sprache zu und
+  übersetzt die Pfade.
+- **`skipProxyUrlNormalize: true` in `next.config.ts` nicht entfernen.** Ohne diese Option
+  erzeugt Next.js 16 im Standalone-Server (also im Container) für jede deutsche Seite eine
+  307-Endlosschleife und hinter dem Reverse Proxy einen 500er. `next dev` ist davon nicht
+  betroffen, der Fehler zeigt sich nur im Container. Details im Kommentar dort.
+- **404-Seiten:** Unbekannte Pfade bekommen eine statische, zweisprachige 404-Seite
+  (`src/app/not-found.tsx`). Diese Lösung ist bewusst so gewählt: Ein `notFound()` innerhalb
+  einer Seite liefert in Next.js 16.4 zwar Status 404, die Seite wird aber erst im Browser
+  gerendert.
+- **Design:** Farben als CSS-Variablen in `src/app/globals.css`. Alle Kombinationen erfüllen WCAG
+  AA in beiden Designs. Auf Akzentflächen immer `text-accent-fg` verwenden, nie `text-white`.
+- **Sicherheit:** Container ohne Root, ohne Linux-Capabilities, `no-new-privileges`. Dazu
+  Sicherheits-Header (`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
+  `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen.
+- **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
+  `engines` in `package.json`.
+
+### Projektstruktur
+
+```
+content/                 Inhalte (YAML + MDX)
+messages/                Oberflächentexte de/en
+public/images/           Bilder
+src/app/[locale]/        Seiten (Ordnernamen = interne deutsche Routen)
+src/app/og/              Open-Graph-Bilder
+src/app/api/health/      Healthcheck
+src/components/          UI-Komponenten
+src/i18n/                Sprachen, übersetzte Pfade, Navigation
+src/lib/content.ts       Lädt und prüft alle Inhalte
+src/lib/structured-data.ts  schema.org / JSON-LD
+src/proxy.ts             Sprach-Routing
+Dockerfile               Multi-Stage-Build (Node LTS Alpine)
+docker-compose.yml       Betrieb auf dem Server
+start.sh                 Ausrollen/Rollback auf dem Server
+.github/workflows/       Checks + Deploy
+deploy/                  Beispielkonfiguration Nginx
+```
+
+---
+
+## Vor dem Livegang
+
+- [ ] `content/site.yaml`: echte Daten (Name, Texte, E-Mail, Social-Links, Verein, Sportart)
+- [ ] `public/images/portrait.jpg`, `team-logo.svg` und alle Beispielbilder ersetzen
+- [ ] Projekte, Fotos und Saison in `content/` mit echten Inhalten füllen
+- [ ] **Impressum und Datenschutz** vervollständigen und rechtlich prüfen lassen
+- [ ] GitHub Secrets und die Variable `SITE_URL` anlegen
+- [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
+- [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)
+- [ ] Nach dem ersten Deploy: Lighthouse auf der Live-URL prüfen,
+      [Rich Results Test](https://search.google.com/test/rich-results) für die strukturierten Daten

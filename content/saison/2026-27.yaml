@@ -1,0 +1,102 @@
+# Saison 2026/27 – die Datei mit dem höchsten Namen ist die aktuelle Saison.
+#
+# Spiele:
+#   date:   "JJJJ-MM-TT HH:MM" (deutsche Ortszeit) oder nur "JJJJ-MM-TT"
+#   home:   true = Heimspiel, false = Auswärtsspiel
+#   result: immer "Heim:Gast" (wie in jeder Tabelle), z. B. "2:1".
+#           Ohne result gilt das Spiel als noch nicht gespielt –
+#           das erste Spiel ohne Ergebnis wird als „Nächstes Spiel“ angezeigt.
+#
+# ALLE ANGABEN SIND PLATZHALTER.
+
+season: "2026/27"
+
+league:
+  de: Bezirksliga Musterland
+  en: District league Musterland
+
+summary:
+  de: Nach dem Aufstieg geht es in der ersten Saison um einen sicheren Mittelfeldplatz – bisher läuft es besser als erwartet.
+  en: After promotion, the goal for the first season is a safe mid-table finish – so far it's going better than expected.
+
+standing:
+  position: 3
+  teams: 16
+  points: 17
+
+stats:
+  - label: { de: Einsätze, en: Appearances }
+    value: 10
+  - label: { de: Tore, en: Goals }
+    value: 4
+  - label: { de: Vorlagen, en: Assists }
+    value: 6
+  - label: { de: Spielminuten, en: Minutes }
+    value: 845
+
+fixtures:
+  - date: "2026-08-16 15:00"
+    opponent: FC Beispielhausen
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }
+    result: "2:1"
+  - date: "2026-08-23 15:00"
+    opponent: TSV Neudorf
+    home: false
+    venue: Waldstadion Neudorf
+    competition: { de: Liga, en: League }
+    result: "1:1"
+  - date: "2026-08-30 15:00"
+    opponent: SC Altheim
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }
+    result: "3:0"
+  - date: "2026-09-05 18:30"
+    opponent: VfB Seeberg
+    home: false
+    competition: { de: Bezirkspokal, en: District cup }
+    result: "2:3"
+    note: { de: nach Verlängerung, en: after extra time }
+  - date: "2026-09-13 15:00"
+    opponent: FV Grünwiese
+    home: false
+    competition: { de: Liga, en: League }
+    result: "0:2"
+  - date: "2026-09-20 15:00"
+    opponent: SpVgg Bergdorf
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }
+    result: "1:2"
+  - date: "2026-10-04 15:00"
+    opponent: TuS Talheim
+    home: false
+    competition: { de: Liga, en: League }
+    result: "2:2"
+  - date: "2026-10-18 15:00"
+    opponent: SV Eichenau
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }
+    result: "4:1"
+  - date: "2026-11-08 14:30"
+    opponent: 1. FC Steinbach
+    home: false
+    competition: { de: Liga, en: League }
+    result: "1:3"
+  - date: "2026-11-15 14:30"
+    opponent: SG Wiesental
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }
+  - date: "2026-11-22 14:00"
+    opponent: FC Rotbach
+    home: false
+    competition: { de: Liga, en: League }
+  - date: "2026-11-29 14:00"
+    opponent: TSV Lindenberg
+    home: true
+    venue: Sportpark Musterstadt
+    competition: { de: Liga, en: League }

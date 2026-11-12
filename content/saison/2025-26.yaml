@@ -1,0 +1,38 @@
+# Vorsaison – erscheint auf der Saison-Seite unter „Frühere Saisons“.
+# ALLE ANGABEN SIND PLATZHALTER.
+
+season: "2025/26"
+
+league:
+  de: Kreisliga A Musterland
+  en: County league A Musterland
+
+summary:
+  de: Meisterschaft und Aufstieg in die Bezirksliga.
+  en: League title and promotion to the district league.
+
+standing:
+  position: 1
+  teams: 14
+  points: 61
+
+stats:
+  - label: { de: Einsätze, en: Appearances }
+    value: 24
+  - label: { de: Tore, en: Goals }
+    value: 9
+  - label: { de: Vorlagen, en: Assists }
+    value: 12
+
+fixtures:
+  - date: "2026-05-17 15:00"
+    opponent: SV Hügelfeld
+    home: true
+    competition: { de: Liga, en: League }
+    result: "3:1"
+    note: { de: Meisterschaft perfekt, en: Title secured }
+  - date: "2026-05-24 15:00"
+    opponent: FC Kleinbach
+    home: false
+    competition: { de: Liga, en: League }
+    result: "2:2"

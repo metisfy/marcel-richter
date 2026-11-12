@@ -1,0 +1,30 @@
+# Nicht in den Build-Kontext kopieren.
+# Wichtig: Ohne node_modules hier würde `COPY . .` im Builder die im Container
+# frisch installierten Abhängigkeiten mit den lokalen (macOS-)Binaries
+# überschreiben.
+node_modules
+.next
+npm-debug.log*
+
+# Versionsverwaltung & Editor
+.git
+.github
+.vscode
+.idea
+
+# Lokale Umgebungs- und Buildreste
+.env
+.env*
+*.tsbuildinfo
+next-env.d.ts
+
+# Betriebssystem
+.DS_Store
+
+# Server-/Deployment-Dateien gehören nicht ins Image
+Dockerfile
+docker-compose.yml
+.dockerignore
+start.sh
+deploy
+README.md

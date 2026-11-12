@@ -1,0 +1,56 @@
+# Stammdaten der Website. Texte entweder für beide Sprachen gleich
+#   feld: "Text"
+# oder je Sprache
+#   feld: { de: "Deutsch", en: "English" }
+# Fehlt "en", wird der deutsche Text angezeigt.
+#
+# ALLE ANGABEN HIER SIND PLATZHALTER – bitte durch echte Daten ersetzen.
+
+name: Marcel Richter
+
+jobTitle:
+  de: Entwickler & Fußballer
+  en: Developer & footballer
+
+tagline:
+  de: Ich baue digitale Produkte – und stehe am Wochenende für den SV Musterstadt auf dem Platz.
+  en: I build digital products – and on weekends I'm on the pitch for SV Musterstadt.
+
+intro:
+  de: Hier findest du ausgewählte Projekte, Fotos aus Spielen und Training sowie alle Infos zur laufenden Saison.
+  en: Here you'll find selected projects, photos from games and training, and everything about the current season.
+
+location:
+  de: Musterstadt
+  en: Musterstadt, Germany
+
+email: hallo@example.com
+
+portrait: /images/portrait.jpg
+portraitAlt:
+  de: Porträt von Marcel Richter (Platzhalterbild)
+  en: Portrait of Marcel Richter (placeholder image)
+
+socials:
+  - label: Instagram
+    url: https://www.instagram.com/beispielprofil
+  - label: GitHub
+    url: https://github.com/beispielprofil
+  - label: LinkedIn
+    url: https://www.linkedin.com/in/beispielprofil
+
+team:
+  name: SV Musterstadt
+  sport:
+    de: Fußball
+    en: Football
+  league:
+    de: Bezirksliga
+    en: District league
+  url: https://example.com
+  logo: /images/team-logo.svg
+  position:
+    de: Zentrales Mittelfeld
+    en: Central midfield
+  number: 8
+  since: 2019

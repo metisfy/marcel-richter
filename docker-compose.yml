@@ -1,0 +1,58 @@
+# Website Marcel Richter – Betrieb auf dem Server.
+#
+# DIESE DATEI WIRD BEI JEDEM DEPLOYMENT AUS DEM REPOSITORY AUF DEN SERVER
+# KOPIERT. Änderungen deshalb im Repo machen, nicht auf dem Server.
+#
+# Der Server baut nichts. Er zieht das fertige Image aus der GitHub Container
+# Registry. Welche Fassung läuft, steht als IMAGE_TAG (= Commit-SHA) in der
+# .env neben dieser Datei – gesetzt von start.sh:
+#
+#   ./start.sh <commit-sha>   Fassung ausrollen bzw. zurückrollen
+#   ./start.sh                aktuelle Fassung aus .env neu ziehen und starten
+#
+# Logs:     docker compose logs -f web
+# Zustand:  docker compose ps
+
+name: marcel-richter
+
+services:
+  web:
+    image: ghcr.io/metisfy/marcel-richter:${IMAGE_TAG:-latest}
+    # Fester Name: start.sh fragt darüber den Gesundheitszustand ab.
+    container_name: marcel-richter
+    restart: unless-stopped
+
+    # --- Variante A: Nginx (oder Caddy) läuft direkt auf dem Host ----------
+    # Nur auf 127.0.0.1 binden – von außen ist die Seite ausschließlich über
+    # den Reverse Proxy erreichbar (Docker umgeht sonst die Firewall/ufw).
+    # Beispielkonfiguration: deploy/nginx.conf.example
+    ports:
+      - "127.0.0.1:${HOST_PORT:-3100}:3000"
+
+    # --- Variante B: Traefik als Container ----------------------------------
+    # `ports:` oben entfernen und stattdessen einkommentieren (plus den
+    # networks-Block ganz unten). Domain und Netzwerkname anpassen.
+    #
+    # networks: [proxy]
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.docker.network=proxy
+    #   - traefik.http.routers.marcel-richter.rule=Host(`www.example.com`) || Host(`example.com`)
+    #   - traefik.http.routers.marcel-richter.entrypoints=websecure
+    #   - traefik.http.routers.marcel-richter.tls.certresolver=letsencrypt
+    #   - traefik.http.services.marcel-richter.loadbalancer.server.port=3000
+
+    # Den Healthcheck bringt das Image mit (Dockerfile → /api/health).
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# networks:
+#   proxy:
+#     external: true

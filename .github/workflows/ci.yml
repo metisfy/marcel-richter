@@ -1,0 +1,45 @@
+# Workflow 1 – Checks: Install, Lint, Typecheck, Build.
+#
+# Läuft bei jedem Pull Request und jedem Push auf andere Branches als main.
+# Pushes auf main prüft der Deploy-Workflow, indem er genau diesen Workflow
+# als ersten Schritt aufruft (workflow_call) – so läuft er dort nicht doppelt,
+# und ohne grüne Checks wird nichts gebaut oder ausgerollt.
+#
+# Damit ein PR nur grün gemergt werden kann: in den Repository-Einstellungen
+# den Check „Lint, Typecheck & Build“ als Pflicht eintragen (siehe README).
+
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, Typecheck & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build

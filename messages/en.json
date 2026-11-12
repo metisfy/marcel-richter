@@ -1,0 +1,107 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "photos": "Photos",
+    "season": "Season",
+    "contact": "Contact",
+    "main": "Main navigation",
+    "footer": "Legal",
+    "menu": "Menu",
+    "skip": "Skip to content",
+    "breadcrumb": "Breadcrumb"
+  },
+  "language": {
+    "label": "Choose language",
+    "de": "Deutsch",
+    "en": "English",
+    "onlyGerman": "This content is only available in German."
+  },
+  "theme": {
+    "dark": "Dark mode"
+  },
+  "home": {
+    "ctaProjects": "View projects",
+    "ctaSeason": "Current season",
+    "seasonHeading": "Season {season}",
+    "nextGame": "Next game",
+    "lastResult": "Last result",
+    "standing": "Table",
+    "noUpcoming": "No upcoming game scheduled.",
+    "noResult": "No results yet.",
+    "projectsHeading": "Selected projects",
+    "allProjects": "All projects",
+    "photosHeading": "From the gallery",
+    "allPhotos": "All photos",
+    "contactHeading": "Let's talk",
+    "contactText": "Project idea, press enquiry or a question about the club – feel free to get in touch.",
+    "contactCta": "Get in touch"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "A selection of my projects – background, role and results.",
+    "lead": "A selection of what I'm working on and have worked on.",
+    "back": "All projects",
+    "links": "Links",
+    "role": "Role",
+    "date": "Date",
+    "tags": "Tags",
+    "empty": "No projects published yet."
+  },
+  "photos": {
+    "title": "Photos",
+    "description": "Pictures from games, training and projects.",
+    "lead": "Moments from games, training and projects.",
+    "count": "{count, plural, one {# photo} other {# photos}}",
+    "open": "enlarge",
+    "close": "Close",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "position": "Photo {current} of {total}",
+    "empty": "No photos published yet."
+  },
+  "season": {
+    "title": "Season",
+    "description": "Fixtures, results, league position and my stats for the current season.",
+    "heading": "Season {season}",
+    "standing": "League position",
+    "standingValue": "{position} of {teams}",
+    "points": "{points} points",
+    "stats": "My stats",
+    "fixtures": "Fixtures & results",
+    "fixturesCaption": "All games of the {season} season",
+    "date": "Date",
+    "match": "Match",
+    "competition": "Competition",
+    "result": "Result",
+    "home": "Home",
+    "away": "Away",
+    "win": "Win",
+    "draw": "Draw",
+    "loss": "Loss",
+    "open": "upcoming",
+    "archive": "Previous seasons",
+    "none": "No information for this season yet.",
+    "noFixtures": "No games scheduled yet."
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "How to reach me – by email or via my profiles.",
+    "lead": "Email is the fastest way to reach me. I usually reply within a few days.",
+    "email": "Email",
+    "profiles": "Profiles",
+    "team": "Club",
+    "teamLink": "Visit the club website"
+  },
+  "footer": {
+    "legal": "Legal notice",
+    "privacy": "Privacy",
+    "version": "Version"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This page doesn't exist (anymore). The home page might help.",
+    "back": "Back to home"
+  }
+}
