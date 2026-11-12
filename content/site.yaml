@@ -20,6 +20,21 @@ intro:
   de: Hier stehen meine Projekte, Fotos aus der Halle und der Spielplan der laufenden Saison.
   en: This is where you'll find my projects, photos from the gym and this season's fixtures.
 
+# Drei nummerierte Karten im Abschnitt „Über mich“ auf der Startseite
+highlights:
+  - title: { de: Entwicklung, en: Development }
+    text:
+      de: Websites und Web-Apps mit Next.js und TypeScript. Schnell, barrierefrei, ohne Tracking.
+      en: Websites and web apps built with Next.js and TypeScript. Fast, accessible, no tracking.
+  - title: { de: Volleyball, en: Volleyball }
+    text:
+      de: Außenangriff beim TV Musterstadt, nach dem Aufstieg jetzt in der Oberliga.
+      en: Outside hitter for TV Musterstadt, now in the Oberliga after promotion.
+  - title: { de: Fotografie, en: Photography }
+    text:
+      de: Spiele, Training und alles dazwischen, festgehalten mit der Kamera.
+      en: Matches, training and everything in between, captured on camera.
+
 location:
   de: Musterstadt
   en: Musterstadt, Germany

@@ -56,19 +56,25 @@ export default async function ProjectPage({ params }: Props) {
     <article className="container-page">
       <JsonLd data={projectGraph(project, locale, { home: tNav("home"), projects: tNav("projects") })} />
 
-      <nav aria-label={tNav("breadcrumb")} className="pt-10 text-sm">
-        <Link href="/projekte" className="inline-flex items-center gap-1.5 text-muted hover:text-fg">
+      <nav aria-label={tNav("breadcrumb")} className="pt-12 text-sm">
+        <Link href="/projekte" className="inline-flex items-center gap-1.5 font-medium text-muted hover:text-fg">
           <ArrowLeftIcon width={16} height={16} />
           {t("back")}
         </Link>
       </nav>
 
-      <header className="max-w-4xl pt-6 pb-10" lang={fallback ? project.contentLocale : undefined}>
-        <h1 className="display text-[clamp(2.75rem,7vw,5.5rem)] text-balance">{project.title}</h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted">{project.summary}</p>
+      <header className="max-w-3xl pt-8 pb-10" lang={fallback ? project.contentLocale : undefined}>
+        <p className="eyebrow mb-4">
+          {project.date.slice(0, 4)}
+          {project.role ? ` · ${project.role}` : null}
+        </p>
+        <h1 className="text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance">
+          {project.title}
+        </h1>
+        <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{project.summary}</p>
       </header>
 
-      <div className="relative mb-12 aspect-[16/9] overflow-hidden bg-subtle">
+      <div className="card relative mb-12 aspect-[16/9] overflow-hidden bg-surface shadow-soft">
         <Image
           src={project.cover}
           alt={project.coverAlt}
@@ -86,33 +92,39 @@ export default async function ProjectPage({ params }: Props) {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <dl className="divide-y divide-border border-t-[3px] border-rule text-[0.9375rem]">
-            <div className="py-3">
-              <dt className="label text-muted">{t("date")}</dt>
+          <dl className="card divide-y divide-line text-[15px]">
+            <div className="p-5">
+              <dt className="eyebrow">{t("date")}</dt>
               <dd className="mt-1">
                 <time dateTime={project.date}>{formatDate(project.date, locale, { time: false })}</time>
               </dd>
             </div>
             {project.role ? (
-              <div className="py-3">
-                <dt className="label text-muted">{t("role")}</dt>
+              <div className="p-5">
+                <dt className="eyebrow">{t("role")}</dt>
                 <dd className="mt-1">{project.role}</dd>
               </div>
             ) : null}
             {project.tags.length > 0 ? (
-              <div className="py-3">
-                <dt className="label text-muted">{t("tags")}</dt>
-                <dd className="mt-1">{project.tags.join(", ")}</dd>
+              <div className="p-5">
+                <dt className="eyebrow">{t("tags")}</dt>
+                <dd className="mt-2 flex flex-wrap gap-1.5">
+                  {project.tags.map((tag) => (
+                    <span key={tag} className="rounded-md border border-line bg-surface px-2 py-0.5 font-mono text-[11.5px] text-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </dd>
               </div>
             ) : null}
             {project.links.length > 0 ? (
-              <div className="py-3">
-                <dt className="label text-muted">{t("links")}</dt>
+              <div className="p-5">
+                <dt className="eyebrow">{t("links")}</dt>
                 <dd className="mt-1">
                   <ul className="space-y-1">
                     {project.links.map((link) => (
                       <li key={link.url}>
-                        <a href={link.url} className="text-link inline-flex items-center gap-1.5" rel="noopener">
+                        <a href={link.url} className="inline-flex items-center gap-1.5 font-medium text-accent" rel="noopener">
                           {link.label}
                           <ExternalIcon width={14} height={14} />
                         </a>

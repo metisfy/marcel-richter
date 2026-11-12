@@ -36,22 +36,20 @@ export default async function PhotosPage({ params }: LocaleParams) {
 
   return (
     <div className="container-page">
-      <PageIntro title={t("title")} lead={t("lead")} />
+      <PageIntro eyebrow={t("title")} title={t("heading")} lead={t("lead")} />
       {albums.length === 0 ? <p className="text-muted">{t("empty")}</p> : null}
       <div className="space-y-20">
         {albums.map((album) => (
           <section key={album.slug} aria-labelledby={`album-${album.slug}`}>
-            <div className="section-head mb-4">
-              <h2 id={`album-${album.slug}`} className="display text-4xl sm:text-5xl">
-                {album.title}
-              </h2>
-              <p className="text-sm text-muted">
-                <time dateTime={album.date}>{formatDate(album.date, locale, { time: false, month: "long" })}</time>
-                {" · "}
-                {t("count", { count: album.photos.length })}
-              </p>
-            </div>
-            {album.description ? <p className="mb-6 max-w-2xl text-muted">{album.description}</p> : null}
+            <p className="eyebrow mb-3.5">
+              <time dateTime={album.date}>{formatDate(album.date, locale, { time: false, month: "long" })}</time>
+              {" · "}
+              {t("count", { count: album.photos.length })}
+            </p>
+            <h2 id={`album-${album.slug}`} className="h2">
+              {album.title}
+            </h2>
+            {album.description ? <p className="mt-3 mb-8 max-w-2xl text-muted">{album.description}</p> : <div className="mb-8" />}
             <Gallery photos={album.photos} title={album.title} labels={labels} />
           </section>
         ))}

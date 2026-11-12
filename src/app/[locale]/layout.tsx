@@ -11,7 +11,7 @@ import { SiteHeader } from "@/components/site-header";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { routing } from "@/i18n/routing";
 import { getSite } from "@/lib/content";
-import { archivo } from "@/lib/fonts";
+import { fontVariables } from "@/lib/fonts";
 import { SITE_URL } from "@/lib/site-url";
 import { siteGraph } from "@/lib/structured-data";
 import { themeInitScript } from "@/lib/theme-script";
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: LocaleParams): Promise<Metada
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f1eb" },
-    { media: "(prefers-color-scheme: dark)", color: "#111317" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0e11" },
   ],
   colorScheme: "light dark",
 };
@@ -51,7 +51,7 @@ export default async function LocaleLayout({
   const t = await getTranslations("nav");
 
   return (
-    <html lang={locale} className={archivo.variable} suppressHydrationWarning>
+    <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

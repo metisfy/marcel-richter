@@ -30,18 +30,18 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   const site = getSite(locale);
   const nav = await getTranslations({ locale, namespace: "nav" });
 
-  if (key === "home") return { eyebrow: site.jobTitle, title: site.name, text: site.tagline };
+  if (key === "home") return { eyebrow: [site.team.position, site.team.name].filter(Boolean).join(" · "), title: site.name, text: site.tagline };
   if (key === "ueber-mich" || key === "impressum" || key === "datenschutz") {
     const page = getPage(key, locale);
-    return { eyebrow: site.name, title: page.title, text: page.description };
+    return { eyebrow: site.jobTitle, title: page.title, text: page.description };
   }
   if (key === "projekte") {
     const t = await getTranslations({ locale, namespace: "projects" });
-    return { eyebrow: site.name, title: t("title"), text: t("description") };
+    return { eyebrow: site.jobTitle, title: t("title"), text: t("description") };
   }
   if (key === "fotos") {
     const t = await getTranslations({ locale, namespace: "photos" });
-    return { eyebrow: site.name, title: t("title"), text: t("description") };
+    return { eyebrow: site.jobTitle, title: t("title"), text: t("description") };
   }
   if (key === "saison") {
     const t = await getTranslations({ locale, namespace: "season" });
@@ -49,21 +49,22 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   }
   if (key === "kontakt") {
     const t = await getTranslations({ locale, namespace: "contact" });
-    return { eyebrow: site.name, title: t("title"), text: t("description") };
+    return { eyebrow: site.jobTitle, title: t("title"), text: t("description") };
   }
   if (key.startsWith("projekt-")) {
     const project = getProjects(locale).find((p) => p.slug === key.slice("projekt-".length));
-    if (project) return { eyebrow: `${site.name} · ${nav("projects")}`, title: project.title, text: project.summary };
+    if (project) return { eyebrow: nav("projects"), title: project.title, text: project.summary };
   }
   return null;
 }
 
-// Schriften liegen als statische TTF im Repo (Archivo, SIL Open Font License),
-// denn Satori kann weder WOFF2 noch variable Schriften lesen.
+// Schriften liegen als statische TTF im Repo (Inter, JetBrains Mono – beide
+// SIL Open Font License), denn Satori kann weder WOFF2 noch variable Schriften.
 const FONT_DIR = path.join(process.cwd(), "src/app/og/fonts");
 const fonts = Promise.all([
-  readFile(path.join(FONT_DIR, "archivo-condensed-800.ttf")),
-  readFile(path.join(FONT_DIR, "archivo-500.ttf")),
+  readFile(path.join(FONT_DIR, "inter-700.ttf")),
+  readFile(path.join(FONT_DIR, "inter-400.ttf")),
+  readFile(path.join(FONT_DIR, "jetbrains-mono-400.ttf")),
 ]);
 
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string; key: string }> }) {
@@ -72,8 +73,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   const content = await textFor(locale, key);
   if (!content) return new Response("Not found", { status: 404 });
   const site = getSite(locale);
-  const [condensed, regular] = await fonts;
-  const titleSize = content.title.length > 28 ? 92 : content.title.length > 16 ? 120 : 150;
+  const [bold, regular, mono] = await fonts;
+  const titleSize = content.title.length > 30 ? 68 : content.title.length > 18 ? 84 : 104;
+  const nameParts = site.name.split(" ");
+  const lastName = nameParts.length > 1 ? nameParts.pop() : undefined;
 
   return new ImageResponse(
     (
@@ -84,47 +87,59 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "64px 72px",
-          background: "#16181d",
-          color: "#f3f1eb",
-          fontFamily: "Archivo",
-          borderBottom: "24px solid #ff6b2c",
+          padding: "64px 76px",
+          background: "linear-gradient(180deg, #eef3ff 0%, #ffffff 55%)",
+          color: "#111111",
+          fontFamily: "Inter",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          {site.team.number !== undefined ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 32, fontWeight: 700, letterSpacing: -0.5 }}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                minWidth: 64,
-                height: 64,
-                padding: "0 10px",
-                background: "#ff6b2c",
-                color: "#16181d",
-                fontFamily: "Archivo Condensed",
-                fontSize: 48,
+                width: 44,
+                height: 44,
+                borderRadius: 13,
+                background: "#4f7dff",
+                color: "#ffffff",
+                fontFamily: "JetBrains Mono",
+                fontSize: 22,
               }}
             >
-              {site.team.number}
+              {site.team.number ?? site.name[0]}
             </div>
-          ) : null}
-          <div style={{ display: "flex", fontSize: 28, color: "#a7abb3" }}>{content.eyebrow}</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            <div style={{ display: "flex" }}>
+              {nameParts.join(" ")}
+              {lastName ? <span style={{ color: "#3a63d9", marginLeft: 9 }}>{lastName}</span> : null}
+            </div>
+          </div>
           <div
             style={{
               display: "flex",
-              fontFamily: "Archivo Condensed",
-              fontSize: titleSize,
-              lineHeight: 0.9,
-              textTransform: "uppercase",
+              alignItems: "center",
+              gap: 10,
+              height: 44,
+              padding: "0 20px",
+              borderRadius: 999,
+              border: "1px solid #e7e9ee",
+              background: "#ffffff",
+              fontFamily: "JetBrains Mono",
+              fontSize: 20,
+              color: "#666666",
             }}
           >
+            <div style={{ display: "flex", width: 10, height: 10, borderRadius: 999, background: "#2fa98c" }} />
+            {content.eyebrow}
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
+          <div style={{ display: "flex", fontSize: titleSize, fontWeight: 700, lineHeight: 1.02, letterSpacing: -titleSize * 0.03 }}>
             {content.title}
           </div>
-          <div style={{ display: "flex", fontSize: 30, color: "#d9d6ce", lineHeight: 1.35, maxWidth: 980 }}>
+          <div style={{ display: "flex", fontSize: 30, color: "#666666", lineHeight: 1.45, maxWidth: 980 }}>
             {content.text.length > 130 ? `${content.text.slice(0, 127)}…` : content.text}
           </div>
         </div>
@@ -134,8 +149,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
       width: 1200,
       height: 630,
       fonts: [
-        { name: "Archivo Condensed", data: condensed, weight: 800, style: "normal" },
-        { name: "Archivo", data: regular, weight: 500, style: "normal" },
+        { name: "Inter", data: bold, weight: 700, style: "normal" },
+        { name: "Inter", data: regular, weight: 400, style: "normal" },
+        { name: "JetBrains Mono", data: mono, weight: 400, style: "normal" },
       ],
     },
   );

@@ -106,6 +106,15 @@ copyright:                           # Fußzeile: „© 2026 metisCode · metisO
     url: https://metisone.de
 ```
 
+Die drei nummerierten Karten im Abschnitt „Über mich“ auf der Startseite (01, 02, 03) kommen aus
+`highlights`:
+
+```yaml
+highlights:
+  - title: { de: Volleyball, en: Volleyball }
+    text: { de: Außenangriff beim TV Musterstadt …, en: Outside hitter for … }
+```
+
 ### Projekte: `content/projekte/<slug>/de.mdx` (+ `en.mdx`)
 
 Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/vereins-app`,
@@ -408,12 +417,14 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   (`src/app/not-found.tsx`). Diese Lösung ist bewusst so gewählt: Ein `notFound()` innerhalb
   einer Seite liefert in Next.js 16.4 zwar Status 404, die Seite wird aber erst im Browser
   gerendert.
-- **Design:** Farben als CSS-Variablen in `src/app/globals.css`, alle Text-Kombinationen erfüllen
-  WCAG AA in beiden Designs. `signal` (Hallenboden-Orange) nur als Fläche verwenden, Schrift darauf
-  immer `text-signal-fg`. Für orangefarbene Schrift gibt es `text-accent`.
-- **Schrift:** Archivo mit Breitenachse (`src/lib/fonts.ts`), beim Build heruntergeladen und vom
-  eigenen Server ausgeliefert. Überschriften und Zahlen nutzen die schmale Variante (Klasse
-  `.display`). Für die Open-Graph-Bilder liegen zwei statische TTF-Schnitte in `src/app/og/fonts/`.
+- **Design:** angelehnt an [metisone.de](https://metisone.de) (Farben, Inter + JetBrains Mono,
+  16 px Rundungen, Mono-Beschriftungen, Karten mit feinen Rahmen). Farben als CSS-Variablen in
+  `src/app/globals.css`, alle Text-Kombinationen erfüllen WCAG AA in beiden Designs. Für Text und
+  Buttons immer `accent` (#3a63d9) verwenden. Das hellere metis-Blau `accent-bright` (#4f7dff)
+  erreicht auf Weiß nur 3,7:1 und ist deshalb nur für Flächen, Icons und große Überschriften gedacht.
+- **Schrift:** Inter und JetBrains Mono über `next/font` (`src/lib/fonts.ts`), beim Build
+  heruntergeladen und vom eigenen Server ausgeliefert. Für die Open-Graph-Bilder liegen statische
+  TTF-Schnitte in `src/app/og/fonts/`.
 - **Sicherheit:** Container ohne Root, ohne Linux-Capabilities, `no-new-privileges`. Dazu
   Sicherheits-Header (`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen.
@@ -448,9 +459,8 @@ deploy/                  Beispielkonfiguration Nginx
 - [ ] `content/site.yaml`: echte Daten (Name, Texte, E-Mail, Social-Links, Verein, Sportart)
 - [ ] `public/images/portrait.jpg`, `team-logo.svg` und alle Beispielbilder ersetzen
 - [ ] Projekte, Fotos und Saison in `content/` mit echten Inhalten füllen
-- [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG) rechtlich prüfen lassen: Im
-      Impressum fehlt der Vertretungsberechtigte (Geschäftsführer), in der Datenschutzerklärung ggf.
-      der Hosting-/Proxy-Dienst (Kommentar „PRÜFEN“ in `content/seiten/datenschutz.de.mdx`)
+- [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,
+      Auslieferung über Cloudflare) rechtlich prüfen lassen
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen
 - [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
 - [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)

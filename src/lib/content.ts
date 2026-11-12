@@ -138,6 +138,7 @@ const siteSchema = z.object({
   jobTitle: localized,
   tagline: localized,
   intro: localized,
+  highlights: z.array(z.object({ title: localized, text: localized })).default([]),
   location: localized.optional(),
   email: z.email(),
   portrait: imageSrc,
@@ -165,6 +166,7 @@ function resolveSite(raw: z.output<typeof siteSchema>, locale: Locale) {
     jobTitle: pick(raw.jobTitle, locale),
     tagline: pick(raw.tagline, locale),
     intro: pick(raw.intro, locale),
+    highlights: raw.highlights.map((item) => ({ title: pick(item.title, locale), text: pick(item.text, locale) })),
     location: pick(raw.location, locale),
     portraitAlt: pick(raw.portraitAlt, locale),
     team: {

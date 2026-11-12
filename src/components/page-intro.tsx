@@ -12,15 +12,44 @@ export function PageIntro({
   children?: ReactNode;
 }) {
   return (
-    <div className="pt-10 pb-10 sm:pt-16 sm:pb-12">
-      {eyebrow ? <p className="mb-4 text-sm font-medium text-muted">{eyebrow}</p> : null}
-      <h1 className="display text-[clamp(3rem,9vw,6.5rem)] text-balance">{title}</h1>
-      {lead ? <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted">{lead}</p> : null}
+    <div className="max-w-3xl pt-14 pb-12 sm:pt-20">
+      {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
+      <h1 className="text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance">
+        {title}
+      </h1>
+      {lead ? <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{lead}</p> : null}
       {children}
     </div>
   );
 }
 
 export function OnlyGermanNote({ text }: { text: string }) {
-  return <p className="mb-8 border-l-[3px] border-signal bg-subtle px-4 py-3 text-sm">{text}</p>;
+  return <p className="mb-8 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">{text}</p>;
+}
+
+/** Abschnittskopf wie auf metisone.de: Mono-Beschriftung, Überschrift, optional Link rechts. */
+export function SectionHead({
+  eyebrow,
+  title,
+  id,
+  action,
+  center = false,
+}: {
+  eyebrow?: string;
+  title: string;
+  id?: string;
+  action?: ReactNode;
+  center?: boolean;
+}) {
+  return (
+    <div className={`mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 ${center ? "flex-col items-center text-center" : ""}`}>
+      <div className="max-w-2xl">
+        {eyebrow ? <p className="eyebrow mb-3.5">{eyebrow}</p> : null}
+        <h2 id={id} className="h2">
+          {title}
+        </h2>
+      </div>
+      {action}
+    </div>
+  );
 }

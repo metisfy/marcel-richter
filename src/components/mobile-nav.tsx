@@ -27,7 +27,7 @@ export function MobileNav({
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         className="icon-btn"
@@ -43,15 +43,15 @@ export function MobileNav({
         id={panelId}
         aria-label={label}
         hidden={!open}
-        className="absolute inset-x-0 top-full border-b-[3px] border-rule bg-bg"
+        className="absolute inset-x-0 top-full border-b border-line bg-bg shadow-soft"
       >
-        <ul className="container-page flex flex-col pb-4">
+        <ul className="container-page flex flex-col py-3">
           {items.map((item) => (
             <li key={item.href}>
               <NavLink
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="display flex min-h-13 items-center border-b border-border text-[1.75rem] text-fg hover:text-accent data-active:text-accent"
+                className="flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-muted hover:bg-surface hover:text-fg aria-[current=page]:text-fg data-active:font-semibold data-active:text-fg"
               >
                 {item.label}
               </NavLink>

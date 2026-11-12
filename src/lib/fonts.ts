@@ -1,14 +1,21 @@
-import { Archivo } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 /*
- * Archivo als variable Schrift mit Breiten-Achse (wdth 62–125): Fließtext in
- * normaler Breite, Überschriften und Zahlen schmal und fett (.display).
- * Eine einzige Datei, beim Build heruntergeladen und selbst ausgeliefert –
- * der Browser fragt nie bei Google an.
+ * Schriften wie auf metisone.de: Inter für Text und Überschriften,
+ * JetBrains Mono für kleine Beschriftungen. Beim Build heruntergeladen und
+ * selbst ausgeliefert – der Browser fragt nie bei Google an.
  */
-export const archivo = Archivo({
+export const inter = Inter({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
+  variable: "--font-inter",
   display: "swap",
 });
+
+export const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+  display: "swap",
+  weight: ["400", "500"],
+});
+
+export const fontVariables = `${inter.variable} ${jetbrainsMono.variable}`;

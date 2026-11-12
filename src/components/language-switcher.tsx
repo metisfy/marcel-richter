@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <ul aria-label={t("label")} className="flex items-center text-sm font-bold">
+    <ul aria-label={t("label")} className="flex h-[38px] items-center rounded-[9px] border border-line p-[3px] text-[13px] font-medium">
       {routing.locales.map((target) => (
         <li key={target}>
           <NextLink
@@ -41,7 +41,7 @@ export function LanguageSwitcher() {
             lang={target}
             hrefLang={target}
             aria-current={target === locale ? "true" : undefined}
-            className="flex h-9 min-w-9 items-center justify-center px-2 text-muted hover:text-fg aria-[current=true]:text-fg aria-[current=true]:underline aria-[current=true]:decoration-signal aria-[current=true]:decoration-2 aria-[current=true]:underline-offset-4"
+            className="flex h-[30px] min-w-8 items-center justify-center rounded-[6px] px-2 text-muted transition-colors hover:text-fg aria-[current=true]:bg-surface-2 aria-[current=true]:text-fg"
           >
             {target.toUpperCase()}
             <span className="sr-only"> – {t(target)}</span>

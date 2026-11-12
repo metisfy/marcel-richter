@@ -2,10 +2,12 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
-import { ArrowRightIcon } from "@/components/icons";
-import { ProjectRow } from "@/components/project-card";
+import { ArrowRightIcon, CalendarIcon, CheckIcon } from "@/components/icons";
+import { SectionHead } from "@/components/page-intro";
+import { ProjectCard } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 import {
   currentSeason,
   getAlbums,
@@ -13,6 +15,8 @@ import {
   getSite,
   lastResult,
   nextFixture,
+  type Season,
+  type Site,
 } from "@/lib/content";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo";
@@ -32,15 +36,123 @@ export async function generateMetadata({ params }: LocaleParams) {
   });
 }
 
+/**
+ * Saison als „Fenster“ unter der Hauptüberschrift – angelehnt an die
+ * Produktvorschau auf metisone.de. Links das letzte Spiel mit den Sätzen als
+ * Balken, rechts nächstes Spiel und Tabellenplatz.
+ */
+async function SeasonWindow({ season, site, locale }: { season: Season; site: Site; locale: Locale }) {
+  const t = await getTranslations("home");
+  const tSeason = await getTranslations("season");
+  const upcoming = nextFixture(season);
+  const latest = lastResult(season);
+
+  // Sätze aus eigener Sicht: [eigene Punkte, Punkte des Gegners]
+  const sets = (latest?.sets ?? []).map((set) => {
+    const [home, away] = set.split(":").map(Number);
+    return latest?.home ? [home, away] : [away, home];
+  });
+  const max = Math.max(25, ...sets.flat());
+
+  return (
+    <div className="card mx-auto max-w-[60rem] overflow-hidden text-left shadow-soft">
+      <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-3">
+        <span aria-hidden="true" className="size-2.5 rounded-full bg-[#ff5f57]" />
+        <span aria-hidden="true" className="size-2.5 rounded-full bg-[#febc2e]" />
+        <span aria-hidden="true" className="size-2.5 rounded-full bg-[#28c840]" />
+        <h2 className="ml-3 truncate font-mono text-[12px] text-muted">
+          {t("seasonWindow", { season: season.season })} · {season.league}
+        </h2>
+      </div>
+
+      <div className="grid md:grid-cols-[1.35fr_1fr]">
+        <div className="border-b border-line p-6 sm:p-7 md:border-r md:border-b-0">
+          <h3 className="eyebrow">{t("lastResult")}</h3>
+          {latest?.result && latest.outcome ? (
+            <>
+              <p className="mt-3 flex items-center gap-3">
+                <span className="text-4xl font-semibold tracking-[-0.02em] tabular-nums">
+                  {latest.result.home}:{latest.result.away}
+                </span>
+                <OutcomeBadge outcome={latest.outcome} />
+              </p>
+              <p className="mt-1.5 text-[15px] text-muted">{matchTitle(latest, site.team.name).join(" – ")}</p>
+
+              {sets.length > 0 ? (
+                <div className="mt-7">
+                  <SetScores sets={latest.sets} className="sr-only" />
+                  <div aria-hidden="true" className="flex h-32 items-end gap-2.5 sm:gap-4">
+                    {sets.map(([own, other], index) => (
+                      <div key={index} className="flex h-full flex-1 flex-col justify-end">
+                        <div className="flex flex-1 items-end justify-center gap-1">
+                          <span
+                            className={`w-full max-w-5 rounded-t-[4px] ${own > other ? "bg-accent-bright" : "bg-accent-bright/35"}`}
+                            style={{ height: `${(own / max) * 100}%` }}
+                          />
+                          <span className="w-full max-w-5 rounded-t-[4px] bg-surface-2" style={{ height: `${(other / max) * 100}%` }} />
+                        </div>
+                        <span className="mt-2 text-center font-mono text-[11px] text-muted tabular-nums">
+                          {own}:{other}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <p className="mt-3 text-muted">{t("noResult")}</p>
+          )}
+        </div>
+
+        <div className="divide-y divide-line">
+          <div className="p-6 sm:p-7">
+            <h3 className="eyebrow">{t("nextGame")}</h3>
+            {upcoming ? (
+              <>
+                <p className="mt-3 text-2xl font-semibold tracking-[-0.02em]">
+                  <time dateTime={toIsoBerlin(upcoming.date)}>{formatShortDate(upcoming.date, locale)}</time>
+                  {formatTime(upcoming.date, locale) ? (
+                    <span className="ml-2 font-mono text-sm font-normal text-muted">{formatTime(upcoming.date, locale)}</span>
+                  ) : null}
+                </p>
+                <p className="mt-1.5 text-[15px] font-medium">{matchTitle(upcoming, site.team.name).join(" – ")}</p>
+                <p className="text-sm text-muted">
+                  {[upcoming.home ? tSeason("home") : tSeason("away"), upcoming.venue].filter(Boolean).join(" · ")}
+                </p>
+              </>
+            ) : (
+              <p className="mt-3 text-muted">{t("noUpcoming")}</p>
+            )}
+          </div>
+          <div className="p-6 sm:p-7">
+            <h3 className="eyebrow">{t("standing")}</h3>
+            {season.standing ? (
+              <p className="mt-3 flex items-baseline gap-3">
+                <span className="text-4xl font-semibold tracking-[-0.02em] text-accent tabular-nums">
+                  {season.standing.position}.
+                </span>
+                <span className="text-[15px] text-muted">
+                  {tSeason("of", { teams: season.standing.teams })}
+                  {season.standing.points !== undefined ? ` · ${tSeason("points", { points: season.standing.points })}` : null}
+                </span>
+              </p>
+            ) : (
+              <p className="mt-3 text-muted">–</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default async function HomePage({ params }: LocaleParams) {
   const locale = await initLocale(params);
   const t = await getTranslations("home");
-  const tSeason = await getTranslations("season");
   const tPlayer = await getTranslations("player");
   const site = getSite(locale);
   const season = currentSeason(locale);
-  const upcoming = nextFixture(season);
-  const latest = lastResult(season);
 
   const projects = getProjects(locale);
   const featured = [
@@ -52,198 +164,164 @@ export default async function HomePage({ params }: LocaleParams) {
     .slice(0, 5);
 
   const nameParts = site.name.split(" ");
+  const lastName = nameParts.length > 1 ? nameParts.pop() : undefined;
   const roster = [
     { label: tPlayer("position"), value: site.team.position },
-    { label: tPlayer("number"), value: site.team.number?.toString() },
+    { label: tPlayer("number"), value: site.team.number !== undefined ? `#${site.team.number}` : undefined },
     { label: tPlayer("club"), value: site.team.name },
     { label: tPlayer("league"), value: site.team.league },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   return (
     <>
-      {/* Kopf: Name, Kurzvorstellung, Kaderzeile, Porträt */}
-      <section className="container-page grid gap-10 pt-8 pb-16 sm:pt-12 md:grid-cols-12 md:gap-8 md:pb-24">
-        <div className="flex flex-col md:col-span-7 md:pt-4">
-          <h1 className="display text-[clamp(4.25rem,15vw,10rem)] leading-[0.84]">
-            {nameParts.map((part, index) => (
-              <span key={part} className="block">
-                {part}
-                {index < nameParts.length - 1 ? " " : null}
-              </span>
-            ))}
+      {/* Kopf: zentriert wie auf metisone.de */}
+      <section className="relative overflow-x-clip">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(60%_60%_at_50%_0%,var(--accent-soft),transparent_70%)]"
+        />
+        <div className="container-page pt-16 pb-14 text-center sm:pt-24 sm:pb-16">
+          <p className="badge">
+            <span aria-hidden="true" className="badge-dot" />
+            {[site.team.position, site.team.name].filter(Boolean).join(" · ")}
+          </p>
+          <h1 className="mt-7 text-[clamp(3rem,0.9rem+8.6vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.03em]">
+            <span className="block">{nameParts.join(" ")}</span>
+            {lastName ? <span className="gradient-text block pb-[0.08em]"> {lastName}</span> : null}
           </h1>
-          <p className="mt-7 max-w-xl text-xl leading-snug text-pretty sm:text-[1.375rem]">{site.tagline}</p>
-          <p className="mt-3 max-w-xl text-pretty text-muted">{site.intro}</p>
-
-          {roster.length > 0 ? (
-            <dl className="mt-8 grid grid-cols-2 border-t-[3px] border-rule sm:grid-cols-4">
-              {roster.map((item) => (
-                <div key={item.label} className="border-b border-border py-3 pr-3 sm:border-b-0">
-                  <dt className="label text-muted">{item.label}</dt>
-                  <dd className="mt-1 font-semibold">{item.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
-
-          <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <Link href="/projekte" className="btn btn-primary">
+          <p className="mx-auto mt-6 max-w-[36rem] text-[clamp(1.0625rem,1rem+0.3vw,1.1875rem)] leading-relaxed text-pretty text-muted">
+            {site.tagline}
+          </p>
+          <div className="mt-9 flex flex-wrap justify-center gap-3">
+            <Link href="/projekte" className="btn btn-dark">
               {t("ctaProjects")}
-              <ArrowRightIcon width={18} height={18} />
+              <ArrowRightIcon width={17} height={17} />
             </Link>
             {season ? (
-              <Link href="/saison" className="text-link">
+              <Link href="/saison" className="btn btn-ghost">
+                <span aria-hidden="true" className="grid size-6 place-items-center rounded-full bg-surface-2">
+                  <CalendarIcon width={13} height={13} />
+                </span>
                 {t("ctaSeason", { season: season.season })}
               </Link>
             ) : null}
           </div>
         </div>
 
-        <figure className="relative mx-auto w-full max-w-md md:col-span-5 md:max-w-none">
-          <div className="relative aspect-[4/5] overflow-hidden bg-subtle">
+        {season ? (
+          <div className="container-page pb-16 sm:pb-20">
+            <SeasonWindow season={season} site={site} locale={locale} />
+          </div>
+        ) : null}
+      </section>
+
+      {/* Leiste mit Häkchen */}
+      {roster.length > 0 ? (
+        <div className="border-y border-line bg-surface">
+          <ul className="container-page flex flex-wrap justify-center gap-x-8 gap-y-2 py-4 text-[14.5px] text-muted">
+            {roster.map((item) => (
+              <li key={item.label} className="inline-flex items-center gap-2">
+                <span aria-hidden="true" className="grid size-[18px] place-items-center rounded-full bg-accent-soft text-accent">
+                  <CheckIcon width={11} height={11} strokeWidth={3} />
+                </span>
+                <span className="sr-only">{item.label}: </span>
+                {item.value}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* Über mich: Porträt, Text, nummerierte Karten */}
+      <section aria-labelledby="ueber-titel" className="container-page py-20 sm:py-24">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          <div className="card relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-surface shadow-soft lg:max-w-none">
             <Image
               src={site.portrait}
               alt={site.portraitAlt}
               fill
               priority
-              sizes="(min-width: 1216px) 470px, (min-width: 768px) 40vw, 90vw"
+              sizes="(min-width: 1024px) 440px, (min-width: 448px) 448px, 100vw"
               className="object-cover"
             />
           </div>
-          {site.team.number !== undefined ? (
-            <span
-              aria-hidden="true"
-              className="display absolute bottom-0 left-0 bg-signal px-4 pt-3 pb-2 text-7xl text-signal-fg tabular-nums"
-            >
-              {site.team.number}
-            </span>
-          ) : null}
-        </figure>
+          <div>
+            <p className="eyebrow">{t("aboutEyebrow")}</p>
+            <h2 id="ueber-titel" className="h2 mt-3.5">
+              {site.jobTitle}.
+            </h2>
+            <p className="mt-5 text-[16.5px] leading-relaxed text-muted">{site.intro}</p>
+
+            {site.highlights.length > 0 ? (
+              <ol className="mt-8 space-y-3">
+                {site.highlights.map((item, index) => (
+                  <li key={item.title} className="card flex gap-4 p-5 sm:p-6">
+                    <span aria-hidden="true" className="pt-0.5 font-mono text-[13px] font-medium text-accent">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <h3 className="font-semibold">{item.title}</h3>
+                      <p className="mt-1 text-[15px] leading-relaxed text-muted">{item.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+
+            <Link href="/ueber-mich" className="arrow-link mt-8">
+              {t("aboutLink")}
+            </Link>
+          </div>
+        </div>
       </section>
 
-      {/* Saison wie auf einer Anzeigetafel */}
-      {season ? (
-        <section aria-labelledby="saison-titel" className="bg-board text-board-fg">
-          <div className="container-page py-10 md:py-12">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-board-rule pb-4">
-              <h2 id="saison-titel" className="display text-3xl sm:text-4xl">
-                {t("seasonHeading", { season: season.season })}
-              </h2>
-              <p className="text-sm text-board-muted">
-                {site.team.name} · {season.league}
-              </p>
-            </div>
-
-            <div className="grid divide-y divide-board-rule md:grid-cols-3 md:divide-x md:divide-y-0">
-              <div className="py-6 md:pr-8">
-                <h3 className="label text-board-muted">{t("nextGame")}</h3>
-                {upcoming ? (
-                  <>
-                    <p className="display mt-3 text-5xl tabular-nums">
-                      <time dateTime={toIsoBerlin(upcoming.date)}>{formatShortDate(upcoming.date, locale)}</time>
-                    </p>
-                    <p className="mt-3 font-semibold">{matchTitle(upcoming, site.team.name).join(" – ")}</p>
-                    <p className="mt-1 text-sm text-board-muted">
-                      {[formatTime(upcoming.date, locale), upcoming.home ? tSeason("home") : tSeason("away"), upcoming.venue]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                  </>
-                ) : (
-                  <p className="mt-3 text-board-muted">{t("noUpcoming")}</p>
-                )}
-              </div>
-
-              <div className="py-6 md:px-8">
-                <h3 className="label text-board-muted">{t("lastResult")}</h3>
-                {latest?.result && latest.outcome ? (
-                  <>
-                    <p className="mt-3 flex items-center gap-3">
-                      <span className="display text-5xl tabular-nums">
-                        {latest.result.home}:{latest.result.away}
-                      </span>
-                      <OutcomeBadge outcome={latest.outcome} locale={locale} />
-                    </p>
-                    <p className="mt-3 font-semibold">{matchTitle(latest, site.team.name).join(" – ")}</p>
-                    <p className="mt-1 text-sm text-board-muted">
-                      <SetScores sets={latest.sets} />
-                    </p>
-                  </>
-                ) : (
-                  <p className="mt-3 text-board-muted">{t("noResult")}</p>
-                )}
-              </div>
-
-              <div className="py-6 md:pl-8">
-                <h3 className="label text-board-muted">{t("standing")}</h3>
-                {season.standing ? (
-                  <>
-                    <p className="display mt-3 text-5xl text-board-accent tabular-nums">{season.standing.position}.</p>
-                    <p className="mt-3 font-semibold">{tSeason("of", { teams: season.standing.teams })}</p>
-                    {season.standing.points !== undefined ? (
-                      <p className="mt-1 text-sm text-board-muted">
-                        {tSeason("points", { points: season.standing.points })}
-                      </p>
-                    ) : null}
-                  </>
-                ) : (
-                  <p className="mt-3 text-board-muted">–</p>
-                )}
-              </div>
-            </div>
-
-            <Link
-              href="/saison"
-              className="mt-2 inline-flex items-center gap-2 font-semibold underline decoration-board-accent decoration-2 underline-offset-[5px] hover:text-board-accent"
-            >
-              {t("allFixtures")}
-              <ArrowRightIcon width={16} height={16} />
-            </Link>
-          </div>
-        </section>
-      ) : null}
-
-      {/* Projekte */}
+      {/* Projekte als graues Band */}
       {featured.length > 0 ? (
-        <section aria-labelledby="projekte-titel" className="container-page pt-16 md:pt-24">
-          <div className="section-head mb-0">
-            <h2 id="projekte-titel" className="display text-4xl sm:text-5xl">
-              {t("projectsHeading")}
-            </h2>
-            <Link href="/projekte" className="text-link">
-              {t("allProjects")}
-            </Link>
-          </div>
-          <div>
-            {featured.map((project) => (
-              <ProjectRow key={project.slug} project={project} locale={locale} headingLevel="h3" />
-            ))}
+        <section aria-labelledby="projekte-titel" className="border-y border-line bg-surface py-20 sm:py-24">
+          <div className="container-page">
+            <SectionHead
+              eyebrow={t("projectsHeading")}
+              title={t("projectsTitle")}
+              id="projekte-titel"
+              action={
+                <Link href="/projekte" className="arrow-link">
+                  {t("allProjects")}
+                </Link>
+              }
+            />
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((project) => (
+                <ProjectCard key={project.slug} project={project} locale={locale} headingLevel="h3" />
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
 
-      {/* Fotos: ein großes, vier kleine */}
+      {/* Fotos */}
       {photos.length > 0 ? (
-        <section aria-labelledby="fotos-titel" className="container-page pt-16 md:pt-24">
-          <div className="section-head">
-            <h2 id="fotos-titel" className="display text-4xl sm:text-5xl">
-              {t("photosHeading")}
-            </h2>
-            <Link href="/fotos" className="text-link">
-              {t("allPhotos")}
-            </Link>
-          </div>
-          <ul className="grid grid-cols-2 gap-1 sm:grid-cols-4">
+        <section aria-labelledby="fotos-titel" className="container-page py-20 sm:py-24">
+          <SectionHead
+            eyebrow={t("photosHeading")}
+            title={t("photosTitle")}
+            id="fotos-titel"
+            action={
+              <Link href="/fotos" className="arrow-link">
+                {t("allPhotos")}
+              </Link>
+            }
+          />
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {photos.map((photo, index) => (
               <li
                 key={photo.src}
-                className={`relative aspect-square overflow-hidden bg-subtle ${index === 0 ? "col-span-2 row-span-2" : ""}`}
+                className={`relative aspect-square overflow-hidden rounded-2xl border border-line bg-surface ${index === 0 ? "col-span-2 row-span-2" : ""}`}
               >
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   fill
-                  sizes={index === 0 ? "(min-width: 1216px) 580px, (min-width: 640px) 50vw, 100vw" : "(min-width: 1216px) 290px, 25vw"}
+                  sizes={index === 0 ? "(min-width: 1168px) 560px, (min-width: 640px) 50vw, 100vw" : "(min-width: 1168px) 280px, 25vw"}
                   className="object-cover"
                 />
               </li>
@@ -253,22 +331,20 @@ export default async function HomePage({ params }: LocaleParams) {
       ) : null}
 
       {/* Kontakt */}
-      <section aria-labelledby="kontakt-titel" className="container-page pt-16 md:pt-24">
-        <div className="section-head">
-          <h2 id="kontakt-titel" className="display text-4xl sm:text-5xl">
-            {t("contactHeading")}
-          </h2>
-          <Link href="/kontakt" className="text-link">
+      <section aria-labelledby="kontakt-titel" className="container-page pt-4 text-center">
+        <h2 id="kontakt-titel" className="text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-tight font-semibold tracking-[-0.02em]">
+          {t("ctaTitle")}
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-[17px] leading-relaxed text-muted">{t("contactText")}</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a href={`mailto:${site.email}`} className="btn btn-primary">
+            {t("ctaMail")}
+            <ArrowRightIcon width={17} height={17} />
+          </a>
+          <Link href="/kontakt" className="btn btn-ghost">
             {t("contactCta")}
           </Link>
         </div>
-        <a
-          href={`mailto:${site.email}`}
-          className="condensed inline-block text-[clamp(2.25rem,7vw,5rem)] leading-none break-all underline decoration-signal decoration-[3px] underline-offset-[0.12em] hover:text-accent"
-        >
-          {site.email}
-        </a>
-        <p className="mt-5 max-w-xl text-muted">{t("contactText")}</p>
       </section>
     </>
   );

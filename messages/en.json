@@ -43,7 +43,15 @@
     "allPhotos": "All photos",
     "contactHeading": "Contact",
     "contactText": "Email works best. I usually reply within a few days.",
-    "contactCta": "Other ways to reach me"
+    "contactCta": "Other ways to reach me",
+    "aboutEyebrow": "About me",
+    "aboutLink": "More about me",
+    "projectsTitle": "What I'm working on.",
+    "photosTitle": "From the gym.",
+    "ctaTitle": "Let's talk.",
+    "ctaMail": "Send an email",
+    "seasonWindow": "Season {season}",
+    "lastSets": "Sets"
   },
   "projects": {
     "title": "Projects",
@@ -54,7 +62,8 @@
     "role": "Role",
     "date": "Date",
     "tags": "Tech",
-    "empty": "No projects published yet."
+    "empty": "No projects published yet.",
+    "heading": "What I'm working on."
   },
   "photos": {
     "title": "Photos",
@@ -66,7 +75,8 @@
     "previous": "Previous photo",
     "next": "Next photo",
     "position": "Photo {current} of {total}",
-    "empty": "No photos published yet."
+    "empty": "No photos published yet.",
+    "heading": "From the gym."
   },
   "season": {
     "title": "Season",
@@ -105,7 +115,10 @@
   "footer": {
     "legal": "Legal notice",
     "privacy": "Privacy",
-    "version": "Version"
+    "version": "Version",
+    "navigation": "Navigation",
+    "profiles": "Profiles",
+    "legalHeading": "Legal"
   },
   "notFound": {
     "title": "Page not found",

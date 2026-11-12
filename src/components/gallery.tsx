@@ -64,13 +64,13 @@ export function Gallery({
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {photos.map((item, i) => (
           <li key={item.src}>
             <button
               type="button"
               onClick={(event) => open(i, event.currentTarget)}
-              className="group relative block aspect-square w-full overflow-hidden bg-subtle"
+              className="group relative block aspect-square w-full overflow-hidden rounded-2xl border border-line bg-surface"
             >
               <Image
                 src={item.src}
@@ -94,7 +94,7 @@ export function Gallery({
         onClose={onClose}
       >
         <div className="flex items-center justify-between gap-4 p-3 sm:p-4">
-          <p className="text-sm text-[#c9c7c0] tabular-nums" aria-live="polite">
+          <p className="font-mono text-[13px] text-[#c4c8cf] tabular-nums" aria-live="polite">
             {index !== null
               ? labels.position
                   .replace("{current}", String(index + 1))
@@ -120,7 +120,7 @@ export function Gallery({
               />
             </div>
             {photo.caption ? (
-              <figcaption className="pointer-events-auto max-w-2xl text-center text-sm text-[#dedcd5]">
+              <figcaption className="pointer-events-auto max-w-2xl text-center text-sm text-[#dfe2e6]">
                 {photo.caption}
               </figcaption>
             ) : null}

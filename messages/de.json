@@ -43,7 +43,15 @@
     "allPhotos": "Alle Fotos",
     "contactHeading": "Kontakt",
     "contactText": "Am besten per Mail. Ich antworte meistens innerhalb von ein paar Tagen.",
-    "contactCta": "Weitere Kontaktwege"
+    "contactCta": "Weitere Kontaktwege",
+    "aboutEyebrow": "Über mich",
+    "aboutLink": "Mehr über mich",
+    "projectsTitle": "Woran ich arbeite.",
+    "photosTitle": "Aus der Halle.",
+    "ctaTitle": "Lass uns sprechen.",
+    "ctaMail": "E-Mail schreiben",
+    "seasonWindow": "Saison {season}",
+    "lastSets": "Sätze"
   },
   "projects": {
     "title": "Projekte",
@@ -54,7 +62,8 @@
     "role": "Rolle",
     "date": "Datum",
     "tags": "Technik",
-    "empty": "Noch keine Projekte veröffentlicht."
+    "empty": "Noch keine Projekte veröffentlicht.",
+    "heading": "Woran ich arbeite."
   },
   "photos": {
     "title": "Fotos",
@@ -66,7 +75,8 @@
     "previous": "Vorheriges Foto",
     "next": "Nächstes Foto",
     "position": "Foto {current} von {total}",
-    "empty": "Noch keine Fotos veröffentlicht."
+    "empty": "Noch keine Fotos veröffentlicht.",
+    "heading": "Aus der Halle."
   },
   "season": {
     "title": "Saison",
@@ -105,7 +115,10 @@
   "footer": {
     "legal": "Impressum",
     "privacy": "Datenschutz",
-    "version": "Version"
+    "version": "Version",
+    "navigation": "Navigation",
+    "profiles": "Profile",
+    "legalHeading": "Rechtliches"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
