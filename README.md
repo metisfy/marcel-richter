@@ -353,9 +353,18 @@ Stand nicht zurückkommen, den Commit per `git revert` rückgängig machen und p
 
 ## Reverse Proxy
 
-Der Container lauscht auf `127.0.0.1:3100` (änderbar über `HOST_PORT` in der `.env` auf dem
-Server). Er ist also nur über den Reverse Proxy erreichbar.
+Der Container lauscht auf Port `3100` aller Schnittstellen des Servers, z. B. `http://10.250.1.30:3100`.
+Beides lässt sich in der `.env` neben der `docker-compose.yml` auf dem Server ändern:
 
+| Variable | Standard | Bedeutung |
+| --- | --- | --- |
+| `HOST_PORT` | `3100` | Port auf dem Server |
+| `BIND_IP` | `0.0.0.0` | `127.0.0.1` = nur vom Server selbst erreichbar (wenn der Proxy direkt auf dem Host läuft) |
+
+Docker umgeht mit `0.0.0.0` die Firewall (ufw): Der Port ist überall offen, wo der Server
+erreichbar ist. Nach einer Änderung `./start.sh` ausführen.
+
+- **Nginx Proxy Manager:** Proxy Host anlegen, Forward auf `http://<Server-IP>:3100`.
 - **Nginx/Caddy auf dem Host:** Beispiel in `deploy/nginx.conf.example` (HTTPS, Weiterleitung auf
   `www`, HSTS, Proxy-Header).
 - **Traefik als Container:** In `docker-compose.yml` den `ports:`-Block durch die

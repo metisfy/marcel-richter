@@ -22,12 +22,16 @@ services:
     container_name: marcel-richter
     restart: unless-stopped
 
-    # --- Variante A: Nginx (oder Caddy) läuft direkt auf dem Host ----------
-    # Nur auf 127.0.0.1 binden – von außen ist die Seite ausschließlich über
-    # den Reverse Proxy erreichbar (Docker umgeht sonst die Firewall/ufw).
-    # Beispielkonfiguration: deploy/nginx.conf.example
+    # --- Variante A: Reverse Proxy leitet auf <Server-IP>:3100 weiter --------
+    # Standard: auf allen Schnittstellen erreichbar (z. B. 10.250.1.30:3100),
+    # damit ein Nginx Proxy Manager im Container oder auf einem anderen Host
+    # die Seite erreicht. Achtung: Docker umgeht dabei die Firewall (ufw) –
+    # der Port ist überall offen, wo der Server erreichbar ist.
+    # Läuft der Proxy direkt auf diesem Host, in der .env BIND_IP=127.0.0.1
+    # setzen; dann ist die Seite nur noch über den Proxy erreichbar.
+    # Beispielkonfiguration für Nginx auf dem Host: deploy/nginx.conf.example
     ports:
-      - "127.0.0.1:${HOST_PORT:-3100}:3000"
+      - "${BIND_IP:-0.0.0.0}:${HOST_PORT:-3100}:3000"
 
     # --- Variante B: Traefik als Container ----------------------------------
     # `ports:` oben entfernen und stattdessen einkommentieren (plus den
