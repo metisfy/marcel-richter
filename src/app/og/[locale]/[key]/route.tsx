@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 import { ImageResponse } from "next/og";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -27,7 +30,7 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   const site = getSite(locale);
   const nav = await getTranslations({ locale, namespace: "nav" });
 
-  if (key === "home") return { eyebrow: `${site.jobTitle} · ${site.team.sport}`, title: site.name, text: site.tagline };
+  if (key === "home") return { eyebrow: site.jobTitle, title: site.name, text: site.tagline };
   if (key === "ueber-mich" || key === "impressum" || key === "datenschutz") {
     const page = getPage(key, locale);
     return { eyebrow: site.name, title: page.title, text: page.description };
@@ -55,16 +58,22 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   return null;
 }
 
+// Schriften liegen als statische TTF im Repo (Archivo, SIL Open Font License),
+// denn Satori kann weder WOFF2 noch variable Schriften lesen.
+const FONT_DIR = path.join(process.cwd(), "src/app/og/fonts");
+const fonts = Promise.all([
+  readFile(path.join(FONT_DIR, "archivo-condensed-800.ttf")),
+  readFile(path.join(FONT_DIR, "archivo-500.ttf")),
+]);
+
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string; key: string }> }) {
   const { locale, key } = await params;
   if (!hasLocale(routing.locales, locale)) return new Response("Not found", { status: 404 });
   const content = await textFor(locale, key);
   if (!content) return new Response("Not found", { status: 404 });
-  const initials = getSite(locale)
-    .name.split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2);
+  const site = getSite(locale);
+  const [condensed, regular] = await fonts;
+  const titleSize = content.title.length > 28 ? 92 : content.title.length > 16 ? 120 : 150;
 
   return new ImageResponse(
     (
@@ -75,40 +84,59 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "72px 80px",
-          background: "linear-gradient(135deg, #0c0a09 0%, #1c1917 55%, #134e4a 100%)",
-          color: "#fafaf9",
+          padding: "64px 72px",
+          background: "#16181d",
+          color: "#f3f1eb",
+          fontFamily: "Archivo",
+          borderBottom: "24px solid #ff6b2c",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          {site.team.number !== undefined ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 64,
+                height: 64,
+                padding: "0 10px",
+                background: "#ff6b2c",
+                color: "#16181d",
+                fontFamily: "Archivo Condensed",
+                fontSize: 48,
+              }}
+            >
+              {site.team.number}
+            </div>
+          ) : null}
+          <div style={{ display: "flex", fontSize: 28, color: "#a7abb3" }}>{content.eyebrow}</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 64,
-              height: 64,
-              borderRadius: 16,
-              background: "#2dd4bf",
-              color: "#042f2e",
-              fontSize: 28,
-              fontWeight: 700,
+              fontFamily: "Archivo Condensed",
+              fontSize: titleSize,
+              lineHeight: 0.9,
+              textTransform: "uppercase",
             }}
           >
-            {initials}
-          </div>
-          <div style={{ display: "flex", fontSize: 28, color: "#5eead4", letterSpacing: 1 }}>{content.eyebrow}</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "flex", fontSize: content.title.length > 32 ? 64 : 84, fontWeight: 700, lineHeight: 1.05 }}>
             {content.title}
           </div>
-          <div style={{ display: "flex", fontSize: 32, color: "#d6d3d1", lineHeight: 1.35, maxWidth: 960 }}>
-            {content.text.length > 140 ? `${content.text.slice(0, 137)}…` : content.text}
+          <div style={{ display: "flex", fontSize: 30, color: "#d9d6ce", lineHeight: 1.35, maxWidth: 980 }}>
+            {content.text.length > 130 ? `${content.text.slice(0, 127)}…` : content.text}
           </div>
         </div>
       </div>
     ),
-    { width: 1200, height: 630 },
+    {
+      width: 1200,
+      height: 630,
+      fonts: [
+        { name: "Archivo Condensed", data: condensed, weight: 800, style: "normal" },
+        { name: "Archivo", data: regular, weight: 500, style: "normal" },
+      ],
+    },
   );
 }

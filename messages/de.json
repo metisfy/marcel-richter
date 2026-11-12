@@ -16,43 +16,50 @@
     "label": "Sprache wählen",
     "de": "Deutsch",
     "en": "English",
-    "onlyGerman": "Dieser Inhalt ist nur auf Deutsch verfügbar."
+    "onlyGerman": "Diesen Text gibt es nur auf Deutsch."
   },
   "theme": {
     "dark": "Dunkles Design"
   },
+  "player": {
+    "position": "Position",
+    "number": "Nummer",
+    "club": "Verein",
+    "league": "Liga"
+  },
   "home": {
-    "ctaProjects": "Projekte ansehen",
-    "ctaSeason": "Zur Saison",
+    "ctaProjects": "Zu den Projekten",
+    "ctaSeason": "Spielplan {season}",
     "seasonHeading": "Saison {season}",
     "nextGame": "Nächstes Spiel",
-    "lastResult": "Letztes Ergebnis",
+    "lastResult": "Letztes Spiel",
     "standing": "Tabelle",
-    "noUpcoming": "Aktuell ist kein Spiel angesetzt.",
-    "noResult": "Noch keine Ergebnisse.",
-    "projectsHeading": "Ausgewählte Projekte",
+    "noUpcoming": "Kein Spiel angesetzt.",
+    "noResult": "Noch kein Spiel gespielt.",
+    "allFixtures": "Spielplan und Ergebnisse",
+    "projectsHeading": "Projekte",
     "allProjects": "Alle Projekte",
-    "photosHeading": "Aus der Galerie",
+    "photosHeading": "Fotos",
     "allPhotos": "Alle Fotos",
-    "contactHeading": "Lust auf Austausch?",
-    "contactText": "Ob Projektidee, Presseanfrage oder Fragen zum Verein – schreib mir gern.",
-    "contactCta": "Kontakt aufnehmen"
+    "contactHeading": "Kontakt",
+    "contactText": "Am besten per Mail. Ich antworte meistens innerhalb von ein paar Tagen.",
+    "contactCta": "Weitere Kontaktwege"
   },
   "projects": {
     "title": "Projekte",
-    "description": "Eine Auswahl meiner Projekte – mit Hintergründen, Rolle und Ergebnissen.",
-    "lead": "Eine Auswahl dessen, woran ich arbeite und gearbeitet habe.",
+    "description": "Woran ich arbeite und gearbeitet habe, mit Hintergrund, Rolle und Ergebnis.",
+    "lead": "Woran ich gerade arbeite und was ich bisher gebaut habe.",
     "back": "Alle Projekte",
     "links": "Links",
     "role": "Rolle",
     "date": "Datum",
-    "tags": "Schlagworte",
+    "tags": "Technik",
     "empty": "Noch keine Projekte veröffentlicht."
   },
   "photos": {
     "title": "Fotos",
-    "description": "Bilder aus Spielen, Training und Projekten.",
-    "lead": "Momente aus Spielen, Training und Projekten.",
+    "description": "Fotos aus Spielen, Training und Trainingslager.",
+    "lead": "Aus Spielen, Training und Trainingslager.",
     "count": "{count, plural, one {# Foto} other {# Fotos}}",
     "open": "vergrößern",
     "close": "Schließen",
@@ -63,36 +70,37 @@
   },
   "season": {
     "title": "Saison",
-    "description": "Spielplan, Ergebnisse, Tabellenplatz und meine Statistik der laufenden Saison.",
+    "description": "Spielplan, Ergebnisse, Tabellenplatz und Statistik der laufenden Saison.",
     "heading": "Saison {season}",
     "standing": "Tabellenplatz",
     "standingValue": "{position}. von {teams}",
+    "of": "von {teams}",
     "points": "{points} Punkte",
-    "stats": "Meine Statistik",
-    "fixtures": "Spielplan & Ergebnisse",
+    "stats": "Meine Zahlen",
+    "fixtures": "Spielplan und Ergebnisse",
     "fixturesCaption": "Alle Spiele der Saison {season}",
     "date": "Datum",
     "match": "Begegnung",
     "competition": "Wettbewerb",
-    "result": "Ergebnis",
+    "result": "Sätze",
+    "sets": "Satzergebnisse",
     "home": "Heim",
     "away": "Auswärts",
     "win": "Sieg",
-    "draw": "Unentschieden",
     "loss": "Niederlage",
     "open": "offen",
     "archive": "Frühere Saisons",
-    "none": "Für diese Saison sind noch keine Informationen hinterlegt.",
+    "none": "Für diese Saison ist noch nichts eingetragen.",
     "noFixtures": "Noch keine Spiele eingetragen."
   },
   "contact": {
     "title": "Kontakt",
-    "description": "So erreichst du mich – per E-Mail oder über meine Profile.",
-    "lead": "Am schnellsten erreichst du mich per E-Mail. Ich melde mich in der Regel innerhalb weniger Tage.",
+    "description": "E-Mail-Adresse, Profile und Verein.",
+    "lead": "Am schnellsten per E-Mail.",
     "email": "E-Mail",
     "profiles": "Profile",
     "team": "Verein",
-    "teamLink": "Zur Website des Vereins"
+    "teamLink": "Website des Vereins"
   },
   "footer": {
     "legal": "Impressum",
@@ -101,7 +109,7 @@
   },
   "notFound": {
     "title": "Seite nicht gefunden",
-    "text": "Diese Seite gibt es nicht (mehr). Vielleicht hilft dir die Startseite weiter.",
+    "text": "Diese Seite gibt es nicht oder nicht mehr.",
     "back": "Zur Startseite"
   }
 }

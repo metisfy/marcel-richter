@@ -1,102 +1,107 @@
 # Saison 2026/27 – die Datei mit dem höchsten Namen ist die aktuelle Saison.
 #
 # Spiele:
-#   date:   "JJJJ-MM-TT HH:MM" (deutsche Ortszeit) oder nur "JJJJ-MM-TT"
-#   home:   true = Heimspiel, false = Auswärtsspiel
-#   result: immer "Heim:Gast" (wie in jeder Tabelle), z. B. "2:1".
-#           Ohne result gilt das Spiel als noch nicht gespielt –
-#           das erste Spiel ohne Ergebnis wird als „Nächstes Spiel“ angezeigt.
+#   date:    "JJJJ-MM-TT HH:MM" (deutsche Ortszeit) oder nur "JJJJ-MM-TT"
+#   home:    true = Heimspiel, false = Auswärtsspiel
+#   result:  Sätze, immer "Heim:Gast" (wie in jeder Tabelle), z. B. "3:1"
+#   sets:    optional, die einzelnen Sätze ebenfalls aus Sicht der
+#            Heimmannschaft, mit Leerzeichen getrennt: "25:21 22:25 25:19 25:17"
+#   Ohne result gilt das Spiel als noch nicht gespielt – das erste Spiel
+#   ohne Ergebnis wird als „Nächstes Spiel“ angezeigt.
 #
 # ALLE ANGABEN SIND PLATZHALTER.
 
 season: "2026/27"
 
 league:
-  de: Bezirksliga Musterland
-  en: District league Musterland
+  de: Oberliga Musterland
+  en: Oberliga Musterland
 
 summary:
-  de: Nach dem Aufstieg geht es in der ersten Saison um einen sicheren Mittelfeldplatz – bisher läuft es besser als erwartet.
-  en: After promotion, the goal for the first season is a safe mid-table finish – so far it's going better than expected.
+  de: Erste Saison nach dem Aufstieg. Ziel ist der Klassenerhalt, nach sechs Ligaspielen stehen wir im oberen Mittelfeld.
+  en: Our first season after promotion. The aim is to stay up, and after six league games we're in the top half.
 
 standing:
-  position: 3
-  teams: 16
-  points: 17
+  position: 4
+  teams: 10
+  points: 10
 
 stats:
-  - label: { de: Einsätze, en: Appearances }
-    value: 10
-  - label: { de: Tore, en: Goals }
-    value: 4
-  - label: { de: Vorlagen, en: Assists }
-    value: 6
-  - label: { de: Spielminuten, en: Minutes }
-    value: 845
+  - label: { de: Spiele, en: Matches }
+    value: 7
+  - label: { de: Sätze, en: Sets }
+    value: 28
+  - label: { de: Punkte, en: Points }
+    value: 98
+  - label: { de: Asse, en: Aces }
+    value: 11
+  - label: { de: Blockpunkte, en: Blocks }
+    value: 9
 
 fixtures:
-  - date: "2026-08-16 15:00"
-    opponent: FC Beispielhausen
-    home: true
-    venue: Sportpark Musterstadt
-    competition: { de: Liga, en: League }
-    result: "2:1"
-  - date: "2026-08-23 15:00"
+  - date: "2026-09-26 19:30"
     opponent: TSV Neudorf
-    home: false
-    venue: Waldstadion Neudorf
-    competition: { de: Liga, en: League }
-    result: "1:1"
-  - date: "2026-08-30 15:00"
-    opponent: SC Altheim
     home: true
-    venue: Sportpark Musterstadt
+    venue: Sporthalle am Rosenweg
     competition: { de: Liga, en: League }
-    result: "3:0"
-  - date: "2026-09-05 18:30"
+    result: "3:1"
+    sets: "25:21 22:25 25:19 25:17"
+  - date: "2026-10-03 19:00"
     opponent: VfB Seeberg
     home: false
-    competition: { de: Bezirkspokal, en: District cup }
+    venue: Seehalle Seeberg
+    competition: { de: Liga, en: League }
     result: "2:3"
-    note: { de: nach Verlängerung, en: after extra time }
-  - date: "2026-09-13 15:00"
-    opponent: FV Grünwiese
-    home: false
-    competition: { de: Liga, en: League }
-    result: "0:2"
-  - date: "2026-09-20 15:00"
-    opponent: SpVgg Bergdorf
+    sets: "25:23 20:25 25:22 21:25 12:15"
+  - date: "2026-10-11 15:00"
+    opponent: SC Altheim
     home: true
-    venue: Sportpark Musterstadt
+    venue: Sporthalle am Rosenweg
     competition: { de: Liga, en: League }
-    result: "1:2"
-  - date: "2026-10-04 15:00"
-    opponent: TuS Talheim
+    result: "3:0"
+    sets: "25:18 25:20 25:16"
+  - date: "2026-10-17 19:30"
+    opponent: VC Grünwiese
     home: false
     competition: { de: Liga, en: League }
-    result: "2:2"
-  - date: "2026-10-18 15:00"
-    opponent: SV Eichenau
+    result: "3:1"
+    sets: "25:22 25:27 25:20 25:23"
+  - date: "2026-10-24 19:30"
+    opponent: USC Bergdorf
     home: true
-    venue: Sportpark Musterstadt
+    venue: Sporthalle am Rosenweg
     competition: { de: Liga, en: League }
-    result: "4:1"
-  - date: "2026-11-08 14:30"
-    opponent: 1. FC Steinbach
+    result: "3:2"
+    sets: "25:20 23:25 25:27 25:19 15:11"
+  - date: "2026-11-01 16:00"
+    opponent: SSC Talheim
     home: false
+    competition: { de: Verbandspokal, en: Regional cup }
+    result: "0:3"
+    sets: "19:25 22:25 20:25"
+  - date: "2026-11-07 19:30"
+    opponent: DJK Eichenau
+    home: true
+    venue: Sporthalle am Rosenweg
     competition: { de: Liga, en: League }
     result: "1:3"
-  - date: "2026-11-15 14:30"
-    opponent: SG Wiesental
-    home: true
-    venue: Sportpark Musterstadt
+    sets: "25:23 19:25 22:25 21:25"
+  - date: "2026-11-14 19:30"
+    opponent: TuS Steinbach
+    home: false
+    venue: Dreifachhalle Steinbach
     competition: { de: Liga, en: League }
-  - date: "2026-11-22 14:00"
-    opponent: FC Rotbach
+  - date: "2026-11-22 15:00"
+    opponent: VSG Wiesental
+    home: true
+    venue: Sporthalle am Rosenweg
+    competition: { de: Liga, en: League }
+  - date: "2026-11-28 19:30"
+    opponent: TSG Rotbach
     home: false
     competition: { de: Liga, en: League }
-  - date: "2026-11-29 14:00"
-    opponent: TSV Lindenberg
+  - date: "2026-12-05 19:30"
+    opponent: MTV Lindenberg
     home: true
-    venue: Sportpark Musterstadt
+    venue: Sporthalle am Rosenweg
     competition: { de: Liga, en: League }

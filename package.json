@@ -13,7 +13,6 @@
     "node": ">=24"
   },
   "dependencies": {
-    "geist": "^1.9.2",
     "next": "^16.4.6",
     "next-intl": "^4.15.0",
     "next-mdx-remote": "^6.0.0",

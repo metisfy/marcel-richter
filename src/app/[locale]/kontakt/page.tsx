@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
-import { ExternalIcon, MailIcon } from "@/components/icons";
+import { ExternalIcon } from "@/components/icons";
 import { PageIntro } from "@/components/page-intro";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { getSite } from "@/lib/content";
@@ -23,34 +23,48 @@ export async function generateMetadata({ params }: LocaleParams) {
 export default async function ContactPage({ params }: LocaleParams) {
   const locale = await initLocale(params);
   const t = await getTranslations("contact");
+  const tPlayer = await getTranslations("player");
   const site = getSite(locale);
+
+  const clubFacts = [
+    { label: tPlayer("league"), value: site.team.league },
+    { label: tPlayer("position"), value: site.team.position },
+    { label: tPlayer("number"), value: site.team.number?.toString() },
+  ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   return (
     <div className="container-page">
       <PageIntro title={t("title")} lead={t("lead")} />
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <section aria-labelledby="kontakt-mail" className="card p-6 md:col-span-2">
-          <h2 id="kontakt-mail" className="text-sm font-semibold text-muted">
-            {t("email")}
-          </h2>
+      <div className="grid gap-x-12 gap-y-14 lg:grid-cols-[3fr_2fr]">
+        <section aria-labelledby="kontakt-mail">
+          <div className="section-head">
+            <h2 id="kontakt-mail" className="label">
+              {t("email")}
+            </h2>
+          </div>
           <a
             href={`mailto:${site.email}`}
-            className="mt-3 inline-flex items-center gap-3 text-2xl font-semibold tracking-tight break-all text-accent underline-offset-4 hover:underline sm:text-3xl"
+            className="condensed inline-block text-[clamp(2rem,5.5vw,3.75rem)] leading-none break-all underline decoration-signal decoration-[3px] underline-offset-[0.12em] hover:text-accent"
           >
-            <MailIcon width={28} height={28} className="shrink-0" />
             {site.email}
           </a>
 
           {site.socials.length > 0 ? (
             <>
-              <h2 className="mt-10 text-sm font-semibold text-muted">{t("profiles")}</h2>
-              <ul className="mt-3 flex flex-wrap gap-3">
+              <div className="section-head mt-14 mb-0">
+                <h2 className="label">{t("profiles")}</h2>
+              </div>
+              <ul>
                 {site.socials.map((social) => (
                   <li key={social.url}>
-                    <a href={social.url} rel="me noopener" className="btn btn-secondary">
-                      {social.label}
-                      <ExternalIcon width={16} height={16} />
+                    <a
+                      href={social.url}
+                      rel="me noopener"
+                      className="group flex items-center justify-between gap-4 border-b border-border py-4 hover:text-accent"
+                    >
+                      <span className="condensed text-2xl">{social.label}</span>
+                      <ExternalIcon width={20} height={20} className="text-muted group-hover:text-accent" />
                     </a>
                   </li>
                 ))}
@@ -59,32 +73,35 @@ export default async function ContactPage({ params }: LocaleParams) {
           ) : null}
         </section>
 
-        <section aria-labelledby="kontakt-verein" className="card p-6">
-          <h2 id="kontakt-verein" className="text-sm font-semibold text-muted">
-            {t("team")}
-          </h2>
-          <div className="mt-4 flex items-center gap-4">
+        <section aria-labelledby="kontakt-verein">
+          <div className="section-head">
+            <h2 id="kontakt-verein" className="label">
+              {t("team")}
+            </h2>
+          </div>
+          <div className="flex items-center gap-4">
             {site.team.logo ? (
-              <Image src={site.team.logo} alt="" width={56} height={56} className="size-14 shrink-0" />
+              <Image src={site.team.logo} alt="" width={64} height={64} className="size-16 shrink-0" />
             ) : null}
             <div>
-              <p className="font-semibold">{site.team.name}</p>
-              <p className="text-sm text-muted">
-                {[site.team.sport, site.team.league].filter(Boolean).join(" · ")}
-              </p>
+              <p className="condensed text-3xl leading-tight">{site.team.name}</p>
+              <p className="text-muted">{site.team.sport}</p>
             </div>
           </div>
-          {site.team.position || site.team.number ? (
-            <p className="mt-4 text-sm text-muted">
-              {[site.team.position, site.team.number ? `#${site.team.number}` : null]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
+          {clubFacts.length > 0 ? (
+            <dl className="mt-6 border-t border-border">
+              {clubFacts.map((item) => (
+                <div key={item.label} className="flex justify-between gap-4 border-b border-border py-3">
+                  <dt className="text-muted">{item.label}</dt>
+                  <dd className="text-right font-semibold">{item.value}</dd>
+                </div>
+              ))}
+            </dl>
           ) : null}
           {site.team.url ? (
-            <a href={site.team.url} rel="noopener" className="text-link mt-6 inline-flex items-center gap-1.5 text-sm">
+            <a href={site.team.url} rel="noopener" className="text-link mt-6 inline-flex items-center gap-1.5">
               {t("teamLink")}
-              <ExternalIcon width={14} height={14} />
+              <ExternalIcon width={16} height={16} />
             </a>
           ) : null}
         </section>

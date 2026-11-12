@@ -85,16 +85,26 @@ angegeben werden. Fehlt `en`, wird der deutsche Text angezeigt.
 ```yaml
 name: Marcel Richter                 # gilt für beide Sprachen
 tagline:
-  de: Ich baue digitale Produkte …
-  en: I build digital products …
-label: { de: Tore, en: Goals }       # Kurzschreibweise
+  de: Ich entwickle Websites und Web-Apps …
+  en: I build websites and web apps …
+label: { de: Asse, en: Aces }        # Kurzschreibweise
 ```
 
 ### Stammdaten: `content/site.yaml`
 
-Name, Berufsbezeichnung, Kurzvorstellung, E-Mail, Porträt, Social-Profile und Verein
-(Name, Sportart, Liga, Position, Rückennummer, Logo). Diese Angaben stehen auf der Startseite, in
-der Fußzeile, auf der Kontaktseite und in den strukturierten Daten für Suchmaschinen.
+Name, Berufsbezeichnung, Kurzvorstellung, E-Mail, Porträt, Social-Profile, Copyright-Vermerk und
+Verein (Name, Sportart, Liga, Position, Rückennummer, Logo). Diese Angaben stehen auf der
+Startseite, in der Fußzeile, auf der Kontaktseite und in den strukturierten Daten für
+Suchmaschinen. Die Rückennummer erscheint zusätzlich als orangefarbenes Feld neben dem Namen und
+am Porträt.
+
+```yaml
+copyright:                           # Fußzeile: „© 2026 metisCode · metisOne“
+  - label: metisCode
+    url: https://metiscode.com
+  - label: metisOne
+    url: https://metisone.de
+```
 
 ### Projekte: `content/projekte/<slug>/de.mdx` (+ `en.mdx`)
 
@@ -142,7 +152,7 @@ albums:
     description: { de: …, en: … }       # optional
     photos:
       - src: /images/fotos/spiel-01.jpg
-        alt: { de: Zweikampf im Mittelfeld, en: Midfield duel }   # Pflicht
+        alt: { de: Doppelblock am Netz, en: Double block at the net }   # Pflicht
         caption: { de: Heimspiel gegen …, en: Home game against … } # optional
 ```
 
@@ -157,26 +167,30 @@ erscheinen unter „Frühere Saisons“. Für eine neue Saison die alte Datei ko
 
 ```yaml
 season: "2026/27"
-league: { de: Bezirksliga Musterland, en: District league Musterland }
+league: { de: Oberliga Musterland, en: Oberliga Musterland }
 summary: { de: …, en: … }                # optional
 standing: { position: 3, teams: 16, points: 17 }   # optional
 stats:                                   # optional, beliebig viele Kacheln
-  - label: { de: Tore, en: Goals }
-    value: 4
+  - label: { de: Asse, en: Aces }
+    value: 11
 fixtures:
   - date: "2026-11-15 14:30"             # deutsche Ortszeit, Uhrzeit optional
     opponent: SG Wiesental
     home: true                           # Heimspiel?
-    venue: Sportpark Musterstadt         # optional
+    venue: Sporthalle am Rosenweg        # optional
     competition: { de: Liga, en: League }  # optional
-    result: "2:1"                        # IMMER Heim:Gast – leer = noch nicht gespielt
-    note: { de: nach Verlängerung, en: after extra time }  # optional
+    result: "3:1"                        # Sätze, IMMER Heim:Gast – leer = noch nicht gespielt
+    sets: "25:21 22:25 25:19 25:17"      # optional, Sätze ebenfalls aus Sicht der Heimmannschaft
+    note: { de: Meisterschaft perfekt, en: Title secured }  # optional
 ```
 
 - **„Nächstes Spiel“** auf der Startseite ist das erste Spiel ohne `result`. Nach dem Spiel also
   einfach das Ergebnis eintragen.
-- Sieg, Unentschieden und Niederlage werden aus `result` und `home` berechnet.
-- Datum und Ergebnis in Anführungszeichen setzen (`"2:1"`), wie im Beispiel.
+- Sieg und Niederlage werden aus `result` und `home` berechnet. Ein Unentschieden lehnt die
+  Prüfung ab, das gibt es im Volleyball nicht.
+- Passen die einzelnen Sätze in `sets` nicht zum Endstand in `result`, bricht der Build mit einer
+  Meldung ab, die Datum und Gegner nennt.
+- Datum, Ergebnis und Sätze in Anführungszeichen setzen (`"3:1"`), wie im Beispiel.
 
 ### Einzelseiten: `content/seiten/`
 
@@ -243,6 +257,13 @@ ausgerollt.
 laufenden Images. Der Workflow ist erst grün, wenn die Live-URL genau den gerade ausgerollten
 Commit meldet. Ein alter Container, der noch antwortet, zählt also nicht als Erfolg. Der SHA steht
 auch klein in der Fußzeile.
+
+**Ohne SSH-Zugang bleibt der Lauf grün.** Fehlen die Secrets `SSH_HOST`, `SSH_USER` oder
+`SSH_PRIVATE_KEY`, baut der Workflow das Image wie gewohnt, überspringt aber das Ausrollen und
+meldet in der Zusammenfassung den Befehl für den Server (`./start.sh <sha>`). Das ist der
+Normalfall, solange der Server nur im internen Netz erreichbar ist: GitHub kann ihn dann nicht per
+SSH erreichen. Sobald die Secrets gesetzt sind, rollt der Workflow selbst aus und wird bei jedem
+Fehler rot. Ein manueller Rollback über „Run workflow“ schlägt ohne SSH-Zugang absichtlich fehl.
 
 **Automatischer Rollback auf dem Server.** Wird die neue Fassung im Container nicht „healthy“,
 startet `start.sh` sofort wieder die vorherige und beendet sich mit Fehler. Damit schlägt auch der
@@ -387,8 +408,12 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   (`src/app/not-found.tsx`). Diese Lösung ist bewusst so gewählt: Ein `notFound()` innerhalb
   einer Seite liefert in Next.js 16.4 zwar Status 404, die Seite wird aber erst im Browser
   gerendert.
-- **Design:** Farben als CSS-Variablen in `src/app/globals.css`. Alle Kombinationen erfüllen WCAG
-  AA in beiden Designs. Auf Akzentflächen immer `text-accent-fg` verwenden, nie `text-white`.
+- **Design:** Farben als CSS-Variablen in `src/app/globals.css`, alle Text-Kombinationen erfüllen
+  WCAG AA in beiden Designs. `signal` (Hallenboden-Orange) nur als Fläche verwenden, Schrift darauf
+  immer `text-signal-fg`. Für orangefarbene Schrift gibt es `text-accent`.
+- **Schrift:** Archivo mit Breitenachse (`src/lib/fonts.ts`), beim Build heruntergeladen und vom
+  eigenen Server ausgeliefert. Überschriften und Zahlen nutzen die schmale Variante (Klasse
+  `.display`). Für die Open-Graph-Bilder liegen zwei statische TTF-Schnitte in `src/app/og/fonts/`.
 - **Sicherheit:** Container ohne Root, ohne Linux-Capabilities, `no-new-privileges`. Dazu
   Sicherheits-Header (`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
   `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen.
@@ -423,7 +448,9 @@ deploy/                  Beispielkonfiguration Nginx
 - [ ] `content/site.yaml`: echte Daten (Name, Texte, E-Mail, Social-Links, Verein, Sportart)
 - [ ] `public/images/portrait.jpg`, `team-logo.svg` und alle Beispielbilder ersetzen
 - [ ] Projekte, Fotos und Saison in `content/` mit echten Inhalten füllen
-- [ ] **Impressum und Datenschutz** vervollständigen und rechtlich prüfen lassen
+- [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG) rechtlich prüfen lassen: Im
+      Impressum fehlt der Vertretungsberechtigte (Geschäftsführer), in der Datenschutzerklärung ggf.
+      der Hosting-/Proxy-Dienst (Kommentar „PRÜFEN“ in `content/seiten/datenschutz.de.mdx`)
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen
 - [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
 - [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)

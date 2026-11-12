@@ -143,6 +143,8 @@ const siteSchema = z.object({
   portrait: imageSrc,
   portraitAlt: localized,
   socials: z.array(link).default([]),
+  /** Rechteinhaber für den Copyright-Vermerk; leer = Name der Person */
+  copyright: z.array(z.object({ label: z.string(), url: z.url().optional() })).default([]),
   team: z.object({
     name: z.string(),
     sport: localized,
@@ -333,28 +335,59 @@ const seasonSchema = z.object({
     .default([]),
   fixtures: z
     .array(
-      z.object({
-        date: z
-          .string()
-          .regex(
-            /^\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?$/,
-            'Format "JJJJ-MM-TT" oder "JJJJ-MM-TT HH:MM" (deutsche Ortszeit)',
-          ),
-        opponent: z.string(),
-        home: z.boolean(),
-        venue: z.string().optional(),
-        competition: localized.optional(),
-        result: z
-          .string()
-          .regex(/^\d+:\d+$/, 'Ergebnis als "Heim:Gast", z. B. "3:1"')
-          .optional(),
-        note: localized.optional(),
-      }),
+      z
+        .object({
+          date: z
+            .string()
+            .regex(
+              /^\d{4}-\d{2}-\d{2}( \d{2}:\d{2})?$/,
+              'Format "JJJJ-MM-TT" oder "JJJJ-MM-TT HH:MM" (deutsche Ortszeit)',
+            ),
+          opponent: z.string(),
+          home: z.boolean(),
+          venue: z.string().optional(),
+          competition: localized.optional(),
+          result: z
+            .string()
+            .regex(/^\d+:\d+$/, 'Sätze als "Heim:Gast", z. B. "3:1"')
+            .optional(),
+          sets: z
+            .string()
+            .regex(
+              /^\d+:\d+( \d+:\d+)*$/,
+              'Satzergebnisse aus Sicht der Heimmannschaft, mit Leerzeichen getrennt, z. B. "25:21 22:25 25:19 25:17"',
+            )
+            .optional(),
+          note: localized.optional(),
+        })
+        .superRefine((fixture, ctx) => {
+          if (!fixture.result) {
+            if (fixture.sets) {
+              ctx.addIssue({ code: "custom", path: ["sets"], message: "Satzergebnisse ohne result – bitte auch result eintragen" });
+            }
+            return;
+          }
+          const [home, away] = fixture.result.split(":").map(Number);
+          if (home === away) {
+            ctx.addIssue({ code: "custom", path: ["result"], message: `Unentschieden gibt es im Volleyball nicht (${fixture.result})` });
+          }
+          if (!fixture.sets) return;
+          const sets = fixture.sets.split(" ").map((set) => set.split(":").map(Number));
+          const homeSets = sets.filter(([h, a]) => h > a).length;
+          const awaySets = sets.filter(([h, a]) => a > h).length;
+          if (homeSets !== home || awaySets !== away) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["sets"],
+              message: `Sätze ergeben ${homeSets}:${awaySets}, result sagt ${fixture.result} (${fixture.date}, ${fixture.opponent})`,
+            });
+          }
+        }),
     )
     .default([]),
 });
 
-export type Outcome = "win" | "draw" | "loss";
+export type Outcome = "win" | "loss";
 
 export type Fixture = {
   /** "JJJJ-MM-TT" oder "JJJJ-MM-TT HH:MM", deutsche Ortszeit */
@@ -364,7 +397,10 @@ export type Fixture = {
   venue?: string;
   competition?: string;
   note?: string;
+  /** Endstand in Sätzen, aus Sicht der Heimmannschaft */
   result?: { home: number; away: number };
+  /** Einzelne Sätze, aus Sicht der Heimmannschaft, z. B. ["25:21", "22:25"] */
+  sets: string[];
   outcome?: Outcome;
 };
 
@@ -381,9 +417,7 @@ export type Season = {
 function outcomeOf(home: boolean, result: { home: number; away: number }): Outcome {
   const own = home ? result.home : result.away;
   const other = home ? result.away : result.home;
-  if (own > other) return "win";
-  if (own < other) return "loss";
-  return "draw";
+  return own > other ? "win" : "loss";
 }
 
 export const getSeasons = cache((locale: Locale): Season[] =>
@@ -417,6 +451,7 @@ export const getSeasons = cache((locale: Locale): Season[] =>
               competition: pick(fixture.competition, locale),
               note: pick(fixture.note, locale),
               result,
+              sets: fixture.sets?.split(" ") ?? [],
               outcome: result ? outcomeOf(fixture.home, result) : undefined,
             };
           })

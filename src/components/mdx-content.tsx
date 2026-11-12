@@ -22,7 +22,7 @@ function Figure({
 }) {
   return (
     <figure>
-      <div className="relative overflow-hidden rounded-xl bg-subtle" style={{ aspectRatio: ratio }}>
+      <div className="relative overflow-hidden bg-subtle" style={{ aspectRatio: ratio }}>
         <Image src={src} alt={alt} fill sizes="(min-width: 768px) 680px, 100vw" className="object-cover" />
       </div>
       {caption ? <figcaption>{caption}</figcaption> : null}

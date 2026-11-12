@@ -38,11 +38,11 @@ export default async function PhotosPage({ params }: LocaleParams) {
     <div className="container-page">
       <PageIntro title={t("title")} lead={t("lead")} />
       {albums.length === 0 ? <p className="text-muted">{t("empty")}</p> : null}
-      <div className="space-y-16">
+      <div className="space-y-20">
         {albums.map((album) => (
           <section key={album.slug} aria-labelledby={`album-${album.slug}`}>
-            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-              <h2 id={`album-${album.slug}`} className="text-2xl font-bold tracking-tight">
+            <div className="section-head mb-4">
+              <h2 id={`album-${album.slug}`} className="display text-4xl sm:text-5xl">
                 {album.title}
               </h2>
               <p className="text-sm text-muted">

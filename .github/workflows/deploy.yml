@@ -8,6 +8,9 @@
 #   4. Healthcheck auf die Live-URL: /api/health muss genau diesen Commit
 #      melden, sonst schlägt der Workflow fehl
 #
+# Ohne SSH-Secrets werden 3. und 4. übersprungen und der Lauf bleibt grün –
+# auf dem Server dann `./start.sh <sha>` ausführen.
+#
 # Rollback: „Run workflow“ mit einem früheren Commit-SHA starten. Dann wird
 # nichts gebaut, sondern das vorhandene Image dieses Commits ausgerollt.
 #
@@ -113,7 +116,13 @@ jobs:
           # volle Historie, um beim Rollback kurze SHAs aufzulösen
           fetch-depth: 0
 
+      # Ohne SSH-Zugang (z. B. Server nur im internen Netz erreichbar) wird
+      # nicht ausgerollt, der Lauf bleibt aber grün: Das Image liegt fertig
+      # in der Registry, auf dem Server holt es `./start.sh`. Sobald die
+      # Secrets gesetzt sind, rollt der Workflow selbst aus – und schlägt
+      # dann bei jedem Fehler fehl.
       - name: Konfiguration prüfen
+        id: config
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -121,13 +130,34 @@ jobs:
           [ -n "$SSH_HOST" ] || missing+=("Secret SSH_HOST")
           [ -n "$SSH_USER" ] || missing+=("Secret SSH_USER")
           [ -n "$SSH_PRIVATE_KEY" ] || missing+=("Secret SSH_PRIVATE_KEY")
-          [ -n "$SITE_URL" ] || missing+=("Variable SITE_URL")
           if [ ${#missing[@]} -gt 0 ]; then
-            echo "::error title=Deployment nicht eingerichtet::Es fehlt: ${missing[*]}. Siehe README, Abschnitt „GitHub Secrets & Variablen“."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            if [ -n "$REQUESTED_TAG" ]; then
+              echo "::error title=Rollback nicht möglich::Ohne SSH-Zugang kann der Workflow nicht ausrollen. Auf dem Server: ./start.sh ${REQUESTED_TAG}"
+              exit 1
+            fi
+            echo "::notice title=Nicht automatisch ausgerollt::Es fehlt: ${missing[*]}. Das Image ist gebaut – auf dem Server mit ./start.sh ${GITHUB_SHA} ausrollen."
+            {
+              echo "### Image gebaut, nicht ausgerollt"
+              echo ""
+              echo "Kein SSH-Zugang eingerichtet (es fehlt: ${missing[*]})."
+              echo ""
+              echo "Auf dem Server im Ordner mit der \`docker-compose.yml\`:"
+              echo ""
+              echo "\`\`\`bash"
+              echo "./start.sh ${GITHUB_SHA}"
+              echo "\`\`\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ -z "$SITE_URL" ]; then
+            echo "::error title=Variable SITE_URL fehlt::Ohne SITE_URL ist kein Healthcheck auf die Live-URL möglich. Siehe README, Abschnitt „GitHub Secrets & Variablen“."
             exit 1
           fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
 
       - name: Auszurollenden Commit bestimmen
+        if: steps.config.outputs.enabled == 'true'
         id: tag
         run: |
           if [ -z "$REQUESTED_TAG" ]; then
@@ -143,6 +173,7 @@ jobs:
           echo "Ausgerollt wird: $tag ($(git log -1 --format='%s' "$tag"))"
 
       - name: An ghcr.io anmelden
+        if: steps.config.outputs.enabled == 'true'
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
@@ -150,6 +181,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prüfen, ob das Image existiert
+        if: steps.config.outputs.enabled == 'true'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
@@ -159,6 +191,7 @@ jobs:
           fi
 
       - name: SSH einrichten
+        if: steps.config.outputs.enabled == 'true'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
@@ -186,12 +219,14 @@ jobs:
           chmod 600 ~/.ssh/config
 
       - name: docker-compose.yml und start.sh auf den Server kopieren
+        if: steps.config.outputs.enabled == 'true'
         run: |
           ssh deploy-target "mkdir -p '$DEPLOY_PATH'"
           scp -q docker-compose.yml start.sh "deploy-target:$DEPLOY_PATH/"
           ssh deploy-target "chmod +x '$DEPLOY_PATH/start.sh'"
 
       - name: Server an ghcr.io anmelden
+        if: steps.config.outputs.enabled == 'true'
         env:
           GHCR_USER: ${{ secrets.GHCR_USER || github.repository_owner }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
@@ -205,11 +240,13 @@ jobs:
           echo "✓ angemeldet als $GHCR_USER"
 
       - name: Ausrollen (docker compose pull && up -d)
+        if: steps.config.outputs.enabled == 'true'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: ssh deploy-target "cd '$DEPLOY_PATH' && ./start.sh '$TAG'"
 
       - name: Healthcheck auf die Live-URL
+        if: steps.config.outputs.enabled == 'true'
         env:
           EXPECTED: ${{ steps.tag.outputs.tag }}
         run: |
@@ -229,7 +266,7 @@ jobs:
           exit 1
 
       - name: Zusammenfassung
-        if: always()
+        if: always() && steps.config.outputs.enabled == 'true'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
           JOB_STATUS: ${{ job.status }}

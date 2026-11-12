@@ -32,15 +32,19 @@ export function formatDate(
   }).format(new Date(Date.UTC(p.year, p.month - 1, p.date, p.hour, p.minute)));
 }
 
-/** Nur Tag und Monat, z. B. für kompakte Spielpläne. */
+/**
+ * Wochentag, Tag und Monat für kompakte Spielpläne:
+ * „Sa 14.11.“ bzw. „Sat 14/11“ (ohne das „Sa.,“ von Intl).
+ */
 export function formatShortDate(value: string, locale: Locale): string {
   const p = parts(value);
-  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
-    timeZone: "UTC",
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-  }).format(new Date(Date.UTC(p.year, p.month - 1, p.date)));
+  const date = new Date(Date.UTC(p.year, p.month - 1, p.date));
+  const weekday = new Intl.DateTimeFormat(INTL_LOCALE[locale], { timeZone: "UTC", weekday: "short" })
+    .format(date)
+    .replace(/\.$/, "");
+  const day = String(p.date).padStart(2, "0");
+  const month = String(p.month).padStart(2, "0");
+  return locale === "de" ? `${weekday} ${day}.${month}.` : `${weekday} ${day}/${month}`;
 }
 
 export function formatTime(value: string, locale: Locale): string | undefined {

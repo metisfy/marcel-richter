@@ -43,15 +43,15 @@ export function MobileNav({
         id={panelId}
         aria-label={label}
         hidden={!open}
-        className="absolute inset-x-0 top-full border-b border-border bg-bg shadow-lg"
+        className="absolute inset-x-0 top-full border-b-[3px] border-rule bg-bg"
       >
-        <ul className="container-page flex flex-col py-2">
+        <ul className="container-page flex flex-col pb-4">
           {items.map((item) => (
             <li key={item.href}>
               <NavLink
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-fg hover:bg-subtle aria-[current=page]:text-accent data-active:text-accent"
+                className="display flex min-h-13 items-center border-b border-border text-[1.75rem] text-fg hover:text-accent data-active:text-accent"
               >
                 {item.label}
               </NavLink>

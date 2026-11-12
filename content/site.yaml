@@ -9,16 +9,16 @@
 name: Marcel Richter
 
 jobTitle:
-  de: Entwickler & Fußballer
-  en: Developer & footballer
+  de: Softwareentwickler und Volleyballer
+  en: Software developer and volleyball player
 
 tagline:
-  de: Ich baue digitale Produkte – und stehe am Wochenende für den SV Musterstadt auf dem Platz.
-  en: I build digital products – and on weekends I'm on the pitch for SV Musterstadt.
+  de: Ich entwickle Websites und Web-Apps. Abends und am Wochenende spiele ich Volleyball beim TV Musterstadt.
+  en: I build websites and web apps. In the evenings and at weekends I play volleyball for TV Musterstadt.
 
 intro:
-  de: Hier findest du ausgewählte Projekte, Fotos aus Spielen und Training sowie alle Infos zur laufenden Saison.
-  en: Here you'll find selected projects, photos from games and training, and everything about the current season.
+  de: Hier stehen meine Projekte, Fotos aus der Halle und der Spielplan der laufenden Saison.
+  en: This is where you'll find my projects, photos from the gym and this season's fixtures.
 
 location:
   de: Musterstadt
@@ -28,8 +28,15 @@ email: hallo@example.com
 
 portrait: /images/portrait.jpg
 portraitAlt:
-  de: Porträt von Marcel Richter (Platzhalterbild)
-  en: Portrait of Marcel Richter (placeholder image)
+  de: Porträt von Marcel Richter im Trikot mit der Nummer 7 (Platzhalterbild)
+  en: Portrait of Marcel Richter wearing the number 7 shirt (placeholder image)
+
+# Copyright-Vermerk in der Fußzeile: „© <Jahr> metisCode · metisOne“
+copyright:
+  - label: metisCode
+    url: https://metiscode.com
+  - label: metisOne
+    url: https://metisone.de
 
 socials:
   - label: Instagram
@@ -40,17 +47,17 @@ socials:
     url: https://www.linkedin.com/in/beispielprofil
 
 team:
-  name: SV Musterstadt
+  name: TV Musterstadt
   sport:
-    de: Fußball
-    en: Football
+    de: Volleyball
+    en: Volleyball
   league:
-    de: Bezirksliga
-    en: District league
+    de: Oberliga Musterland
+    en: Oberliga Musterland
   url: https://example.com
   logo: /images/team-logo.svg
   position:
-    de: Zentrales Mittelfeld
-    en: Central midfield
-  number: 8
-  since: 2019
+    de: Außenangriff
+    en: Outside hitter
+  number: 7
+  since: 2018

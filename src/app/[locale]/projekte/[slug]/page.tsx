@@ -63,12 +63,12 @@ export default async function ProjectPage({ params }: Props) {
         </Link>
       </nav>
 
-      <header className="max-w-3xl pt-6 pb-10" lang={fallback ? project.contentLocale : undefined}>
-        <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">{project.title}</h1>
-        <p className="mt-4 text-lg leading-relaxed text-pretty text-muted">{project.summary}</p>
+      <header className="max-w-4xl pt-6 pb-10" lang={fallback ? project.contentLocale : undefined}>
+        <h1 className="display text-[clamp(2.75rem,7vw,5.5rem)] text-balance">{project.title}</h1>
+        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-muted">{project.summary}</p>
       </header>
 
-      <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-2xl bg-subtle">
+      <div className="relative mb-12 aspect-[16/9] overflow-hidden bg-subtle">
         <Image
           src={project.cover}
           alt={project.coverAlt}
@@ -79,41 +79,35 @@ export default async function ProjectPage({ params }: Props) {
         />
       </div>
 
-      <div className="grid gap-12 lg:grid-cols-[1fr_16rem]">
+      <div className="grid gap-12 lg:grid-cols-[1fr_17rem]">
         <div>
           {fallback ? <OnlyGermanNote text={tLanguage("onlyGerman")} /> : null}
           <MdxContent source={project.body} lang={fallback ? project.contentLocale : undefined} />
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <dl className="card divide-y divide-border text-sm">
-            <div className="p-4">
-              <dt className="font-semibold text-muted">{t("date")}</dt>
+          <dl className="divide-y divide-border border-t-[3px] border-rule text-[0.9375rem]">
+            <div className="py-3">
+              <dt className="label text-muted">{t("date")}</dt>
               <dd className="mt-1">
                 <time dateTime={project.date}>{formatDate(project.date, locale, { time: false })}</time>
               </dd>
             </div>
             {project.role ? (
-              <div className="p-4">
-                <dt className="font-semibold text-muted">{t("role")}</dt>
+              <div className="py-3">
+                <dt className="label text-muted">{t("role")}</dt>
                 <dd className="mt-1">{project.role}</dd>
               </div>
             ) : null}
             {project.tags.length > 0 ? (
-              <div className="p-4">
-                <dt className="font-semibold text-muted">{t("tags")}</dt>
-                <dd className="mt-2 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent-soft-fg">
-                      {tag}
-                    </span>
-                  ))}
-                </dd>
+              <div className="py-3">
+                <dt className="label text-muted">{t("tags")}</dt>
+                <dd className="mt-1">{project.tags.join(", ")}</dd>
               </div>
             ) : null}
             {project.links.length > 0 ? (
-              <div className="p-4">
-                <dt className="font-semibold text-muted">{t("links")}</dt>
+              <div className="py-3">
+                <dt className="label text-muted">{t("links")}</dt>
                 <dd className="mt-1">
                   <ul className="space-y-1">
                     {project.links.map((link) => (

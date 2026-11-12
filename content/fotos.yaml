@@ -6,67 +6,67 @@
 
 albums:
   - slug: hinrunde-2026-27
-    date: 2026-11-08
+    date: 2026-11-07
     title:
       de: Hinrunde 2026/27
       en: First half of the 2026/27 season
     description:
-      de: Heimspiele, Auswärtsfahrten und ein paar Momente zwischendurch.
-      en: Home games, away trips and a few moments in between.
+      de: Heimspiele in der Sporthalle am Rosenweg und ein paar Auswärtsfahrten.
+      en: Home games at the Rosenweg sports hall and a few away trips.
     photos:
       - src: /images/fotos/spiel-01.jpg
         alt:
-          de: Zweikampf im Mittelfeld beim Heimspiel (Platzhalterbild)
-          en: Midfield duel during a home game (placeholder image)
+          de: Angriff über die Außenposition beim Heimspiel (Platzhalterbild)
+          en: Attack from the outside position during a home game (placeholder image)
         caption:
-          de: Heimspiel gegen den FC Beispielhausen
-          en: Home game against FC Beispielhausen
+          de: Heimspiel gegen den TSV Neudorf
+          en: Home game against TSV Neudorf
       - src: /images/fotos/spiel-02.jpg
         alt:
-          de: Torjubel der Mannschaft (Platzhalterbild)
-          en: Team celebrating a goal (placeholder image)
+          de: Die Mannschaft jubelt nach dem Matchball (Platzhalterbild)
+          en: The team celebrating after match point (placeholder image)
+        caption:
+          de: Seeberg, 15:12 im Tie-Break
+          en: Seeberg, 15–12 in the deciding set
       - src: /images/fotos/spiel-03.jpg
         alt:
-          de: Flutlichtspiel am Freitagabend (Platzhalterbild)
-          en: Floodlit game on a Friday evening (placeholder image)
-        caption:
-          de: Flutlicht in Neudorf
-          en: Under the lights in Neudorf
+          de: Doppelblock am Netz (Platzhalterbild)
+          en: Double block at the net (placeholder image)
       - src: /images/fotos/spiel-04.jpg
         alt:
-          de: Mannschaftsfoto vor dem Anpfiff (Platzhalterbild)
-          en: Team photo before kick-off (placeholder image)
+          de: Mannschaftsfoto vor dem Einspielen (Platzhalterbild)
+          en: Team photo before the warm-up (placeholder image)
       - src: /images/fotos/spiel-05.jpg
         alt:
-          de: Ball liegt auf dem Elfmeterpunkt (Platzhalterbild)
-          en: Ball on the penalty spot (placeholder image)
+          de: Sprungaufschlag von der Grundlinie (Platzhalterbild)
+          en: Jump serve from the baseline (placeholder image)
       - src: /images/fotos/spiel-06.jpg
         alt:
-          de: Fans auf der Tribüne (Platzhalterbild)
-          en: Fans in the stand (placeholder image)
+          de: Zuschauer auf der Tribüne der Sporthalle (Platzhalterbild)
+          en: Spectators in the stand of the sports hall (placeholder image)
 
   - slug: trainingslager-2026
-    date: 2026-07-20
+    date: 2026-08-22
     title:
       de: Trainingslager 2026
       en: Training camp 2026
     description:
-      de: Eine Woche Vorbereitung auf die neue Saison.
-      en: One week of preparation for the new season.
+      de: Eine Woche Vorbereitung, zweimal am Tag in der Halle und einmal im Sand.
+      en: One week of preparation, twice a day in the gym and once on the sand.
     photos:
       - src: /images/fotos/training-01.jpg
         alt:
-          de: Sprinttraining auf dem Kunstrasen (Platzhalterbild)
-          en: Sprint training on artificial turf (placeholder image)
+          de: Annahmetraining in Dreiergruppen (Platzhalterbild)
+          en: Passing drill in groups of three (placeholder image)
       - src: /images/fotos/training-02.jpg
         alt:
-          de: Mannschaft beim Aufwärmen (Platzhalterbild)
-          en: Team warming up (placeholder image)
+          de: Mannschaft beim Einspielen am Netz (Platzhalterbild)
+          en: Team warming up at the net (placeholder image)
       - src: /images/fotos/training-03.jpg
         alt:
-          de: Hütchen-Parcours im Abendlicht, Hochformat (Platzhalterbild)
-          en: Cone drill in the evening light, portrait format (placeholder image)
+          de: Beachvolleyball am Abend, Hochformat (Platzhalterbild)
+          en: Beach volleyball in the evening, portrait format (placeholder image)
       - src: /images/fotos/training-04.jpg
         alt:
-          de: Taktikbesprechung an der Tafel (Platzhalterbild)
-          en: Tactics talk at the whiteboard (placeholder image)
+          de: Besprechung der Rotationen an der Taktiktafel (Platzhalterbild)
+          en: Going through the rotations on the tactics board (placeholder image)

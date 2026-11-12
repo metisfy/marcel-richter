@@ -64,20 +64,20 @@ export function Gallery({
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
         {photos.map((item, i) => (
           <li key={item.src}>
             <button
               type="button"
               onClick={(event) => open(i, event.currentTarget)}
-              className="group relative block aspect-square w-full overflow-hidden rounded-lg bg-subtle"
+              className="group relative block aspect-square w-full overflow-hidden bg-subtle"
             >
               <Image
                 src={item.src}
                 alt={item.alt}
                 fill
                 sizes="(min-width: 1024px) 270px, (min-width: 640px) 33vw, 50vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
               />
               <span className="sr-only"> ({labels.open})</span>
             </button>
@@ -94,7 +94,7 @@ export function Gallery({
         onClose={onClose}
       >
         <div className="flex items-center justify-between gap-4 p-3 sm:p-4">
-          <p className="text-sm text-stone-300" aria-live="polite">
+          <p className="text-sm text-[#c9c7c0] tabular-nums" aria-live="polite">
             {index !== null
               ? labels.position
                   .replace("{current}", String(index + 1))
@@ -120,7 +120,7 @@ export function Gallery({
               />
             </div>
             {photo.caption ? (
-              <figcaption className="pointer-events-auto max-w-2xl text-center text-sm text-stone-200">
+              <figcaption className="pointer-events-auto max-w-2xl text-center text-sm text-[#dedcd5]">
                 {photo.caption}
               </figcaption>
             ) : null}

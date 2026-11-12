@@ -55,6 +55,15 @@ export function siteGraph(site: Site, locale: Locale): JsonLd {
     inLanguage: locale,
     publisher: { "@id": PERSON_ID },
     about: { "@id": PERSON_ID },
+    ...(site.copyright.length > 0
+      ? {
+          copyrightHolder: site.copyright.map((holder) => ({
+            "@type": "Organization",
+            name: holder.label,
+            ...(holder.url ? { url: holder.url } : {}),
+          })),
+        }
+      : {}),
   };
 
   return { "@context": "https://schema.org", "@graph": [person, team, website] };

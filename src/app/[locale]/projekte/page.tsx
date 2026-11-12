@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { PageIntro } from "@/components/page-intro";
-import { ProjectCard } from "@/components/project-card";
+import { ProjectRow } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { getProjects, getSite } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
@@ -28,9 +28,9 @@ export default async function ProjectsPage({ params }: LocaleParams) {
     <div className="container-page">
       <PageIntro title={t("title")} lead={t("lead")} />
       {projects.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="border-t-[3px] border-rule">
           {projects.map((project, index) => (
-            <ProjectCard key={project.slug} project={project} locale={locale} priority={index < 3} />
+            <ProjectRow key={project.slug} project={project} locale={locale} size="lg" priority={index < 2} />
           ))}
         </div>
       ) : (
