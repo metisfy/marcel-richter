@@ -44,7 +44,7 @@ async function SeasonFacts({ season }: { season: Season }) {
   if (!season.standing && facts.length === 0) return null;
 
   return (
-    <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <dl data-reveal-stagger className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
       {season.standing ? (
         <div className="card col-span-2 border-transparent bg-accent-soft p-5 sm:col-span-1">
           <dt className="eyebrow">{t("standing")}</dt>
@@ -121,7 +121,7 @@ export default async function SeasonPage({ params }: LocaleParams) {
           <SectionHead title={t("archive")} id="archiv" />
           <div className="space-y-3">
             {previous.map((season) => (
-              <details key={season.id} className="card group">
+              <details key={season.id} data-reveal className="card group">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-2xl p-5 sm:px-6 [&::-webkit-details-marker]:hidden">
                   <span>
                     <span className="font-semibold">{t("heading", { season: season.season })}</span>

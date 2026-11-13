@@ -17,7 +17,7 @@ export async function SiteFooter({ site }: { site: Site }) {
   return (
     <footer className="mt-24 border-t border-line bg-surface">
       <div className="container-page pt-16 pb-9">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]" data-reveal-stagger>
           <div className="max-w-xs">
             <Brand name={site.name} number={site.team.number} />
             <p className="mt-4 text-[14.5px] leading-relaxed text-muted">{site.tagline}</p>

@@ -4,29 +4,52 @@
 #   feld: { de: "Deutsch", en: "English" }
 # Fehlt "en", wird der deutsche Text angezeigt.
 #
-# Verein und Liga sind echt (TSV Pfuhl, Bezirksliga Schwaben). Alles mit
-# „Platzhalter“ markierte bitte durch echte Daten ersetzen.
+# Echt: Geschäftsführer der metisOne UG, Verein TSV Pfuhl (Bezirksliga Schwaben).
+# Alles mit „Platzhalter“ markierte bitte durch echte Daten ersetzen.
 
 name: Marcel Richter
 
 jobTitle:
-  de: Softwareentwickler und Volleyballer
-  en: Software developer and volleyball player
+  de: Geschäftsführer von metisOne
+  en: Managing Director of metisOne
+
+# Unternehmen: erscheint oben auf der Startseite, auf der Kontaktseite und in
+# den strukturierten Daten (Person → worksFor). Die Firmendaten müssen zum
+# Impressum passen.
+company:
+  name: metisOne
+  legalName: metisOne UG (haftungsbeschränkt)
+  url: https://metisone.de
+  role:
+    de: Geschäftsführer
+    en: Managing Director
+  city: Heidenheim an der Brenz
+  # Projekte der metisOne UG
+  projects:
+    - name: metisCode
+      url: https://metiscode.com
+      description:
+        de: Individuelle Software, Web-Apps und Websites
+        en: Custom software, web apps and websites
 
 tagline:
-  de: Ich entwickle Websites und Web-Apps. Abends und am Wochenende spiele ich Volleyball beim TSV Pfuhl.
-  en: I build websites and web apps. In the evenings and at weekends I play volleyball for TSV Pfuhl.
+  de: Ich bin Geschäftsführer der metisOne und entwickle mit metisCode Software, Web-Apps und Websites. Abends und am Wochenende spiele ich Volleyball beim TSV Pfuhl.
+  en: I'm the managing director of metisOne and build software, web apps and websites with metisCode. In the evenings and at weekends I play volleyball for TSV Pfuhl.
 
 intro:
   de: Hier stehen meine Projekte und der aktuelle Spielplan der ersten Herrenmannschaft des TSV Pfuhl.
   en: This is where you'll find my projects and the current fixtures of TSV Pfuhl's first men's team.
 
-# Drei nummerierte Karten im Abschnitt „Über mich“ auf der Startseite
+# Nummerierte Karten im Abschnitt „Über mich“ auf der Startseite
 highlights:
-  - title: { de: Entwicklung, en: Development }
+  - title: { de: Geschäftsführer, en: Managing Director }
     text:
-      de: Websites und Web-Apps mit Next.js und TypeScript. Schnell, barrierefrei, ohne Tracking.
-      en: Websites and web apps built with Next.js and TypeScript. Fast, accessible, no tracking.
+      de: Ich leite die metisOne UG (haftungsbeschränkt) in Heidenheim an der Brenz.
+      en: I run metisOne UG (haftungsbeschränkt) in Heidenheim an der Brenz, Germany.
+  - title: { de: metisCode, en: metisCode }
+    text:
+      de: Ein Projekt der metisOne – individuelle Software, Web-Apps und Websites. Schnell, barrierefrei, ohne Tracking.
+      en: A metisOne project – custom software, web apps and websites. Fast, accessible, no tracking.
   - title: { de: Volleyball, en: Volleyball }
     text:
       de: Erste Herrenmannschaft des TSV Pfuhl, aktuell in der Bezirksliga Schwaben.

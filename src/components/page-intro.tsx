@@ -13,12 +13,12 @@ export function PageIntro({
 }) {
   return (
     <div className="max-w-3xl pt-14 pb-12 sm:pt-20">
-      {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
-      <h1 className="text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance">
+      {eyebrow ? <p className="eyebrow rise mb-4">{eyebrow}</p> : null}
+      <h1 className="rise text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
         {title}
       </h1>
-      {lead ? <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{lead}</p> : null}
-      {children}
+      {lead ? <p className="rise mt-5 text-lg leading-relaxed text-pretty text-muted [--delay:0.14s]">{lead}</p> : null}
+      {children ? <div className="rise [--delay:0.22s]">{children}</div> : null}
     </div>
   );
 }
@@ -42,7 +42,7 @@ export function SectionHead({
   center?: boolean;
 }) {
   return (
-    <div className={`mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 ${center ? "flex-col items-center text-center" : ""}`}>
+    <div data-reveal className={`mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-4 ${center ? "flex-col items-center text-center" : ""}`}>
       <div className="max-w-2xl">
         {eyebrow ? <p className="eyebrow mb-3.5">{eyebrow}</p> : null}
         <h2 id={id} className="h2">

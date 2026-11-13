@@ -144,6 +144,17 @@ const siteSchema = z.object({
   portrait: imageSrc,
   portraitAlt: localized,
   socials: z.array(link).default([]),
+  /** Unternehmen, für das die Person arbeitet (Rolle, Firma, Projekte) */
+  company: z
+    .object({
+      name: z.string(),
+      legalName: z.string(),
+      url: z.url(),
+      role: localized,
+      city: z.string().optional(),
+      projects: z.array(z.object({ name: z.string(), url: z.url(), description: localized.optional() })).default([]),
+    })
+    .optional(),
   /** Rechteinhaber für den Copyright-Vermerk; leer = Name der Person */
   copyright: z.array(z.object({ label: z.string(), url: z.url().optional() })).default([]),
   team: z.object({
@@ -169,6 +180,13 @@ function resolveSite(raw: z.output<typeof siteSchema>, locale: Locale) {
     highlights: raw.highlights.map((item) => ({ title: pick(item.title, locale), text: pick(item.text, locale) })),
     location: pick(raw.location, locale),
     portraitAlt: pick(raw.portraitAlt, locale),
+    company: raw.company
+      ? {
+          ...raw.company,
+          role: pick(raw.company.role, locale),
+          projects: raw.company.projects.map((project) => ({ ...project, description: pick(project.description, locale) })),
+        }
+      : undefined,
     team: {
       ...raw.team,
       sport: pick(raw.team.sport, locale),
@@ -181,6 +199,12 @@ function resolveSite(raw: z.output<typeof siteSchema>, locale: Locale) {
 export const getSite = cache((locale: Locale) =>
   resolveSite(loadYaml("site.yaml", siteSchema), locale),
 );
+
+/** Kurzzeile über dem Namen: „Geschäftsführer · metisOne“ (ohne Firma: Position · Verein) */
+export function roleLine(site: Site): string {
+  if (site.company) return `${site.company.role} · ${site.company.name}`;
+  return [site.team.position, site.team.name].filter(Boolean).join(" · ");
+}
 
 // ---------------------------------------------------------------------------
 // Projekte: content/projekte/<slug>/de.mdx (+ en.mdx)

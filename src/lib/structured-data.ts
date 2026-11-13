@@ -29,6 +29,21 @@ export function siteGraph(site: Site, locale: Locale): JsonLd {
     email: `mailto:${site.email}`,
     sameAs: site.socials.map((social) => social.url),
     memberOf: { "@id": TEAM_ID },
+    ...(site.company
+      ? {
+          worksFor: {
+            "@type": "Organization",
+            name: site.company.legalName,
+            alternateName: site.company.name,
+            url: site.company.url,
+            ...(site.company.city ? { address: { "@type": "PostalAddress", addressLocality: site.company.city, addressCountry: "DE" } } : {}),
+            ...(site.company.projects.length > 0
+              ? { brand: site.company.projects.map((project) => ({ "@type": "Brand", name: project.name, url: project.url })) }
+              : {}),
+          },
+          hasOccupation: { "@type": "Occupation", name: site.company.role },
+        }
+      : {}),
     ...(site.location
       ? { homeLocation: { "@type": "Place", name: site.location } }
       : {}),

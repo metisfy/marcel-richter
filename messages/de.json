@@ -48,7 +48,8 @@
     "ctaMail": "E-Mail schreiben",
     "seasonWindow": "Saison {season}",
     "lastSets": "Sätze",
-    "nextMatchday": "Nächster Spieltag"
+    "nextMatchday": "Nächster Spieltag",
+    "live": "Live vom BVV"
   },
   "projects": {
     "title": "Projekte",
@@ -99,16 +100,18 @@
     "pointsShort": "Punkte",
     "source": "Quelle: Bayerischer Volleyball-Verband, Stand {updated} Uhr.",
     "unavailable": "Der Spielplan des Verbands ist gerade nicht erreichbar.",
-    "sourceLink": "Zur Ligaseite beim BVV"
+    "sourceLink": "Zur Ligaseite beim BVV",
+    "nextUp": "Als Nächstes"
   },
   "contact": {
     "title": "Kontakt",
-    "description": "E-Mail-Adresse, Profile und Verein.",
+    "description": "E-Mail-Adresse, Unternehmen, Profile und Verein.",
     "lead": "Am schnellsten per E-Mail.",
     "email": "E-Mail",
     "profiles": "Profile",
     "team": "Verein",
-    "teamLink": "Website des Vereins"
+    "teamLink": "Website des Vereins",
+    "company": "Unternehmen"
   },
   "footer": {
     "legal": "Impressum",

@@ -6,7 +6,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { routing, type Locale } from "@/i18n/routing";
-import { getPage, getProjects, getSite } from "@/lib/content";
+import { getPage, getProjects, getSite, roleLine } from "@/lib/content";
 
 /*
  * Open-Graph-Bilder (1200×630) für jede Seite und jedes Projekt, in beiden
@@ -30,7 +30,7 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   const site = getSite(locale);
   const nav = await getTranslations({ locale, namespace: "nav" });
 
-  if (key === "home") return { eyebrow: [site.team.position, site.team.name].filter(Boolean).join(" · "), title: site.name, text: site.tagline };
+  if (key === "home") return { eyebrow: roleLine(site), title: site.name, text: site.tagline };
   if (key === "ueber-mich" || key === "impressum" || key === "datenschutz") {
     const page = getPage(key, locale);
     return { eyebrow: site.jobTitle, title: page.title, text: page.description };

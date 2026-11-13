@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { JsonLd } from "@/components/json-ld";
+import { RevealObserver } from "@/components/reveal-observer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
@@ -67,6 +68,7 @@ export default async function LocaleLayout({
           <SiteFooter site={site} />
         </NextIntlClientProvider>
         <JsonLd data={siteGraph(site, locale)} />
+        <RevealObserver />
       </body>
     </html>
   );

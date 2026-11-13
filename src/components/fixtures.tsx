@@ -68,6 +68,8 @@ export async function FixtureTable({
   if (fixtures.length === 0) return <p className="text-muted">{t("noFixtures")}</p>;
 
   const showCompetition = fixtures.some((fixture) => fixture.competition);
+  // Nächster Spieltag: erstes Spiel ohne Ergebnis und alle weiteren am selben Tag
+  const nextDay = fixtures.find((fixture) => !fixture.result)?.date.slice(0, 10);
   const places = await Promise.all(fixtures.map(matchPlace));
 
   return (
@@ -76,6 +78,7 @@ export async function FixtureTable({
     // positionierten sr-only-Texte im Scrollbereich – sonst verbreitern sie
     // auf dem Handy die ganze Seite.
     <div
+      data-reveal
       className="card relative overflow-x-auto"
       role="region"
       aria-label={t("fixturesCaption", { season })}
@@ -96,10 +99,11 @@ export async function FixtureTable({
             const time = formatTime(fixture.date, locale);
             // Zweites Spiel desselben Spieltags: Datum nicht noch einmal sichtbar wiederholen
             const sameDayAsPrevious = index > 0 && fixtures[index - 1].date.slice(0, 10) === fixture.date.slice(0, 10);
+            const upNext = !fixture.result && fixture.date.startsWith(nextDay ?? "-");
             return (
               <tr
                 key={`${fixture.date}-${fixture.number ?? ""}-${fixture.opponent}`}
-                className={`align-top ${sameDayAsPrevious ? "" : "border-t border-line first:border-t-0"}`}
+                className={`align-top ${sameDayAsPrevious ? "" : "border-t border-line first:border-t-0"} ${upNext ? "bg-accent-soft/60" : ""}`}
               >
                 <td className={`px-5 whitespace-nowrap ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
                   <time dateTime={toIsoBerlin(fixture.date)}>
@@ -128,6 +132,11 @@ export async function FixtureTable({
                       </span>
                       <SetScores sets={fixture.sets} className="mt-0.5 block text-[12px] text-muted" />
                     </>
+                  ) : upNext ? (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-bg px-2.5 py-1 font-mono text-[11.5px] font-medium">
+                      <span aria-hidden="true" className="live-dot" />
+                      {t("nextUp")}
+                    </span>
                   ) : (
                     <span className="font-mono text-[12.5px] text-muted">{t("open")}</span>
                   )}
@@ -146,7 +155,7 @@ export async function LeagueTable({ rows, league }: { rows: TableRow[]; league: 
   const numeric = "px-3 py-3 text-right tabular-nums sm:px-4";
 
   return (
-    <div className="card relative overflow-x-auto" role="region" aria-label={t("tableCaption", { league })} tabIndex={0}>
+    <div data-reveal className="card relative overflow-x-auto" role="region" aria-label={t("tableCaption", { league })} tabIndex={0}>
       <table className="w-full min-w-[36rem] border-collapse text-left text-[15px]">
         <caption className="sr-only">{t("tableCaption", { league })}</caption>
         <thead className="border-b border-line bg-surface">
@@ -163,7 +172,7 @@ export async function LeagueTable({ rows, league }: { rows: TableRow[]; league: 
             <th scope="col" className={`eyebrow table-cell py-3 pr-5 pl-3 text-right font-normal`}>{t("pointsShort")}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody data-reveal-stagger>
           {rows.map((row) => (
             <tr key={row.team} className={`border-b border-line last:border-0 ${row.own ? "bg-accent-soft font-semibold" : ""}`}>
               <td className="py-3 pr-2 pl-5 tabular-nums">{row.position}.</td>
@@ -197,8 +206,9 @@ export async function SourceNote({ source, locale }: { source: NonNullable<Seaso
     : undefined;
 
   return (
-    <p className="mt-4 text-sm text-muted">
-      {updated ? t("source", { updated }) : t("unavailable")}{" "}
+    <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+      {updated ? <span aria-hidden="true" className="live-dot" /> : null}
+      <span>{updated ? t("source", { updated }) : t("unavailable")}</span>
       <a href={source.url} rel="noopener" className="font-medium text-accent underline-offset-4 hover:underline">
         {t("sourceLink")}
       </a>

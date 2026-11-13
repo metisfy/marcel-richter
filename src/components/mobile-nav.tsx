@@ -43,7 +43,7 @@ export function MobileNav({
         id={panelId}
         aria-label={label}
         hidden={!open}
-        className="absolute inset-x-0 top-full border-b border-line bg-bg shadow-soft"
+        className="mobile-panel absolute inset-x-0 top-full border-b border-line bg-bg shadow-soft"
       >
         <ul className="container-page flex flex-col py-3">
           {items.map((item) => (

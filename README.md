@@ -101,6 +101,15 @@ stehen auf der Startseite, in der Fußzeile, auf der Kontaktseite und in den str
 für Suchmaschinen. Die Rückennummer erscheint zusätzlich im blauen Feld neben dem Namen.
 
 ```yaml
+company:                             # „Geschäftsführer · metisOne“ oben auf der Startseite,
+  name: metisOne                     # Karte „Unternehmen“ auf der Kontaktseite,
+  legalName: metisOne UG (haftungsbeschränkt)   # worksFor in den strukturierten Daten
+  url: https://metisone.de
+  role: { de: Geschäftsführer, en: Managing Director }
+  projects:
+    - name: metisCode
+      url: https://metiscode.com
+
 copyright:                           # Fußzeile: „© 2026 metisCode · metisOne“
   - label: metisCode
     url: https://metiscode.com
@@ -437,6 +446,12 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   `src/app/globals.css`, alle Text-Kombinationen erfüllen WCAG AA in beiden Designs. Für Text und
   Buttons immer `accent` (#3a63d9) verwenden. Das hellere metis-Blau `accent-bright` (#4f7dff)
   erreicht auf Weiß nur 3,7:1 und ist deshalb nur für Flächen, Icons und große Überschriften gedacht.
+- **Animationen:** wie auf metisone.de, alles am Ende von `src/app/globals.css`. Beim Laden
+  erscheinen Kopfbereich und Seitenüberschriften gestaffelt (`.rise`, Verzögerung über
+  `[--delay:0.1s]`). Beim Scrollen blenden Elemente mit `data-reveal` (Varianten `pop`, `left`,
+  `right`, `zoom`) bzw. deren Kinder mit `data-reveal-stagger` ein; ausgelöst von
+  `src/components/reveal-observer.tsx`. Was beim Laden schon sichtbar ist, wird nie versteckt,
+  ohne JavaScript ist alles sichtbar, und bei „Bewegung reduzieren“ ist alles aus.
 - **Schrift:** Inter und JetBrains Mono über `next/font` (`src/lib/fonts.ts`), beim Build
   heruntergeladen und vom eigenen Server ausgeliefert. Für die Open-Graph-Bilder liegen statische
   TTF-Schnitte in `src/app/og/fonts/`.

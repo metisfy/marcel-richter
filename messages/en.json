@@ -48,7 +48,8 @@
     "ctaMail": "Send an email",
     "seasonWindow": "Season {season}",
     "lastSets": "Sets",
-    "nextMatchday": "Next matchday"
+    "nextMatchday": "Next matchday",
+    "live": "Live from BVV"
   },
   "projects": {
     "title": "Projects",
@@ -99,16 +100,18 @@
     "pointsShort": "Pts",
     "source": "Source: Bavarian Volleyball Association, as of {updated}.",
     "unavailable": "The association's fixtures are unavailable right now.",
-    "sourceLink": "League page on volleyball.bayern"
+    "sourceLink": "League page on volleyball.bayern",
+    "nextUp": "Up next"
   },
   "contact": {
     "title": "Contact",
-    "description": "Email address, profiles and club.",
+    "description": "Email address, company, profiles and club.",
     "lead": "Email is the quickest way.",
     "email": "Email",
     "profiles": "Profiles",
     "team": "Club",
-    "teamLink": "Club website"
+    "teamLink": "Club website",
+    "company": "Company"
   },
   "footer": {
     "legal": "Legal notice",

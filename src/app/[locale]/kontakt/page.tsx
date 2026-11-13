@@ -38,7 +38,7 @@ export default async function ContactPage({ params }: LocaleParams) {
       <PageIntro eyebrow={t("title")} title={tHome("ctaTitle")} lead={t("lead")} />
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-        <div className="space-y-5">
+        <div className="space-y-5" data-reveal-stagger>
           <section aria-labelledby="kontakt-mail" className="card p-6 sm:p-8">
             <h2 id="kontakt-mail" className="eyebrow">
               {t("email")}
@@ -81,6 +81,36 @@ export default async function ContactPage({ params }: LocaleParams) {
           ) : null}
         </div>
 
+        <div className="space-y-5" data-reveal-stagger>
+        {site.company ? (
+          <section aria-labelledby="kontakt-firma" className="card p-6 sm:p-8">
+            <h2 id="kontakt-firma" className="eyebrow">
+              {t("company")}
+            </h2>
+            <p className="mt-5 text-xl font-semibold tracking-[-0.01em]">{site.company.legalName}</p>
+            <p className="text-muted">
+              {site.name}, {site.company.role}
+            </p>
+            <ul className="mt-6 space-y-2.5">
+              {[{ name: site.company.name, url: site.company.url, description: site.company.city }, ...site.company.projects].map((entry) => (
+                <li key={entry.url}>
+                  <a
+                    href={entry.url}
+                    rel="noopener"
+                    className="group flex items-center justify-between gap-3 rounded-xl border border-line px-4 py-3 transition-colors hover:bg-surface"
+                  >
+                    <span>
+                      <span className="block font-medium">{entry.name}</span>
+                      {entry.description ? <span className="block text-sm text-muted">{entry.description}</span> : null}
+                    </span>
+                    <ExternalIcon width={16} height={16} className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <section aria-labelledby="kontakt-verein" className="card bg-surface p-6 sm:p-8">
           <h2 id="kontakt-verein" className="eyebrow">
             {t("team")}
@@ -110,6 +140,7 @@ export default async function ContactPage({ params }: LocaleParams) {
             </a>
           ) : null}
         </section>
+        </div>
       </div>
     </div>
   );

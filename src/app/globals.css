@@ -213,7 +213,10 @@
   }
 
   .gradient-text {
-    background-image: linear-gradient(96deg, var(--accent-bright) 4%, var(--accent-2) 96%);
+    /* 200 % breit: sichtbar ist die linke Hälfte (Blau → Violett). Die
+       Animation weiter unten schiebt den Verlauf langsam hin und her. */
+    background-image: linear-gradient(96deg, var(--accent-bright) 2%, var(--accent-2) 48%, var(--accent-bright) 98%);
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -242,7 +245,18 @@
     transition:
       background-color 0.2s,
       border-color 0.2s,
-      opacity 0.2s;
+      opacity 0.2s,
+      scale 0.15s;
+  }
+  .btn:active {
+    scale: 0.97;
+  }
+  /* Pfeil am Ende eines Buttons rutscht beim Hover nach rechts */
+  .btn > svg:last-child {
+    transition: translate 0.2s;
+  }
+  .btn:hover > svg:last-child {
+    translate: 3px 0;
   }
   .btn-primary {
     background-color: var(--btn);
@@ -420,5 +434,280 @@
   .prose figcaption {
     margin-top: 0.6rem;
     font-size: 0.875rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Animationen – angelehnt an metisone.de
+ *
+ * 1. Einstieg beim Laden (.rise): Kopfbereich und Seitenüberschriften
+ *    erscheinen gestaffelt. Reines CSS, läuft auch bei jedem Seitenwechsel.
+ * 2. Beim Scrollen (data-reveal, data-reveal-stagger): Abschnitte und Karten
+ *    blenden ein, sobald sie ins Bild kommen. Gesteuert von
+ *    src/components/reveal-observer.tsx. Was beim Laden schon sichtbar ist,
+ *    wird nie versteckt – ohne JavaScript ist einfach alles sichtbar.
+ * 3. Dauerhaft und dezent: wandernder Farbverlauf im Namen, pulsierende
+ *    Live-Punkte, schwebende Farbflächen hinter dem Kopfbereich.
+ *
+ * Mit „Bewegung reduzieren“ (Betriebssystem) ist alles davon aus.
+ * ------------------------------------------------------------------------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+}
+@keyframes reveal-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.02);
+  }
+}
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes reveal-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--care) 55%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+@keyframes gradient-shift {
+  to {
+    background-position: 100% 0;
+  }
+}
+@keyframes blob-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(7%, -9%) scale(1.12);
+  }
+  66% {
+    transform: translate(-6%, 7%) scale(0.92);
+  }
+}
+@keyframes blob-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-9%, 8%) scale(1.16);
+  }
+}
+@keyframes blob-c {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    transform: translate(8%, 10%) scale(0.9);
+  }
+  70% {
+    transform: translate(-7%, -7%) scale(1.1);
+  }
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes icon-spin {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+}
+@keyframes header-shadow {
+  to {
+    box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.35);
+  }
+}
+
+@layer components {
+  /* Live-Punkt (grün), pulsiert */
+  .live-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background-color: var(--care);
+  }
+
+  /* Schwebende Farbflächen hinter dem Kopfbereich der Startseite */
+  .hero-blobs {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: 40rem;
+    overflow: hidden;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .blob-a {
+    top: -16rem;
+    left: calc(50% - 34rem);
+    width: 40rem;
+    height: 40rem;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-bright) 22%, transparent), transparent);
+  }
+  .blob-b {
+    top: -10rem;
+    left: calc(50% + 2rem);
+    width: 34rem;
+    height: 34rem;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent);
+  }
+  .blob-c {
+    top: 6rem;
+    left: calc(50% - 12rem);
+    width: 24rem;
+    height: 24rem;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--care) 12%, transparent), transparent);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. Einstieg beim Laden */
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--delay, 0s);
+  }
+  .bar-grow {
+    transform-origin: bottom;
+    animation: bar-grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--delay, 0s);
+  }
+
+  /* 2. Beim Scrollen */
+  html.reveal [data-reveal]:not([data-shown]),
+  html.reveal [data-reveal-stagger]:not([data-shown]) > * {
+    opacity: 0;
+  }
+  html.reveal [data-reveal][data-shown=""] {
+    animation: reveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  html.reveal [data-reveal="pop"][data-shown=""] {
+    animation-name: reveal-pop;
+    animation-timing-function: cubic-bezier(0.34, 1.5, 0.5, 1);
+  }
+  html.reveal [data-reveal="left"][data-shown=""] {
+    animation-name: reveal-left;
+  }
+  html.reveal [data-reveal="right"][data-shown=""] {
+    animation-name: reveal-right;
+  }
+  html.reveal [data-reveal="zoom"][data-shown=""] {
+    animation-name: reveal-zoom;
+  }
+  html.reveal [data-reveal-stagger][data-shown=""] > * {
+    animation: reveal-pop 0.58s cubic-bezier(0.34, 1.45, 0.5, 1) both;
+  }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(1) { animation-delay: 0.04s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(2) { animation-delay: 0.11s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(3) { animation-delay: 0.18s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(4) { animation-delay: 0.25s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(5) { animation-delay: 0.32s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(6) { animation-delay: 0.39s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(7) { animation-delay: 0.46s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(8) { animation-delay: 0.53s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(9) { animation-delay: 0.6s; }
+  html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(n + 10) { animation-delay: 0.66s; }
+
+  /* 3. Dauerhaft und dezent */
+  .gradient-text {
+    animation: gradient-shift 7s ease-in-out infinite alternate;
+  }
+  .badge-dot,
+  .live-dot {
+    animation: live-pulse 1.8s ease-in-out infinite;
+  }
+  .blob-a {
+    animation: blob-a 22s ease-in-out infinite;
+  }
+  .blob-b {
+    animation: blob-b 26s ease-in-out infinite;
+  }
+  .blob-c {
+    animation: blob-c 30s ease-in-out infinite;
+  }
+
+  /* Kleinigkeiten */
+  .mobile-panel:not([hidden]) {
+    animation: menu-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .theme-icon-sun,
+  .theme-icon-moon {
+    animation: icon-spin 0.45s cubic-bezier(0.34, 1.5, 0.5, 1) both;
+  }
+  .brand-mark {
+    transition: rotate 0.3s cubic-bezier(0.34, 1.5, 0.5, 1), scale 0.3s cubic-bezier(0.34, 1.5, 0.5, 1);
+  }
+  a:hover > .brand-mark,
+  a:hover .brand-mark {
+    rotate: -10deg;
+    scale: 1.08;
+  }
+
+  /* Kopfzeile bekommt beim Scrollen einen Schatten (wo der Browser
+     scroll-gesteuerte Animationen kann; sonst bleibt sie einfach flach) */
+  @supports (animation-timeline: scroll()) {
+    .site-header {
+      animation: header-shadow linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 140px;
+    }
+  }
+}
+
+@media print {
+  html.reveal [data-reveal],
+  html.reveal [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    animation: none !important;
   }
 }

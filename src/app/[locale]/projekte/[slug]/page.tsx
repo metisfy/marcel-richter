@@ -64,17 +64,17 @@ export default async function ProjectPage({ params }: Props) {
       </nav>
 
       <header className="max-w-3xl pt-8 pb-10" lang={fallback ? project.contentLocale : undefined}>
-        <p className="eyebrow mb-4">
+        <p className="eyebrow rise mb-4">
           {project.date.slice(0, 4)}
           {project.role ? ` · ${project.role}` : null}
         </p>
-        <h1 className="text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance">
+        <h1 className="rise text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
           {project.title}
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-pretty text-muted">{project.summary}</p>
+        <p className="rise mt-5 text-lg leading-relaxed text-pretty text-muted [--delay:0.14s]">{project.summary}</p>
       </header>
 
-      <div className="card relative mb-12 aspect-[16/9] overflow-hidden bg-surface shadow-soft">
+      <div className="rise card relative mb-12 aspect-[16/9] overflow-hidden bg-surface shadow-soft [--delay:0.22s]">
         <Image
           src={project.cover}
           alt={project.coverAlt}
@@ -92,7 +92,7 @@ export default async function ProjectPage({ params }: Props) {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <dl className="card divide-y divide-line text-[15px]">
+          <dl data-reveal="right" className="card divide-y divide-line text-[15px]">
             <div className="p-5">
               <dt className="eyebrow">{t("date")}</dt>
               <dd className="mt-1">

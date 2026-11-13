@@ -20,7 +20,7 @@ export async function SiteHeader({ name, number }: { name: string; number?: numb
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
+    <header className="site-header sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
       <div className="container-page relative flex h-16 items-center justify-between gap-3">
         <Link href="/" className="shrink-0">
           <Brand name={name} number={number} />

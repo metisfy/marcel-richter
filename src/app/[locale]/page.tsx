@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
 
 import { matchPlace, matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
@@ -8,7 +9,7 @@ import { ProjectCard } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { getProjects, getSite, lastResult, nextMatchday, ownSets, type Season } from "@/lib/content";
+import { getProjects, getSite, lastResult, nextMatchday, ownSets, roleLine, type Season } from "@/lib/content";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 import { loadCurrentSeason } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
@@ -58,6 +59,12 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
         <h2 className="ml-3 truncate font-mono text-[12px] text-muted">
           {t("seasonWindow", { season: season.season })} · {season.league}
         </h2>
+        {season.source?.updatedAt ? (
+          <span className="ml-auto hidden shrink-0 items-center gap-2 font-mono text-[11.5px] text-muted sm:inline-flex">
+            <span aria-hidden="true" className="live-dot" />
+            {t("live")}
+          </span>
+        ) : null}
       </div>
 
       <div className="grid md:grid-cols-[1.35fr_1fr]">
@@ -81,11 +88,15 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
                     {sets.map(([own, other], index) => (
                       <div key={index} className="flex h-full flex-1 flex-col justify-end">
                         <div className="flex flex-1 items-end justify-center gap-1">
+                          {/* Balken wachsen nacheinander aus der Grundlinie (.bar-grow) */}
                           <span
-                            className={`w-full max-w-5 rounded-t-[4px] ${own > other ? "bg-accent-bright" : "bg-accent-bright/35"}`}
-                            style={{ height: `${(own / max) * 100}%` }}
+                            className={`bar-grow w-full max-w-5 rounded-t-[4px] ${own > other ? "bg-accent-bright" : "bg-accent-bright/35"}`}
+                            style={{ height: `${(own / max) * 100}%`, "--delay": `${0.6 + index * 0.09}s` } as CSSProperties}
                           />
-                          <span className="w-full max-w-5 rounded-t-[4px] bg-surface-2" style={{ height: `${(other / max) * 100}%` }} />
+                          <span
+                            className="bar-grow w-full max-w-5 rounded-t-[4px] bg-surface-2"
+                            style={{ height: `${(other / max) * 100}%`, "--delay": `${0.65 + index * 0.09}s` } as CSSProperties}
+                          />
                         </div>
                         <span className="mt-2 text-center font-mono text-[11px] text-muted tabular-nums">
                           {own}:{other}
@@ -170,24 +181,31 @@ export default async function HomePage({ params }: LocaleParams) {
   return (
     <>
       {/* Kopf: zentriert wie auf metisone.de */}
-      <section className="relative overflow-x-clip">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(60%_60%_at_50%_0%,var(--accent-soft),transparent_70%)]"
-        />
+      <section className="relative isolate overflow-x-clip">
+        {/* Schwebende Farbflächen statt eines starren Verlaufs */}
+        <div aria-hidden="true" className="hero-blobs">
+          <span className="blob blob-a" />
+          <span className="blob blob-b" />
+          <span className="blob blob-c" />
+        </div>
         <div className="container-page pt-16 pb-14 text-center sm:pt-24 sm:pb-16">
-          <p className="badge">
+          <p className="badge rise">
             <span aria-hidden="true" className="badge-dot" />
-            {[site.team.position, site.team.name].filter(Boolean).join(" · ")}
+            {roleLine(site)}
           </p>
           <h1 className="mt-7 text-[clamp(3rem,0.9rem+8.6vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.03em]">
-            <span className="block">{nameParts.join(" ")}</span>
-            {lastName ? <span className="gradient-text block pb-[0.08em]"> {lastName}</span> : null}
+            <span className="rise block [--delay:0.06s]">{nameParts.join(" ")}</span>
+            {lastName ? (
+              <span className="rise block pb-[0.08em] [--delay:0.13s]">
+                {" "}
+                <span className="gradient-text">{lastName}</span>
+              </span>
+            ) : null}
           </h1>
-          <p className="mx-auto mt-6 max-w-[36rem] text-[clamp(1.0625rem,1rem+0.3vw,1.1875rem)] leading-relaxed text-pretty text-muted">
+          <p className="rise mx-auto mt-6 max-w-[38rem] text-[clamp(1.0625rem,1rem+0.3vw,1.1875rem)] leading-relaxed text-pretty text-muted [--delay:0.2s]">
             {site.tagline}
           </p>
-          <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <div className="rise mt-9 flex flex-wrap justify-center gap-3 [--delay:0.27s]">
             <Link href="/projekte" className="btn btn-dark">
               {t("ctaProjects")}
               <ArrowRightIcon width={17} height={17} />
@@ -204,7 +222,7 @@ export default async function HomePage({ params }: LocaleParams) {
         </div>
 
         {season ? (
-          <div className="container-page pb-16 sm:pb-20">
+          <div className="rise container-page pb-16 sm:pb-20 [--delay:0.36s]">
             <SeasonWindow season={season} locale={locale} />
           </div>
         ) : null}
@@ -213,7 +231,7 @@ export default async function HomePage({ params }: LocaleParams) {
       {/* Leiste mit Häkchen */}
       {roster.length > 0 ? (
         <div className="border-y border-line bg-surface">
-          <ul className="container-page flex flex-wrap justify-center gap-x-8 gap-y-2 py-4 text-[14.5px] text-muted">
+          <ul data-reveal-stagger className="container-page flex flex-wrap justify-center gap-x-8 gap-y-2 py-4 text-[14.5px] text-muted">
             {roster.map((item) => (
               <li key={item.label} className="inline-flex items-center gap-2">
                 <span aria-hidden="true" className="grid size-[18px] place-items-center rounded-full bg-accent-soft text-accent">
@@ -230,7 +248,7 @@ export default async function HomePage({ params }: LocaleParams) {
       {/* Über mich: Porträt, Text, nummerierte Karten */}
       <section aria-labelledby="ueber-titel" className="container-page py-20 sm:py-24">
         <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          <div className="card relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-surface shadow-soft lg:max-w-none">
+          <div data-reveal="left" className="card relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-surface shadow-soft lg:max-w-none">
             <Image
               src={site.portrait}
               alt={site.portraitAlt}
@@ -241,16 +259,18 @@ export default async function HomePage({ params }: LocaleParams) {
             />
           </div>
           <div>
-            <p className="eyebrow">{t("aboutEyebrow")}</p>
-            <h2 id="ueber-titel" className="h2 mt-3.5">
-              {site.jobTitle}.
-            </h2>
-            <p className="mt-5 text-[16.5px] leading-relaxed text-muted">{site.intro}</p>
+            <div data-reveal="right">
+              <p className="eyebrow">{t("aboutEyebrow")}</p>
+              <h2 id="ueber-titel" className="h2 mt-3.5">
+                {site.jobTitle}.
+              </h2>
+              <p className="mt-5 text-[16.5px] leading-relaxed text-muted">{site.intro}</p>
+            </div>
 
             {site.highlights.length > 0 ? (
-              <ol className="mt-8 space-y-3">
+              <ol data-reveal-stagger className="mt-8 space-y-3">
                 {site.highlights.map((item, index) => (
-                  <li key={item.title} className="card flex gap-4 p-5 sm:p-6">
+                  <li key={item.title} className="card flex gap-4 p-5 transition-[translate,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-accent-bright/40 hover:shadow-soft sm:p-6">
                     <span aria-hidden="true" className="pt-0.5 font-mono text-[13px] font-medium text-accent">
                       {String(index + 1).padStart(2, "0")}
                     </span>
@@ -263,7 +283,7 @@ export default async function HomePage({ params }: LocaleParams) {
               </ol>
             ) : null}
 
-            <Link href="/ueber-mich" className="arrow-link mt-8">
+            <Link href="/ueber-mich" className="arrow-link mt-8" data-reveal>
               {t("aboutLink")}
             </Link>
           </div>
@@ -284,7 +304,7 @@ export default async function HomePage({ params }: LocaleParams) {
                 </Link>
               }
             />
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div data-reveal-stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((project) => (
                 <ProjectCard key={project.slug} project={project} locale={locale} headingLevel="h3" />
               ))}
@@ -294,7 +314,7 @@ export default async function HomePage({ params }: LocaleParams) {
       ) : null}
 
       {/* Kontakt */}
-      <section aria-labelledby="kontakt-titel" className="container-page pt-4 text-center">
+      <section aria-labelledby="kontakt-titel" data-reveal="zoom" className="container-page pt-4 text-center">
         <h2 id="kontakt-titel" className="text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-tight font-semibold tracking-[-0.02em]">
           {t("ctaTitle")}
         </h2>
