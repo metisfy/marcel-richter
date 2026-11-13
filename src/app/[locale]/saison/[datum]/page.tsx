@@ -25,9 +25,10 @@ import { loadSeasons } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
 import { seasonEvents } from "@/lib/structured-data";
 
-// Ergebnisse, Spielberichte und Tabellenplatz kommen live vom BVV: höchstens
-// stündlich neu bauen (siehe src/lib/season.ts). Muss eine Zahl sein.
-export const revalidate = 3600;
+// Ergebnisse, Spielberichte und Tabellenplatz kommen live vom BVV: alle fünf
+// Minuten neu bauen, die Daten selbst liegen im Fetch-Cache (siehe
+// src/lib/season.ts). Muss eine Zahl sein.
+export const revalidate = 300;
 
 type Props = { params: Promise<{ locale: string; datum: string }> };
 

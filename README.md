@@ -229,10 +229,15 @@ stats:                                   # optional, eigene Zahlen als zusätzli
 
 - **Tabellenverlauf:** Die Saisonseite zeigt den Tabellenplatz nach jedem Spieltag als Linie
   (Daten aus dem Tabellenverlauf der BVV-Spielseiten).
-- **Aktualisierung:** Startseite und Saisonseite werden höchstens einmal pro Stunde im Hintergrund
-  neu erzeugt (`export const revalidate = 3600`). Neue Ergebnisse erscheinen also spätestens nach
-  etwa einer Stunde, **ohne neues Deployment**. Der BVV wird dabei höchstens einmal pro Stunde
-  abgefragt, egal wie viele Besucher kommen.
+- **Aktualisierung:** Startseite, Saison- und Spieltagsseiten werden höchstens alle fünf Minuten im
+  Hintergrund neu erzeugt (`export const revalidate = 300`). Die Daten des BVV liegen getrennt
+  davon im Fetch-Cache: Ligaseite höchstens einmal pro Stunde, Spielseiten höchstens alle sechs
+  Stunden. Neue Ergebnisse erscheinen also spätestens nach etwa einer Stunde, **ohne neues
+  Deployment**, und der Verband wird nicht öfter abgefragt, egal wie viele Besucher kommen.
+- **Wenn der Build keine Daten bekommt** (z. B. weil der BVV die Server von GitHub Actions nicht
+  bedient), zeigt die Seite zunächst den Hinweis und holt die Daten wenige Minuten nach dem Start
+  des Containers selbst nach. Den Grund verrät das Attribut `data-bvv-error` am Hinweis im
+  Seitenquelltext.
 - **Wenn der BVV nicht erreichbar ist:** Im laufenden Betrieb bleibt einfach der letzte Stand
   stehen. Beim Build läuft das Deployment trotzdem durch, die Seite zeigt dann einen Hinweis mit
   Link zur Ligaseite und lädt die Daten eine Stunde später nach.

@@ -14,9 +14,9 @@ import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 import { loadCurrentSeason } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
 
-// Das Saison-Fenster zeigt Live-Daten vom BVV: höchstens stündlich neu bauen
+// Das Saison-Fenster zeigt Live-Daten vom BVV: alle fünf Minuten neu bauen (Daten selbst: Fetch-Cache, siehe src/lib/season.ts)
 // (siehe src/lib/season.ts). Muss eine Zahl sein, kein Ausdruck.
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: LocaleParams) {
   const locale = await initLocale(params);

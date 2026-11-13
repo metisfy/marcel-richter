@@ -12,11 +12,14 @@ import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
  * Saisons mit Live-Daten vom BVV.
  *
  * Seiten, die das hier benutzen (Startseite, Saison, Spieltage), werden beim
- * Build statisch erzeugt und danach höchstens einmal pro Stunde im
+ * Build statisch erzeugt und danach höchstens alle fünf Minuten im
  * Hintergrund neu gebaut (Incremental Static Regeneration, `export const
- * revalidate = 3600` in der jeweiligen page.tsx). Die Ligaseite wird dadurch
- * höchstens einmal pro Stunde abgerufen, die Spielseiten höchstens alle sechs
- * Stunden – egal wie viele Besucher kommen.
+ * revalidate = 300` in der jeweiligen page.tsx). Die Abrufe beim Verband
+ * liegen getrennt davon im Fetch-Cache: die Ligaseite höchstens einmal pro
+ * Stunde, die Spielseiten höchstens alle sechs Stunden – egal wie viele
+ * Besucher kommen. Fehlten die Daten beim Build (z. B. weil der Verband
+ * GitHub-Server nicht bedient), sind sie so wenige Minuten nach dem Start
+ * des Containers da.
  *
  * Schlägt der Abruf der Ligaseite fehl:
  * - beim Build: Die Seite wird ohne Live-Daten gebaut (Hinweis + Link zum
@@ -33,14 +36,29 @@ const MATCH_REVALIDATE_SECONDS = 6 * 3600;
 
 function fetchBvv(url: string, revalidate: number) {
   return fetch(url, {
-    headers: { accept: "text/html", "user-agent": "Mozilla/5.0 (compatible; spielplan-abruf/1.0)" },
+    headers: {
+      accept: "text/html,application/xhtml+xml",
+      "accept-language": "de-DE,de;q=0.9",
+      "user-agent": "Mozilla/5.0 (compatible; spielplan-abruf/1.0)",
+    },
     next: { revalidate, tags: ["bvv"] },
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(25_000),
   });
 }
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt: string }> {
-  const response = await fetchBvv(url, REVALIDATE_SECONDS);
+  // Ein zweiter Versuch nach kurzer Pause: Die Ligaseite ist groß und der
+  // Server des Verbands antwortet nicht immer gleich schnell.
+  let response: Response;
+  try {
+    response = await fetchBvv(url, REVALIDATE_SECONDS);
+    if (response.status >= 500) throw new Error(`HTTP ${response.status}`);
+  } catch {
+    await wait(3000);
+    response = await fetchBvv(url, REVALIDATE_SECONDS);
+  }
   if (!response.ok) throw new Error(`BVV antwortet mit HTTP ${response.status} (${url})`);
   const league = parseBvvLeague(await response.text());
   // Das Date-Header bleibt im Fetch-Cache erhalten und zeigt so, wann die
@@ -192,8 +210,11 @@ async function resolve(season: Season): Promise<Season> {
   } catch (error) {
     const atRuntime = process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD;
     if (atRuntime) throw error;
-    console.warn(`⚠ Spielplan vom BVV nicht geladen, Seite ohne Live-Daten: ${error instanceof Error ? error.message : String(error)}`);
-    return season;
+    const message = error instanceof Error ? `${error.name}: ${error.message}${error.cause ? ` (${String(error.cause)})` : ""}` : String(error);
+    console.warn(`⚠ Spielplan vom BVV nicht geladen, Seite ohne Live-Daten: ${message}`);
+    // Grund unsichtbar in der Seite vermerken (data-bvv-error), damit er sich
+    // auch ohne Zugriff auf das Build-Log nachvollziehen lässt.
+    return { ...season, source: { ...source, error: message.slice(0, 300) } };
   }
 }
 

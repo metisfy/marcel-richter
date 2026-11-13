@@ -256,7 +256,7 @@ export async function SourceNote({ source, locale }: { source: NonNullable<Seaso
     : undefined;
 
   return (
-    <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+    <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted" data-bvv-error={source.error}>
       {updated ? <span aria-hidden="true" className="live-dot" /> : null}
       <span>{updated ? t("source", { updated }) : t("unavailable")}</span>
       <a href={source.url} rel="noopener" className="font-medium text-accent underline-offset-4 hover:underline">

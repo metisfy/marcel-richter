@@ -11,9 +11,9 @@ import { loadSeasons } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
 import { seasonEvents } from "@/lib/structured-data";
 
-// Spielplan und Tabelle kommen live vom BVV: höchstens stündlich neu bauen
+// Spielplan und Tabelle kommen live vom BVV: alle fünf Minuten neu bauen (Daten selbst: Fetch-Cache, siehe src/lib/season.ts)
 // (siehe src/lib/season.ts). Muss eine Zahl sein, kein Ausdruck.
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: LocaleParams) {
   const locale = await initLocale(params);

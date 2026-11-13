@@ -499,7 +499,7 @@ export type Season = {
   /** Eigene Einsätze: eingesetzt in `played` von `matches` Spielen mit Spielbericht */
   appearances?: { played: number; squad: number; matches: number };
   /** Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist */
-  source?: { url: string; team: string; player: { lastName: string; firstName: string }; updatedAt?: string };
+  source?: { url: string; team: string; player: { lastName: string; firstName: string }; updatedAt?: string; error?: string };
 };
 
 export function outcomeOf(own: 0 | 1, result: [number, number]): Outcome {
