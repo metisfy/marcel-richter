@@ -116,7 +116,12 @@
     "appearancePlayed": "played",
     "appearanceLibero": "Libero",
     "appearanceSquad": "Squad",
-    "appearanceAbsent": "not involved"
+    "appearanceAbsent": "not involved",
+    "calendarTitle": "Fixtures in your calendar",
+    "calendarText": "Every matchday with venue and results – changes arrive automatically.",
+    "calendarSubscribe": "Subscribe",
+    "calendarGoogle": "Google Calendar",
+    "calendarDownload": "Download .ics"
   },
   "contact": {
     "title": "Contact",

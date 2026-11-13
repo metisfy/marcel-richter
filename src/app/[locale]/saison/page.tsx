@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { CalendarLinks } from "@/components/calendar-links";
 import { FixtureTable, LeagueTable, SourceNote } from "@/components/fixtures";
 import { RankingChart } from "@/components/match";
 import { JsonLd } from "@/components/json-ld";
@@ -121,6 +122,12 @@ export default async function SeasonPage({ params }: LocaleParams) {
           <FixtureTable fixtures={current.fixtures} season={current.season} locale={locale} />
         )}
         {current.source ? <SourceNote source={current.source} locale={locale} /> : null}
+        {current.fixtures.length > 0 ? (
+          <CalendarLinks
+            path={locale === "de" ? "/spielplan.ics" : "/fixtures.ics"}
+            labels={{ title: t("calendarTitle"), text: t("calendarText"), subscribe: t("calendarSubscribe"), google: t("calendarGoogle"), download: t("calendarDownload") }}
+          />
+        ) : null}
       </section>
 
       {current.table.length > 0 ? (

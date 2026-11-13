@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: Props) {
     href: { pathname: "/saison/[datum]", params: { datum } },
     title: `${custom?.title ?? report.title} · ${t("matchdayOf", { date: formatDate(datum, locale) })}`,
     description: description.length > 160 ? `${description.slice(0, 157).replace(/\s+\S*$/, "")} …` : description,
-    ogKey: "saison",
+    ogKey: `spieltag/${datum}`,
     siteName: getSite(locale).name,
     type: "article",
   });

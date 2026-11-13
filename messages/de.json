@@ -116,7 +116,12 @@
     "appearancePlayed": "eingesetzt",
     "appearanceLibero": "Libero",
     "appearanceSquad": "Kader",
-    "appearanceAbsent": "nicht dabei"
+    "appearanceAbsent": "nicht dabei",
+    "calendarTitle": "Spielplan im Kalender",
+    "calendarText": "Alle Spieltage mit Halle und Ergebnissen – Verschiebungen kommen automatisch an.",
+    "calendarSubscribe": "Abonnieren",
+    "calendarGoogle": "Google Kalender",
+    "calendarDownload": ".ics laden"
   },
   "contact": {
     "title": "Kontakt",

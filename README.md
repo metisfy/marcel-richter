@@ -229,6 +229,13 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   Was am Spieltag passiert ist, in Markdown …
   ```
 
+- **Kalender-Abo:** `/spielplan.ics` (Deutsch) und `/fixtures.ics` (Englisch), ein Termin pro
+  Spieltag mit Halle, Adresse, Koordinaten und, sobald gespielt, den Ergebnissen. Auf der
+  Saisonseite gibt es dafür „Abonnieren“ (webcal), „Google Kalender“ und „.ics laden“. Google
+  Kalender kann nur Adressen abonnieren, die öffentlich erreichbar sind, also erst nach dem
+  Livegang.
+- **Vorschaubilder je Spieltag:** `/og/<sprache>/spieltag/<JJJJ-MM-TT>`, mit Ergebnissen bzw.
+  Gegnern und Uhrzeit; wird beim Teilen eines Spieltags angezeigt.
 - **Tabellenverlauf:** Die Saisonseite zeigt den Tabellenplatz nach jedem Spieltag als Linie
   (Daten aus dem Tabellenverlauf der BVV-Spielseiten).
 - **Aktualisierung:** Startseite, Saison- und Spieltagsseiten werden höchstens alle fünf Minuten im
@@ -303,6 +310,7 @@ Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen 
 | Projekt     | `/projekte/<slug>`     | `/en/projects/<slug>`      |
 | Saison      | `/saison`              | `/en/season`               |
 | Spieltag    | `/saison/<JJJJ-MM-TT>` | `/en/season/<JJJJ-MM-TT>`  |
+| Kalender    | `/spielplan.ics`       | `/fixtures.ics`            |
 | Kontakt     | `/kontakt`             | `/en/contact`              |
 | Impressum   | `/impressum`           | `/en/legal-notice`         |
 | Datenschutz | `/datenschutz`         | `/en/privacy`              |
