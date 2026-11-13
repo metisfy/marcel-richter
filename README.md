@@ -194,6 +194,29 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   `bvv: { …, player: { lastName: Richter, firstName: Marcel } }`. Spielberichte werden höchstens
   alle sechs Stunden neu abgerufen; ist einer nicht erreichbar, fehlt nur die Angabe zu diesem
   Spiel.
+- **Spieltagsseiten** (`/saison/2026-10-10`, englisch `/en/season/2026-10-10`): Jede Begegnung
+  im Spielplan ist anklickbar und führt zum Spieltag. Dort stehen
+  - Zahlen des Tages (Siege, Punkte, Sätze, Bälle, Tabellenplatz danach, meine Einsätze),
+  - der **Bericht vom Spieltag**, automatisch aus den Verbandsdaten erzeugt (Wir-Form),
+  - je Spiel: Satz-Diagramm, Spielwertung, Bälle, Ø Punkte je Satz, knappster Satz, Satzverlauf,
+    Schiedsgericht, Kadergröße, mein Einsatz und der Saisonvergleich gegen denselben Gegner,
+  - Halle mit Adresse und Kartenlink, Ausrichter und das dritte Spiel des Tages.
+  Vor dem Spieltag zeigt die Seite eine **Vorschau** mit Tabellenplatz, Bilanz und Form der Gegner.
+  Namen anderer Spieler übernimmt die Website bewusst nicht, nur Anzahlen.
+- **Eigener Bericht statt des automatischen:** Datei `content/spieltage/<JJJJ-MM-TT>.de.mdx`
+  (optional `.en.mdx`) anlegen:
+
+  ```mdx
+  ---
+  title: Zwei Siege in Augsburg        # optional, ersetzt die automatische Überschrift
+  description: Kurzfassung für Google  # optional
+  ---
+
+  Was am Spieltag passiert ist, in Markdown …
+  ```
+
+- **Tabellenverlauf:** Die Saisonseite zeigt den Tabellenplatz nach jedem Spieltag als Linie
+  (Daten aus dem Tabellenverlauf der BVV-Spielseiten).
 - **Aktualisierung:** Startseite und Saisonseite werden höchstens einmal pro Stunde im Hintergrund
   neu erzeugt (`export const revalidate = 3600`). Neue Ergebnisse erscheinen also spätestens nach
   etwa einer Stunde, **ohne neues Deployment**. Der BVV wird dabei höchstens einmal pro Stunde
@@ -260,6 +283,7 @@ Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen 
 | Projekte    | `/projekte`            | `/en/projects`             |
 | Projekt     | `/projekte/<slug>`     | `/en/projects/<slug>`      |
 | Saison      | `/saison`              | `/en/season`               |
+| Spieltag    | `/saison/<JJJJ-MM-TT>` | `/en/season/<JJJJ-MM-TT>`  |
 | Kontakt     | `/kontakt`             | `/en/contact`              |
 | Impressum   | `/impressum`           | `/en/legal-notice`         |
 | Datenschutz | `/datenschutz`         | `/en/privacy`              |
@@ -486,6 +510,7 @@ src/i18n/                Sprachen, übersetzte Pfade, Navigation
 src/lib/content.ts       Lädt und prüft alle Inhalte
 src/lib/bvv.ts           Liest Spielplan und Tabelle von der BVV-Ligaseite
 src/lib/season.ts        Führt Saisondatei und BVV-Daten zusammen (stündlich)
+src/lib/matchday.ts      Spieltage, Statistik je Spiel, automatischer Bericht
 src/lib/structured-data.ts  schema.org / JSON-LD
 src/proxy.ts             Sprach-Routing
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)

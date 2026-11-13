@@ -5,28 +5,30 @@ import { cache } from "react";
 
 import type { Locale } from "@/i18n/routing";
 
-import { type BvvLeague, type BvvMatch, parseBvvLeague, parseBvvLineups } from "./bvv";
+import { type BvvLeague, type BvvMatch, type BvvMatchDetail, parseBvvLeague, parseBvvMatchDetail } from "./bvv";
 import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
 
 /*
  * Saisons mit Live-Daten vom BVV.
  *
- * Seiten, die das hier benutzen (Startseite, Saison), werden beim Build
- * statisch erzeugt und danach höchstens einmal pro Stunde im Hintergrund neu
- * gebaut (Incremental Static Regeneration, `export const revalidate = 3600`
- * in der jeweiligen page.tsx). Die BVV-Seite wird dadurch höchstens einmal
- * pro Stunde abgerufen, egal wie viele Besucher kommen.
+ * Seiten, die das hier benutzen (Startseite, Saison, Spieltage), werden beim
+ * Build statisch erzeugt und danach höchstens einmal pro Stunde im
+ * Hintergrund neu gebaut (Incremental Static Regeneration, `export const
+ * revalidate = 3600` in der jeweiligen page.tsx). Die Ligaseite wird dadurch
+ * höchstens einmal pro Stunde abgerufen, die Spielseiten höchstens alle sechs
+ * Stunden – egal wie viele Besucher kommen.
  *
- * Schlägt der Abruf fehl:
+ * Schlägt der Abruf der Ligaseite fehl:
  * - beim Build: Die Seite wird ohne Live-Daten gebaut (Hinweis + Link zum
  *   BVV) – ein Ausfall beim Verband soll kein Deployment verhindern.
  * - im laufenden Betrieb: Der Fehler wird weitergeworfen. Next.js liefert dann
  *   weiter die letzte gute Fassung der Seite aus und versucht es beim
  *   nächsten Aufruf erneut.
+ * Fehlt nur eine einzelne Spielseite, fehlen nur deren Angaben.
  */
 
 const REVALIDATE_SECONDS = 3600;
-// Spielberichte gespielter Spiele ändern sich kaum noch: seltener abrufen.
+// Spielseiten ändern sich kaum noch (Halle, Spielbericht): seltener abrufen.
 const MATCH_REVALIDATE_SECONDS = 6 * 3600;
 
 function fetchBvv(url: string, revalidate: number) {
@@ -45,6 +47,15 @@ async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt:
   // Daten wirklich abgerufen wurden.
   const date = new Date(response.headers.get("date") ?? Date.now());
   return { league, updatedAt: (Number.isNaN(date.getTime()) ? new Date() : date).toISOString() };
+}
+
+async function fetchMatchDetail(url: string): Promise<BvvMatchDetail | undefined> {
+  try {
+    const response = await fetchBvv(url, MATCH_REVALIDATE_SECONDS);
+    return response.ok ? parseBvvMatchDetail(await response.text()) : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Ausrichter eines Spiels; steht er nicht dabei, über das andere Spiel desselben Spieltags. */
@@ -89,6 +100,17 @@ function withLeague(season: Season, source: NonNullable<Season["source"]>, leagu
   return {
     ...season,
     fixtures,
+    matches: league.matches.map((match) => {
+      const sameDay = league.matches.filter((other) => other.date.slice(0, 10) === match.date.slice(0, 10));
+      return {
+        date: match.date,
+        number: match.number,
+        teams: [match.teamA, match.teamB],
+        host: hostOf(match, sameDay.filter((other) => [other.teamA, other.teamB].some((name) => name === match.teamA || name === match.teamB))),
+        result: match.result,
+        sets: match.sets,
+      };
+    }),
     table: table.map((entry) => ({ ...entry, own: entry.team === team })),
     standing: row ? { position: row.position, teams: table.length, points: row.points } : season.standing,
     record: row && row.played > 0 ? { played: row.played, won: row.won, lost: row.lost, sets: row.sets, balls: row.balls } : undefined,
@@ -98,38 +120,57 @@ function withLeague(season: Season, source: NonNullable<Season["source"]>, leagu
 
 const sameName = (a: string, b: string) => a.trim().localeCompare(b.trim(), "de", { sensitivity: "base" }) === 0;
 
-/** Eigener Einsatz in einem gespielten Spiel laut Spielbericht; ohne Spielbericht undefined. */
-async function appearanceIn(fixture: Fixture, source: NonNullable<Season["source"]>): Promise<Fixture["appearance"]> {
-  if (!fixture.result || !fixture.url) return undefined;
-  try {
-    const response = await fetchBvv(fixture.url, MATCH_REVALIDATE_SECONDS);
-    if (!response.ok) return undefined;
-    const lineup = parseBvvLineups(await response.text()).find((entry) => entry.team === source.team);
-    if (!lineup || lineup.players.length === 0) return undefined;
-    const me = lineup.players.find(
-      (player) => sameName(player.lastName, source.player.lastName) && sameName(player.firstName, source.player.firstName),
-    );
-    if (!me) return { status: "absent", libero: false };
-    return { status: me.played ? "played" : "squad", libero: me.libero };
-  } catch {
-    // Einzelner Spielbericht nicht erreichbar: Spiel ohne Einsatz-Angabe anzeigen
-    return undefined;
-  }
+/** Überträgt die Angaben einer Spielseite auf das eigene Spiel. */
+function applyDetail(fixture: Fixture, detail: BvvMatchDetail, source: NonNullable<Season["source"]>): Fixture {
+  const ballsOf = (name: string) => detail.balls.find((entry) => entry.team === name)?.balls;
+  const [ballsA, ballsB] = fixture.teams.map(ballsOf);
+  const lineup = detail.lineups.find((entry) => entry.team === source.team);
+  const hasReport = Boolean(fixture.result && lineup && lineup.players.length > 0);
+  const me = lineup?.players.find(
+    (player) => sameName(player.lastName, source.player.lastName) && sameName(player.firstName, source.player.firstName),
+  );
+
+  return {
+    ...fixture,
+    details: {
+      referee: detail.referee,
+      venue: detail.venue,
+      balls: ballsA !== undefined && ballsB !== undefined ? [ballsA, ballsB] : undefined,
+      // Nur Anzahlen – Namen anderer Spieler übernimmt die Website nicht.
+      squad: hasReport && lineup ? { listed: lineup.players.length, played: lineup.players.filter((player) => player.played).length } : undefined,
+    },
+    appearance: hasReport ? (me ? { status: me.played ? "played" : "squad", libero: me.libero } : { status: "absent", libero: false }) : undefined,
+  };
 }
 
-/** Liest die Spielberichte aller gespielten Spiele (höchstens vier gleichzeitig). */
-async function withAppearances(season: Season): Promise<Season> {
+/**
+ * Liest die Spielseiten aller gespielten Spiele und des nächsten Spieltags
+ * (höchstens vier gleichzeitig): Halle, Schiedsgericht, Bälle, Einsätze,
+ * Tabellenverlauf.
+ */
+async function withDetails(season: Season): Promise<Season> {
   const { source } = season;
   if (!source) return season;
+  const nextDay = season.fixtures.find((fixture) => !fixture.result)?.date.slice(0, 10);
   const fixtures = [...season.fixtures];
-  const pending = fixtures.map((fixture, index) => ({ fixture, index })).filter(({ fixture }) => fixture.result && fixture.url);
+  const pending = fixtures
+    .map((fixture, index) => ({ fixture, index }))
+    .filter(({ fixture }) => fixture.url && (fixture.result || fixture.date.startsWith(nextDay ?? "-")));
+
+  let ranking: Season["ranking"] = [];
   for (let i = 0; i < pending.length; i += 4) {
     const batch = pending.slice(i, i + 4);
-    const results = await Promise.all(batch.map(({ fixture }) => appearanceIn(fixture, source)));
+    const details = await Promise.all(batch.map(({ fixture }) => fetchMatchDetail(fixture.url!)));
     batch.forEach(({ index }, position) => {
-      fixtures[index] = { ...fixtures[index], appearance: results[position] };
+      const detail = details[position];
+      if (!detail) return;
+      fixtures[index] = applyDetail(fixtures[index], detail, source);
+      // Tabellenverlauf: der längste, den eine Spielseite für uns liefert
+      const own = detail.ranking.find((entry) => entry.team === source.team)?.positions ?? [];
+      if (own.length > ranking.length) ranking = own;
     });
   }
+
   const known = fixtures.filter((fixture) => fixture.appearance);
   const appearances =
     known.length > 0
@@ -139,7 +180,7 @@ async function withAppearances(season: Season): Promise<Season> {
           matches: known.length,
         }
       : undefined;
-  return { ...season, fixtures, appearances };
+  return { ...season, fixtures, appearances, ranking };
 }
 
 async function resolve(season: Season): Promise<Season> {
@@ -147,7 +188,7 @@ async function resolve(season: Season): Promise<Season> {
   if (!source) return season;
   try {
     const { league, updatedAt } = await fetchLeague(source.url);
-    return await withAppearances(withLeague(season, source, league, updatedAt));
+    return await withDetails(withLeague(season, source, league, updatedAt));
   } catch (error) {
     const atRuntime = process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD;
     if (atRuntime) throw error;

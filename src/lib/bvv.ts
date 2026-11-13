@@ -44,6 +44,23 @@ export type BvvPlayer = {
 /** Spielerliste einer Mannschaft auf der Spielseite */
 export type BvvLineup = { team: string; players: BvvPlayer[] };
 
+export type BvvVenue = { name: string; street?: string; city?: string; lat?: number; lng?: number };
+
+/** Alles, was die Spielseite eines einzelnen Spiels hergibt */
+export type BvvMatchDetail = {
+  /** Schiedsgericht (eine Mannschaft) */
+  referee?: string;
+  /** Ausrichter des Spieltags */
+  host?: string;
+  /** Halle – erst nach dem Spiel veröffentlicht */
+  venue?: BvvVenue;
+  /** Bälle (Ballpunkte) je Mannschaft */
+  balls: { team: string; balls: number }[];
+  lineups: BvvLineup[];
+  /** Tabellenverlauf: Platz nach jedem Spieltag, je Mannschaft dieses Spiels */
+  ranking: { team: string; positions: { date: string; position: number }[] }[];
+};
+
 export type BvvTableRow = {
   position: number;
   team: string;
@@ -235,6 +252,82 @@ export function parseBvvLineups(html: string): BvvLineup[] {
     lineups.push({ team: text(team), players });
   }
   return lineups;
+}
+
+function isoDate(value: string): string | undefined {
+  const match = /(\d{1,2})\.(\d{1,2})\.(\d{4})/.exec(value);
+  return match ? `${match[3]}-${match[2].padStart(2, "0")}-${match[1].padStart(2, "0")}` : undefined;
+}
+
+function json(value: string | undefined): unknown {
+  if (!value) return undefined;
+  try {
+    return JSON.parse(decode(value));
+  } catch {
+    return undefined;
+  }
+}
+
+/** Liest eine Spielseite: Ansetzung, Halle, Spielwertung, Spielerlisten, Tabellenverlauf. */
+export function parseBvvMatchDetail(html: string): BvvMatchDetail {
+  // Ansetzung: <dt>Schiedsrichter</dt><dd>SSV Bobingen</dd> …
+  const facts = new Map<string, string>();
+  for (const match of html.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>\s*<dd\b[^>]*>([\s\S]*?)<\/dd>/gi)) {
+    facts.set(text(match[1]), text(match[2]));
+  }
+
+  // Halle: Marker der eingebetteten Karte (Name, Straße, PLZ Ort, Koordinaten)
+  let venue: BvvVenue | undefined;
+  const markers = json(/data-bvv-map-markers[^>]*>([\s\S]*?)<\/script>/i.exec(html)?.[1]);
+  if (Array.isArray(markers) && markers[0] && typeof markers[0] === "object") {
+    const marker = markers[0] as { lat?: unknown; lng?: unknown; lines?: unknown };
+    const lines = Array.isArray(marker.lines) ? marker.lines.filter((line): line is string => typeof line === "string") : [];
+    if (lines[0]) {
+      venue = {
+        name: lines[0],
+        street: lines[1],
+        city: lines[2],
+        lat: typeof marker.lat === "number" ? marker.lat : undefined,
+        lng: typeof marker.lng === "number" ? marker.lng : undefined,
+      };
+    }
+  }
+
+  // Spielwertung: Team | Sätze | Bälle | 1 | 2 | …
+  const balls: BvvMatchDetail["balls"] = [];
+  for (const table of tablesOf(html)) {
+    const header = headerOf(table);
+    const at = header.indexOf("Bälle");
+    if (at < 0 || !header.includes("Sätze")) continue;
+    for (const row of rowsOf(section(table, "tbody"))) {
+      const cells = cellsOf(row).map(text);
+      const value = Number.parseInt(cells[at] ?? "", 10);
+      if (cells[0] && Number.isFinite(value)) balls.push({ team: cells[0], balls: value });
+    }
+  }
+
+  // Tabellenverlauf: Chart-Daten als JSON im data-Attribut
+  const ranking: BvvMatchDetail["ranking"] = [];
+  const chart = json(/data-teams-ranking-line-chart="([^"]*)"/i.exec(html)?.[1]) as
+    | { datasets?: { label?: unknown; data?: { x?: unknown; y?: unknown }[] }[] }
+    | undefined;
+  for (const dataset of chart?.datasets ?? []) {
+    if (typeof dataset.label !== "string" || !Array.isArray(dataset.data)) continue;
+    const positions = dataset.data.flatMap((point) => {
+      const date = typeof point.x === "string" ? isoDate(point.x) : undefined;
+      return date && typeof point.y === "number" ? [{ date, position: point.y }] : [];
+    });
+    ranking.push({ team: dataset.label, positions });
+  }
+
+  return {
+    referee: facts.get("Schiedsrichter") || undefined,
+    host: facts.get("Ausrichter") || undefined,
+    venue,
+    balls,
+    lineups: parseBvvLineups(html),
+    ranking,
+  };
 }
 
 // ---------------------------------------------------------------------------

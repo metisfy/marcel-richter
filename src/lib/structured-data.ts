@@ -107,7 +107,7 @@ export function seasonEvents(site: Site, season: Season, locale: Locale): JsonLd
         name: fixture.venue ?? host ?? fixture.opponent,
       },
       ...(fixture.competition ? { superEvent: { "@type": "SportsEvent", name: fixture.competition } } : {}),
-      url: localizedUrl(locale, "/saison"),
+      url: `${localizedUrl(locale, { pathname: "/saison/[datum]", params: { datum: fixture.date.slice(0, 10) } })}${fixture.number ? `#spiel-${fixture.number}` : ""}`,
     };
   };
 

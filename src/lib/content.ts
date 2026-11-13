@@ -384,6 +384,18 @@ const seasonSchema = z.object({
 
 export type Outcome = "win" | "loss";
 
+export type Venue = { name: string; street?: string; city?: string; lat?: number; lng?: number };
+
+/** Ein Spiel der ganzen Liga (für Gegner-Form, drittes Spiel des Spieltags usw.) */
+export type LeagueMatch = {
+  date: string;
+  number?: number;
+  teams: [string, string];
+  host?: string;
+  result?: [number, number];
+  sets: string[];
+};
+
 export type Fixture = {
   /** "JJJJ-MM-TT" oder "JJJJ-MM-TT HH:MM", deutsche Ortszeit */
   date: string;
@@ -414,6 +426,15 @@ export type Fixture = {
    * absent = nicht im Spielbericht
    */
   appearance?: { status: "played" | "squad" | "absent"; libero: boolean };
+  /** Angaben von der Spielseite des Verbands */
+  details?: {
+    referee?: string;
+    venue?: Venue;
+    /** Bälle, Reihenfolge wie `teams` */
+    balls?: [number, number];
+    /** Eigene Mannschaft im Spielbericht: Spieler gesamt und davon eingesetzt */
+    squad?: { listed: number; played: number };
+  };
 };
 
 export type TableRow = {
@@ -440,6 +461,10 @@ export type Season = {
   table: TableRow[];
   /** Bilanz der eigenen Mannschaft (nur mit Live-Daten) */
   record?: Pick<TableRow, "played" | "won" | "lost" | "sets" | "balls">;
+  /** Alle Spiele der Liga (nur mit Live-Daten) */
+  matches: LeagueMatch[];
+  /** Tabellenplatz der eigenen Mannschaft nach jedem Spieltag (nur mit Live-Daten) */
+  ranking: { date: string; position: number }[];
   /** Eigene Einsätze: eingesetzt in `played` von `matches` Spielen mit Spielbericht */
   appearances?: { played: number; squad: number; matches: number };
   /** Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist */
@@ -474,6 +499,8 @@ export const getSeasons = cache((locale: Locale): Season[] => {
           value: stat.value,
         })),
         table: [],
+        matches: [],
+        ranking: [],
         source: raw.bvv ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName, player: raw.bvv.player ?? defaultPlayer } : undefined,
         fixtures: raw.fixtures
           .map((fixture): Fixture => {
@@ -496,6 +523,25 @@ export const getSeasons = cache((locale: Locale): Season[] => {
           .sort((a, b) => a.date.localeCompare(b.date)),
       };
     });
+});
+
+// ---------------------------------------------------------------------------
+// Eigene Spieltagsberichte: content/spieltage/<JJJJ-MM-TT>.de.mdx (+ .en.mdx)
+// Optional – ohne Datei zeigt die Spieltagsseite einen automatisch aus den
+// Verbandsdaten erzeugten Bericht.
+// ---------------------------------------------------------------------------
+
+const MATCHDAY_DIR = path.join(CONTENT_DIR, "spieltage");
+
+const matchdayReportSchema = z.object({ title: z.string().optional(), description: z.string().optional() });
+
+export const getMatchdayReport = cache((date: string, locale: Locale) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return undefined;
+  if (!fs.existsSync(path.join(MATCHDAY_DIR, `${date}.de.mdx`))) return undefined;
+  const { data, body, contentLocale, file } = readLocalizedMdx((l) => path.join(MATCHDAY_DIR, `${date}.${l}.mdx`), locale);
+  const result = matchdayReportSchema.safeParse(data);
+  if (!result.success) fail(file, result.error);
+  return { ...result.data, body, contentLocale };
 });
 
 /**

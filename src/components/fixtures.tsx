@@ -2,9 +2,10 @@ import { getTranslations } from "next-intl/server";
 
 import type { Locale } from "@/i18n/routing";
 import type { Fixture, Outcome, Season, TableRow } from "@/lib/content";
+import { Link } from "@/i18n/navigation";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
-import { CheckIcon } from "./icons";
+import { CheckIcon, ChevronRightIcon } from "./icons";
 
 const OUTCOME_STYLE: Record<Outcome, string> = {
   win: "bg-win-soft text-win",
@@ -145,8 +146,24 @@ export async function FixtureTable({
                   </time>
                 </td>
                 <th scope="row" className={`px-5 font-normal ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
-                  <MatchTeams fixture={fixture} />
-                  <span className="block text-sm text-muted">{places[index]}</span>
+                  {/* Ganze Begegnung ist der Link zum Spieltag (Statistik, Bericht) */}
+                  <Link
+                    href={{ pathname: "/saison/[datum]", params: { datum: fixture.date.slice(0, 10) }, hash: fixture.number ? `spiel-${fixture.number}` : undefined }}
+                    className="group/match -mx-2 -my-1 flex items-start justify-between gap-3 rounded-lg px-2 py-1 transition-colors hover:bg-surface"
+                  >
+                    <span>
+                      <span className="underline-offset-4 group-hover/match:underline">
+                        <MatchTeams fixture={fixture} />
+                      </span>
+                      <span className="block text-sm text-muted">{places[index]}</span>
+                    </span>
+                    <ChevronRightIcon
+                      width={16}
+                      height={16}
+                      aria-hidden="true"
+                      className="mt-1 shrink-0 text-muted transition-transform group-hover/match:translate-x-0.5"
+                    />
+                  </Link>
                 </th>
                 {showCompetition ? (
                   <td className={`px-5 text-muted ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>{fixture.competition ?? "–"}</td>

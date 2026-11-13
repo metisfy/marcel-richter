@@ -16,6 +16,7 @@ export const routing = defineRouting({
     "/projekte": { de: "/projekte", en: "/projects" },
     "/projekte/[slug]": { de: "/projekte/[slug]", en: "/projects/[slug]" },
     "/saison": { de: "/saison", en: "/season" },
+    "/saison/[datum]": { de: "/saison/[datum]", en: "/season/[datum]" },
     "/kontakt": { de: "/kontakt", en: "/contact" },
     "/impressum": { de: "/impressum", en: "/legal-notice" },
     "/datenschutz": { de: "/datenschutz", en: "/privacy" },

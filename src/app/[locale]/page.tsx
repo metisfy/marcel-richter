@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: LocaleParams) {
 async function SeasonWindow({ season, locale }: { season: Season; locale: Locale }) {
   const t = await getTranslations("home");
   const tSeason = await getTranslations("season");
+  const tMatchday = await getTranslations("matchday");
   const matchday = nextMatchday(season);
   const upcoming = matchday[0];
   const latest = lastResult(season);
@@ -86,6 +87,12 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
                 {matchTitle(latest)}
                 <span className="sr-only"> ({formatShortDate(latest.date, locale)})</span>
               </p>
+              <Link
+                href={{ pathname: "/saison/[datum]", params: { datum: latest.date.slice(0, 10) }, hash: latest.number ? `spiel-${latest.number}` : undefined }}
+                className="arrow-link mt-2 text-[14.5px]"
+              >
+                {tMatchday("toReport")}
+              </Link>
 
               {sets.length > 0 ? (
                 <div className="mt-7">
@@ -135,6 +142,9 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
                   ))}
                 </ul>
                 <p className="mt-1 text-sm text-muted">{places[0]}</p>
+                <Link href={{ pathname: "/saison/[datum]", params: { datum: upcoming.date.slice(0, 10) } }} className="arrow-link mt-2 text-[14.5px]">
+                  {tMatchday("toPreview")}
+                </Link>
               </>
             ) : (
               <p className="mt-3 text-muted">{t("noUpcoming")}</p>

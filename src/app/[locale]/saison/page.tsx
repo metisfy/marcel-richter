@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { FixtureTable, LeagueTable, SourceNote } from "@/components/fixtures";
+import { RankingChart } from "@/components/match";
 import { JsonLd } from "@/components/json-ld";
 import { PageIntro, SectionHead } from "@/components/page-intro";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
@@ -107,6 +108,11 @@ export default async function SeasonPage({ params }: LocaleParams) {
           {t("stats")}
         </h2>
         <SeasonFacts season={current} />
+        {current.ranking.length > 0 ? (
+          <div className="mt-3">
+            <RankingChart ranking={current.ranking} teams={current.standing?.teams ?? current.table.length} locale={locale} />
+          </div>
+        ) : null}
       </section>
 
       <section aria-labelledby="spielplan" className="mb-20">

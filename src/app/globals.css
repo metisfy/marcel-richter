@@ -670,6 +670,23 @@
   html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(9) { animation-delay: 0.6s; }
   html.reveal [data-reveal-stagger][data-shown=""] > :nth-child(n + 10) { animation-delay: 0.66s; }
 
+  /* Balkendiagramme: Container bleibt stehen, die Balken wachsen beim
+     Hineinscrollen nacheinander (Spieltagsseiten) */
+  html.reveal [data-reveal="bars"]:not([data-shown]) {
+    opacity: 1;
+  }
+  html.reveal [data-reveal="bars"]:not([data-shown]) .bar {
+    transform: scaleY(0);
+  }
+  html.reveal [data-reveal="bars"][data-shown=""] {
+    animation: none;
+  }
+  html.reveal [data-reveal="bars"][data-shown=""] .bar {
+    transform-origin: bottom;
+    animation: bar-grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--delay, 0s);
+  }
+
   /* 3. Dauerhaft und dezent */
   .gradient-text {
     animation: gradient-shift 7s ease-in-out infinite alternate;
