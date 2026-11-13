@@ -1,4 +1,4 @@
-# Workflow 1 – Checks: Install, Lint, Typecheck, Build.
+# Workflow 1 – Checks: Install, Lint, Typecheck, Tests, Build.
 #
 # Läuft bei jedem Pull Request und jedem Push auf andere Branches als main.
 # Pushes auf main prüft der Deploy-Workflow, indem er genau diesen Workflow
@@ -40,6 +40,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Tests (BVV-Parser)
+        run: npm test
 
       - name: Build
         run: npm run build

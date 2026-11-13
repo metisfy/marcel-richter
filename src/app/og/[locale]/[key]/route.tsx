@@ -5,6 +5,7 @@ import { ImageResponse } from "next/og";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
+import { initials } from "@/components/brand";
 import { routing, type Locale } from "@/i18n/routing";
 import { getPage, getProjects, getSite, roleLine } from "@/lib/content";
 
@@ -117,7 +118,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
                 fontSize: 22,
               }}
             >
-              {site.team.number ?? site.name[0]}
+              {site.team.number ?? initials(site.name)}
             </div>
             <div style={{ display: "flex" }}>
               {nameParts.join(" ")}

@@ -5,7 +5,29 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+// Content-Security-Policy für statische Seiten (ohne Nonces, siehe
+// node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md):
+// Skripte, Styles, Bilder, Schriften und Verbindungen nur von dieser Domain.
+// 'unsafe-inline' braucht Next.js für die eingebetteten Seitendaten und das
+// Theme-Skript im <head>. Bewusst ohne upgrade-insecure-requests, damit die
+// Seite auch intern über http://<ip>:3100 vollständig lädt.
+const isDev = process.env.NODE_ENV === "development";
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

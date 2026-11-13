@@ -218,12 +218,12 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
 
-      - name: docker-compose.yml und start.sh auf den Server kopieren
+      - name: docker-compose.yml, start.sh und auto-update.sh auf den Server kopieren
         if: steps.config.outputs.enabled == 'true'
         run: |
           ssh deploy-target "mkdir -p '$DEPLOY_PATH'"
-          scp -q docker-compose.yml start.sh "deploy-target:$DEPLOY_PATH/"
-          ssh deploy-target "chmod +x '$DEPLOY_PATH/start.sh'"
+          scp -q docker-compose.yml start.sh auto-update.sh "deploy-target:$DEPLOY_PATH/"
+          ssh deploy-target "chmod +x '$DEPLOY_PATH/start.sh' '$DEPLOY_PATH/auto-update.sh'"
 
       - name: Server an ghcr.io anmelden
         if: steps.config.outputs.enabled == 'true'

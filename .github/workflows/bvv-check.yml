@@ -1,0 +1,40 @@
+# Workflow 3 – Täglicher BVV-Check.
+#
+# Ruft jeden Morgen die Ligaseite und eine Spielseite beim Bayerischen
+# Volleyball-Verband ab und prüft, ob die Website sie noch lesen kann
+# (scripts/bvv-check.mjs). Ändert der Verband den Aufbau seiner Seiten, wird
+# dieser Lauf rot – GitHub schickt dann eine E-Mail. Ein einzelner roter Lauf
+# kann auch nur heißen, dass der Verband gerade nicht erreichbar war; erst
+# wenn er mehrere Tage rot bleibt, src/lib/bvv.ts anpassen.
+#
+# Hinweis: GitHub pausiert zeitgesteuerte Läufe, wenn 60 Tage lang nichts ins
+# Repository gepusht wurde. Dann unter Actions → „BVV-Check“ wieder aktivieren.
+
+name: BVV-Check
+
+on:
+  schedule:
+    - cron: "17 5 * * *" # täglich 05:17 UTC (06:17/07:17 deutscher Zeit)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Spielplan beim BVV lesbar?
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Ligaseite und Spielseite prüfen
+        run: npm run bvv:check

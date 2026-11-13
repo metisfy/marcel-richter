@@ -39,6 +39,8 @@ npm ci            # Abhängigkeiten installieren
 npm run dev       # Entwicklungsserver auf http://localhost:3000
 npm run lint      # ESLint
 npm run typecheck # TypeScript
+npm test          # Tests für den BVV-Parser (mit gespeicherten Verbandsseiten)
+npm run bvv:check # Live-Prüfung: kann die Website den Spielplan beim BVV gerade lesen?
 npm run build     # Produktions-Build (genau wie in der Pipeline)
 ```
 
@@ -315,7 +317,7 @@ Cookies.
 ## Deployment
 
 ```
-Pull Request ──► Checks (Install, Lint, Typecheck, Build) ──► Merge nur wenn grün
+Pull Request ──► Checks (Install, Lint, Typecheck, Tests, Build) ──► Merge nur wenn grün
                                                                      │
 Push auf main ──► Checks ──► Docker-Image bauen ──► ghcr.io (:latest + :<commit-sha>)
                                                                      │
@@ -329,6 +331,7 @@ Push auf main ──► Checks ──► Docker-Image bauen ──► ghcr.io (:
 | --- | --- | --- |
 | **Checks** | `.github/workflows/ci.yml` | jeder Pull Request, jeder Push auf andere Branches als `main` |
 | **Deploy** | `.github/workflows/deploy.yml` | Push auf `main`, manuell („Run workflow“, auch für Rollbacks) |
+| **BVV-Check** | `.github/workflows/bvv-check.yml` | täglich morgens, manuell: Kann die Website den Spielplan beim BVV noch lesen? |
 
 Pushes auf `main` prüft der Deploy-Workflow selbst: Er ruft als ersten Schritt genau den
 Checks-Workflow auf. So wird nichts doppelt geprüft, und ohne grüne Checks wird nichts gebaut oder
@@ -349,6 +352,30 @@ Fehler rot. Ein manueller Rollback über „Run workflow“ schlägt ohne SSH-Zu
 **Automatischer Rollback auf dem Server.** Wird die neue Fassung im Container nicht „healthy“,
 startet `start.sh` sofort wieder die vorherige und beendet sich mit Fehler. Damit schlägt auch der
 Workflow fehl.
+
+### Automatisch ausrollen (ohne SSH, für den internen Server)
+
+GitHub erreicht den internen Server nicht. Deshalb holt sich der Server neue Fassungen selbst:
+`auto-update.sh` zieht alle 5 Minuten `:latest`, liest den Commit aus dem Image und ruft bei einer
+neuen Fassung `./start.sh <commit>` auf, mit Healthcheck und automatischem Rollback. Eine
+gescheiterte Fassung wird gemerkt (`.auto-update-failed`) und erst beim nächsten Push wieder
+versucht.
+
+Einmalig auf dem Server (im Ordner mit `docker-compose.yml` und `start.sh`):
+
+```bash
+# auto-update.sh aus dem Repository in den Ordner legen, dann:
+chmod +x auto-update.sh
+./auto-update.sh                      # einmal von Hand testen (keine Ausgabe = schon aktuell)
+crontab -e
+# Zeile ergänzen:
+*/5 * * * * /root/websites/intern/marcel-richter/auto-update.sh >> /var/log/marcel-richter-update.log 2>&1
+```
+
+Danach ist jeder Push auf `main` etwa 10 Minuten später live (Build in GitHub Actions + bis zu 5
+Minuten Wartezeit). Was passiert ist, steht in `/var/log/marcel-richter-update.log`. Abschalten:
+Zeile in `crontab -e` entfernen. Rollback von Hand geht weiter mit `./start.sh <sha>`. Danach rollt
+`auto-update.sh` erst beim nächsten Push wieder aus.
 
 ### Einmalige Einrichtung
 
@@ -479,8 +506,8 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 ## Technische Hinweise
 
 - **Statisch:** Alle Seiten, OG-Bilder, Sitemap und robots.txt entstehen beim Build. Zur Laufzeit
-  rendert der Server nur Startseite und Saisonseite neu, und zwar höchstens stündlich im
-  Hintergrund (ISR, wegen der BVV-Daten). `src/proxy.ts` ordnet jede Anfrage einer Sprache zu und
+  rendert der Server nur Startseite, Saison- und Spieltagsseiten neu, höchstens alle fünf Minuten
+  im Hintergrund (ISR, wegen der BVV-Daten). `src/proxy.ts` ordnet jede Anfrage einer Sprache zu und
   übersetzt die Pfade. Der Container braucht dafür ausgehend Zugriff auf `volleyball.bayern`
   (HTTPS).
 - **`skipProxyUrlNormalize: true` in `next.config.ts` nicht entfernen.** Ohne diese Option
@@ -507,9 +534,14 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   heruntergeladen und vom eigenen Server ausgeliefert. Für die Open-Graph-Bilder liegen statische
   TTF-Schnitte in `src/app/og/fonts/`.
 - **Sicherheit:** Container ohne Root, ohne Linux-Capabilities, `no-new-privileges`. Dazu
-  Sicherheits-Header (`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
-  `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen im Browser (die BVV-Daten
-  holt der Server).
+  Sicherheits-Header (`Content-Security-Policy`, `Cross-Origin-Opener-Policy`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`, `X-Content-Type-Options`), keine Cookies, keine externen
+  Ressourcen im Browser (die BVV-Daten holt der Server). Die CSP erlaubt nur Inhalte von der
+  eigenen Domain; `'unsafe-inline'` braucht Next.js bei statischen Seiten (Nonces gehen nur bei
+  dynamisch gerenderten Seiten). Bewusst ohne `upgrade-insecure-requests`, damit die Seite intern
+  auch über `http://<ip>:3100` vollständig lädt.
+- **Tests:** `tests/bvv.test.mjs` prüft den Parser mit gespeicherten BVV-Seiten
+  (`tests/fixtures/`), läuft in den Checks. `scripts/bvv-check.mjs` prüft live, läuft täglich.
 - **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
   `engines` in `package.json`.
 
@@ -533,7 +565,10 @@ src/proxy.ts             Sprach-Routing
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)
 docker-compose.yml       Betrieb auf dem Server
 start.sh                 Ausrollen/Rollback auf dem Server
-.github/workflows/       Checks + Deploy
+auto-update.sh           Neue Fassungen automatisch ausrollen (cron auf dem Server)
+tests/                   Tests für den BVV-Parser (+ gespeicherte Verbandsseiten)
+scripts/                 Live-Prüfung beim BVV
+.github/workflows/       Checks, Deploy, täglicher BVV-Check
 deploy/                  Beispielkonfiguration Nginx
 ```
 
@@ -541,11 +576,11 @@ deploy/                  Beispielkonfiguration Nginx
 
 ## Vor dem Livegang
 
-- [ ] `content/site.yaml`: echte Daten (Texte, E-Mail, Social-Links, Position, Rückennummer);
-      Vereinslogo nur mit Erlaubnis des TSV Pfuhl einbinden
-- [ ] Beispielbilder der Projekte ersetzen (`public/images/portrait.jpg` ist bereits dein Foto
-      von metisone.de, 1200 × 1500 px, ohne Metadaten)
-- [ ] Projekte und „Über mich“ in `content/` mit echten Inhalten füllen
+- [x] Kontakt: `hello@metiscode.com` (wie im Impressum); Profile, Position und Rückennummer bei
+      Bedarf in `content/site.yaml` ergänzen. Vereinslogo nur mit Erlaubnis des TSV Pfuhl
+- [x] Porträt (dein Foto von metisone.de) und Projekte (von metisone.de)
+- [ ] Auf dem Server prüfen, ob der Container `volleyball.bayern` erreicht (siehe oben)
+- [ ] `auto-update.sh` per cron einrichten (Abschnitt „Automatisch ausrollen“)
 - [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,
       Auslieferung über Cloudflare) rechtlich prüfen lassen
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen
