@@ -56,15 +56,20 @@
   },
   "projects": {
     "title": "Projects",
-    "description": "What I work on and have worked on, with background, role and outcome.",
-    "lead": "What I'm working on now and what I've built so far.",
+    "description": "Projects of the metisOne group Marcel Richter is involved in – websites, platforms and AI.",
+    "lead": "Projects of the metisOne group I'm involved in – as a developer or as managing director.",
     "back": "All projects",
     "links": "Links",
     "role": "Role",
     "date": "Date",
-    "tags": "Tech",
+    "tags": "Services",
     "empty": "No projects published yet.",
-    "heading": "What I'm working on."
+    "heading": "What I'm working on.",
+    "client": "Client",
+    "status": "Status",
+    "company": "Delivered by",
+    "category": "Category",
+    "fullPage": "The full page"
   },
   "season": {
     "title": "Season",
@@ -167,7 +172,6 @@
     "host": "Host",
     "venue": "Venue",
     "map": "Open map",
-    "mapNote": "OpenStreetMap, opens an external site",
     "squad": "Squad",
     "squadValue": "{listed} on the scoresheet, {played} played",
     "myAppearance": "My appearance",

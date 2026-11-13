@@ -4,17 +4,29 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/lib/content";
 
+/** „● Live“ (grün, pulsierend) bzw. „● In Aufbau“ (violett) */
+export function StatusLabel({ status, className = "" }: { status: string; className?: string }) {
+  const live = /^live$/i.test(status.trim());
+  return (
+    <span className={`inline-flex items-center gap-1.5 ${className}`}>
+      <span aria-hidden="true" className={live ? "live-dot" : "inline-block size-[7px] rounded-full bg-accent-2"} />
+      {status}
+    </span>
+  );
+}
+
 /** Projektkarte wie die Karten auf metisone.de: Bild oben, Text darunter. */
 export function ProjectCard({
   project,
   locale,
   headingLevel = "h2",
-  priority = false,
+  eager = false,
 }: {
   project: Project;
   locale: Locale;
   headingLevel?: "h2" | "h3";
-  priority?: boolean;
+  /** Bild sofort und bevorzugt laden (erstes, sichtbares Bild = Largest Contentful Paint) */
+  eager?: boolean;
 }) {
   const Heading = headingLevel;
   const year = project.date.slice(0, 4);
@@ -26,10 +38,17 @@ export function ProjectCard({
           src={project.cover}
           alt={project.coverAlt}
           fill
-          priority={priority}
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : undefined}
           sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
-          className="object-cover"
+          className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
         />
+        {project.status ? (
+          <StatusLabel
+            status={project.status}
+            className="absolute top-3 left-3 rounded-full border border-line bg-bg/90 px-2.5 py-1 font-mono text-[11px] font-medium backdrop-blur"
+          />
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col p-6" lang={project.contentLocale !== locale ? project.contentLocale : undefined}>
         <p className="eyebrow">

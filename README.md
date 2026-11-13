@@ -128,23 +128,34 @@ highlights:
 
 ### Projekte: `content/projekte/<slug>/de.mdx` (+ `en.mdx`)
 
-Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/vereins-app`,
-`/en/projects/vereins-app`), also nur Kleinbuchstaben, Ziffern und Bindestriche verwenden.
+Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/metiscode`,
+`/en/projects/metiscode`), also nur Kleinbuchstaben, Ziffern und Bindestriche verwenden.
+
+Die Projekte stammen von [metisone.de/projekte](https://metisone.de/projekte) (Texte, Eckdaten,
+Screenshots). `role` sagt, wie ich beteiligt war: „Konzept & Entwicklung“ bzw. „Entwicklung“, wo
+ich selbst Code beigetragen habe, sonst „Geschäftsführung“. Neue Projekte auf metisone.de bitte
+hier als neuen Ordner ergänzen.
 
 ```mdx
 ---
-title: Vereins-App für einen Sportverein
+title: metisCode
 summary: Ein Satz für Übersicht, Suchmaschinen und Vorschaubild.
-date: 2026-05-01                        # sortiert die Liste (neueste zuerst)
-cover: /images/projekte/vereins-app.jpg
+date: "2026-06"                         # "JJJJ", "JJJJ-MM" oder "JJJJ-MM-TT"
+cover: /images/projekte/metiscode.jpg   # 16:10, oberer Ausschnitt der Seite
 coverAlt: Beschreibung des Titelbilds für Screenreader
+screenshot: /images/projekte/metiscode-seite.jpg  # optional: ganze Seite, läuft im Browserfenster durch
 role: Konzept & Entwicklung             # optional
-tags: [Next.js, PWA]                    # optional
-featured: true                          # optional: bevorzugt auf der Startseite
+client: metisCode · Eigenprojekt        # optional: Auftraggeber
+status: Live                            # optional: „Live“ = grüner Punkt, sonst violett
+company: metisCode                      # optional: umgesetzt von
+category: Websites                      # optional
+order: 1                                # optional: Reihenfolge (kleiner = weiter vorn)
+tags: [Design-System, Web-Entwicklung]  # optional: Leistungen
+featured: true                          # optional: auf der Startseite (die ersten drei)
 draft: false                            # optional: true = nur lokal sichtbar
-links:                                  # optional
-  - label: Zur App
-    url: https://example.com
+links:                                  # optional, der erste Link ist auch die Adresse im Browserfenster
+  - label: Website ansehen
+    url: https://metiscode.com
 ---
 
 Hier steht der Text in **Markdown**. Überschriften mit `##`, Listen mit `-`.
@@ -155,7 +166,7 @@ Hier steht der Text in **Markdown**. Überschriften mit `##`, Listen mit `-`.
 - **`en.mdx`** braucht nur, was sich unterscheidet (meist `title`, `summary`, `coverAlt` und den
   Text). Alles andere übernimmt es aus `de.mdx`.
 - **Ohne `en.mdx`** zeigt die englische Seite den deutschen Text mit dem Hinweis „only available in
-  German“. Ein Beispiel dafür ist `saison-in-bildern`.
+  German“.
 - Für Bilder im Text `<Figure … />` verwenden. Die Bilder werden dann automatisch in passenden
   Größen und modernen Formaten (AVIF/WebP) ausgeliefert.
 
@@ -200,7 +211,8 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   - der **Bericht vom Spieltag**, automatisch aus den Verbandsdaten erzeugt (Wir-Form),
   - je Spiel: Satz-Diagramm, Spielwertung, Bälle, Ø Punkte je Satz, knappster Satz, Satzverlauf,
     Schiedsgericht, Kadergröße, mein Einsatz und der Saisonvergleich gegen denselben Gegner,
-  - Halle mit Adresse und Kartenlink, Ausrichter und das dritte Spiel des Tages.
+  - Halle mit Adresse und Links zu Google Maps und Apple Maps, Ausrichter und das dritte Spiel
+    des Tages.
   Vor dem Spieltag zeigt die Seite eine **Vorschau** mit Tabellenplatz, Bilanz und Form der Gegner.
   Namen anderer Spieler übernimmt die Website bewusst nicht, nur Anzahlen.
 - **Eigener Bericht statt des automatischen:** Datei `content/spieltage/<JJJJ-MM-TT>.de.mdx`

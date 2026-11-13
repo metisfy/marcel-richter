@@ -40,7 +40,7 @@ export async function ContentPage({
             data-reveal="right"
             className="card relative order-1 aspect-[4/5] w-full max-w-xs overflow-hidden bg-surface shadow-soft lg:sticky lg:top-24 lg:order-2 lg:max-w-none lg:self-start"
           >
-            <Image src={image.src} alt={image.alt} fill priority sizes="(min-width: 1024px) 320px, 320px" className="object-cover" />
+            <Image src={image.src} alt={image.alt} fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 320px, 320px" className="object-cover" />
           </figure>
         </div>
       ) : (

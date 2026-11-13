@@ -56,15 +56,20 @@
   },
   "projects": {
     "title": "Projekte",
-    "description": "Woran ich arbeite und gearbeitet habe, mit Hintergrund, Rolle und Ergebnis.",
-    "lead": "Woran ich gerade arbeite und was ich bisher gebaut habe.",
+    "description": "Projekte der metisOne-Gruppe, an denen Marcel Richter beteiligt ist – Websites, Plattformen und KI.",
+    "lead": "Projekte der metisOne-Gruppe, an denen ich beteiligt bin – als Entwickler oder als Geschäftsführer.",
     "back": "Alle Projekte",
     "links": "Links",
     "role": "Rolle",
     "date": "Datum",
-    "tags": "Technik",
+    "tags": "Leistungen",
     "empty": "Noch keine Projekte veröffentlicht.",
-    "heading": "Woran ich arbeite."
+    "heading": "Woran ich arbeite.",
+    "client": "Auftraggeber",
+    "status": "Status",
+    "company": "Umsetzung",
+    "category": "Kategorie",
+    "fullPage": "Die ganze Seite"
   },
   "season": {
     "title": "Saison",
@@ -167,7 +172,6 @@
     "host": "Ausrichter",
     "venue": "Halle",
     "map": "Karte öffnen",
-    "mapNote": "OpenStreetMap, öffnet eine externe Seite",
     "squad": "Kader",
     "squadValue": "{listed} im Spielbericht, {played} eingesetzt",
     "myAppearance": "Mein Einsatz",

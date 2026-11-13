@@ -2,6 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { BrowserFrame } from "@/components/browser-frame";
+import { StatusLabel } from "@/components/project-card";
 import { ArrowLeftIcon, ExternalIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
 import { MdxContent } from "@/components/mdx-content";
@@ -10,7 +12,7 @@ import { initLocale } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { getProject, getProjects, getSite } from "@/lib/content";
-import { formatDate } from "@/lib/format";
+import { formatProjectDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo";
 import { projectGraph } from "@/lib/structured-data";
 
@@ -79,9 +81,10 @@ export default async function ProjectPage({ params }: Props) {
           src={project.cover}
           alt={project.coverAlt}
           fill
-          priority
+          loading="eager"
+          fetchPriority="high"
           sizes="(min-width: 1152px) 1104px, 100vw"
-          className="object-cover"
+          className="object-cover object-top"
         />
       </div>
 
@@ -89,6 +92,16 @@ export default async function ProjectPage({ params }: Props) {
         <div>
           {fallback ? <OnlyGermanNote text={tLanguage("onlyGerman")} /> : null}
           <MdxContent source={project.body} lang={fallback ? project.contentLocale : undefined} />
+          {/* Die ganze Seite läuft im Browserfenster durch – bewusst unterhalb
+              des Texts, damit das lange Bild das Laden der Seite nicht bremst. */}
+          {project.screenshot ? (
+            <section aria-labelledby="ganze-seite" className="mt-12" data-reveal>
+              <h2 id="ganze-seite" className="eyebrow mb-4">
+                {t("fullPage")}
+              </h2>
+              <BrowserFrame src={project.screenshot} alt={project.coverAlt} url={project.links[0]?.url} />
+            </section>
+          ) : null}
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
@@ -96,13 +109,33 @@ export default async function ProjectPage({ params }: Props) {
             <div className="p-5">
               <dt className="eyebrow">{t("date")}</dt>
               <dd className="mt-1">
-                <time dateTime={project.date}>{formatDate(project.date, locale, { time: false })}</time>
+                <time dateTime={project.date}>{formatProjectDate(project.date, locale)}</time>
               </dd>
             </div>
             {project.role ? (
               <div className="p-5">
                 <dt className="eyebrow">{t("role")}</dt>
-                <dd className="mt-1">{project.role}</dd>
+                <dd className="mt-1 font-medium">{project.role}</dd>
+              </div>
+            ) : null}
+            {project.client ? (
+              <div className="p-5">
+                <dt className="eyebrow">{t("client")}</dt>
+                <dd className="mt-1">{project.client}</dd>
+              </div>
+            ) : null}
+            {project.status ? (
+              <div className="p-5">
+                <dt className="eyebrow">{t("status")}</dt>
+                <dd className="mt-1">
+                  <StatusLabel status={project.status} />
+                </dd>
+              </div>
+            ) : null}
+            {project.company ? (
+              <div className="p-5">
+                <dt className="eyebrow">{t("company")}</dt>
+                <dd className="mt-1">{project.company}</dd>
               </div>
             ) : null}
             {project.tags.length > 0 ? (

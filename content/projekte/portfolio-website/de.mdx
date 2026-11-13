@@ -1,29 +1,34 @@
 ---
-title: Diese Website
-summary: Zweisprachige, statisch erzeugte Website mit Next.js. Jeder Push wird geprüft und als Docker-Image ausgeliefert.
-date: 2026-11-01
+title: "Diese Website"
+summary: "Persönliche Website mit Live-Spielplan des TSV Pfuhl – zweisprachig, schnell, barrierefrei und automatisch ausgeliefert."
+date: "2026-11"
 cover: /images/projekte/portfolio-website.jpg
-coverAlt: Code-Editor und Browserfenster mit dieser Website (Platzhalterbild)
-role: Design & Entwicklung
-tags: [Next.js, TypeScript, Tailwind CSS, Docker]
-featured: true
+coverAlt: "Startseite dieser Website mit Name, Kurzvorstellung und Saison-Fenster (Screenshot)"
+screenshot: /images/projekte/portfolio-website-seite.jpg
+role: "Konzept & Entwicklung"
+client: "Eigenprojekt"
+status: "Live"
+category: "Websites"
+order: 6
+tags: ["Next.js", "Design-System", "Live-Daten (BVV)", "Docker"]
+featured: false
 links:
-  - label: Quellcode
-    url: https://github.com/beispielprofil/marcel-richter
+  - label: "Quellcode auf GitHub"
+    url: https://github.com/metisfy/marcel-richter
 ---
 
-**Platzhaltertext.** Bitte durch die echte Projektbeschreibung ersetzen.
+Meine persönliche Website, im Design an [metisone.de](https://metisone.de) angelehnt. Meine Rolle:
+Konzept und Entwicklung.
 
-## Ziele
+## Was sie kann
 
-- Lighthouse 95+ in allen Kategorien
-- Barrierefrei nach WCAG AA, helles und dunkles Design
-- Inhalte pflegen, ohne Code anzufassen
+- Spielplan, Ergebnisse, Tabelle und meine Einsätze kommen stündlich aktuell vom Bayerischen
+  Volleyball-Verband, dazu eine eigene Seite mit Statistik und Bericht für jeden Spieltag
+- Deutsch und Englisch, helles und dunkles Design, barrierefrei nach WCAG AA
+- Lighthouse 96–100 in allen Kategorien, keine Cookies, kein Tracking
 
 ## Technik
 
-Die Seite ist mit Next.js (App Router) gebaut und wird beim Build vollständig statisch
-erzeugt. Projekte und Texte liegen als MDX- und YAML-Dateien im Repository, Spielplan und Tabelle
-kommen stündlich aktuell vom Bayerischen Volleyball-Verband.
-Jeder Push auf `main` wird geprüft, als Docker-Image gebaut und automatisch auf den Server
-ausgerollt.
+Next.js (App Router) mit statisch erzeugten Seiten, die sich stündlich im Hintergrund
+aktualisieren. Projekte und Texte liegen als MDX- und YAML-Dateien im Repository. Jeder Push auf
+`main` wird geprüft, als Docker-Image gebaut und in der GitHub Container Registry veröffentlicht.

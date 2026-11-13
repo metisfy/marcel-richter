@@ -564,6 +564,11 @@
     transform: rotate(-90deg) scale(0.6);
   }
 }
+@keyframes shot-scroll {
+  to {
+    transform: translateY(calc(-100% + var(--shot-height)));
+  }
+}
 @keyframes header-shadow {
   to {
     box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.35);
@@ -579,6 +584,25 @@
     flex: none;
     border-radius: 50%;
     background-color: var(--care);
+  }
+
+  /* Lange Kartenlisten: Karten ab der vierten erst zeichnen (und ihre Bilder
+     erst laden), wenn sie in die Nähe des Bildschirms kommen */
+  .lazy-cards > :nth-child(n + 4) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 30rem;
+  }
+
+  /* Browserfenster mit durchlaufendem Seiten-Screenshot (Projektseiten) */
+  .shot-frame {
+    --shot-height: clamp(18rem, 46vw, 34rem);
+    height: var(--shot-height);
+    overflow: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shot-frame {
+      overflow-y: auto;
+    }
   }
 
   /* Schwebende Farbflächen hinter dem Kopfbereich der Startseite */
@@ -685,6 +709,15 @@
     transform-origin: bottom;
     animation: bar-grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--delay, 0s);
+  }
+
+  /* Seiten-Screenshot läuft langsam durch, hält beim Darüberfahren an */
+  .shot-scroll {
+    animation: shot-scroll var(--shot-duration, 30s) ease-in-out 1.5s infinite alternate;
+  }
+  .shot-frame:hover .shot-scroll,
+  .shot-frame:focus-visible .shot-scroll {
+    animation-play-state: paused;
   }
 
   /* 3. Dauerhaft und dezent */

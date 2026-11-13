@@ -28,9 +28,9 @@ export default async function ProjectsPage({ params }: LocaleParams) {
     <div className="container-page">
       <PageIntro eyebrow={t("title")} title={t("heading")} lead={t("lead")} />
       {projects.length > 0 ? (
-        <div data-reveal-stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div data-reveal-stagger className="lazy-cards grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, index) => (
-            <ProjectCard key={project.slug} project={project} locale={locale} priority={index < 3} />
+            <ProjectCard key={project.slug} project={project} locale={locale} eager={index === 0} />
           ))}
         </div>
       ) : (

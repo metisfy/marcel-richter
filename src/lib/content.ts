@@ -59,10 +59,6 @@ const imageSrc = z
     }
   });
 
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Datum im Format "JJJJ-MM-TT" angeben');
-
 const slug = z
   .string()
   .regex(
@@ -215,10 +211,22 @@ const PROJECTS_DIR = path.join(CONTENT_DIR, "projekte");
 const projectSchema = z.object({
   title: z.string(),
   summary: z.string(),
-  date: isoDate,
+  /** "JJJJ", "JJJJ-MM" oder "JJJJ-MM-TT" – je nachdem, wie genau es bekannt ist */
+  date: z.string().regex(/^\d{4}(-\d{2}(-\d{2})?)?$/, 'Datum als "JJJJ", "JJJJ-MM" oder "JJJJ-MM-TT" angeben'),
   cover: imageSrc,
   coverAlt: z.string(),
+  /** Screenshot der ganzen Seite, läuft auf der Projektseite im Browserfenster durch */
+  screenshot: imageSrc.optional(),
   role: z.string().optional(),
+  /** Auftraggeber, z. B. „Gastronomie“ oder „metisOne · Eigenprojekt“ */
+  client: z.string().optional(),
+  /** z. B. „Live“, „In Aufbau“ */
+  status: z.string().optional(),
+  /** Umgesetzt von, z. B. „metisCode“ */
+  company: z.string().optional(),
+  category: z.string().optional(),
+  /** Reihenfolge in Listen (kleiner = weiter vorn); ohne Angabe nach Datum */
+  order: z.number().int().optional(),
   tags: z.array(z.string()).default([]),
   links: z.array(link).default([]),
   featured: z.boolean().default(false),
@@ -257,8 +265,31 @@ export const getProjects = cache((locale: Locale): Project[] =>
   projectSlugs()
     .map((name) => loadProject(name, locale))
     .filter((project) => SHOW_DRAFTS || !project.draft)
-    .sort((a, b) => b.date.localeCompare(a.date)),
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || b.date.localeCompare(a.date)),
 );
+
+/**
+ * Breite und Höhe eines Bildes aus public/ (JPEG oder PNG), direkt aus dem
+ * Dateikopf gelesen – für Bilder, deren Seitenverhältnis die Darstellung
+ * bestimmt (z. B. durchlaufende Seiten-Screenshots).
+ */
+export const imageSize = cache((src: string): { width: number; height: number } | undefined => {
+  const buffer = fs.readFileSync(path.join(PUBLIC_DIR, src));
+  // PNG: Breite/Höhe im IHDR-Block ab Byte 16
+  if (buffer.readUInt32BE(0) === 0x89504e47) return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  // JPEG: Segmente durchgehen bis zum Start-of-Frame (SOF0–SOF15 außer DHT/JPG/DAC)
+  let offset = 2;
+  while (offset < buffer.length) {
+    if (buffer[offset] !== 0xff) return undefined;
+    const marker = buffer[offset + 1];
+    const length = buffer.readUInt16BE(offset + 2);
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return { height: buffer.readUInt16BE(offset + 5), width: buffer.readUInt16BE(offset + 7) };
+    }
+    offset += 2 + length;
+  }
+  return undefined;
+});
 
 export const getProject = cache((locale: Locale, name: string) =>
   getProjects(locale).find((project) => project.slug === name),

@@ -77,3 +77,18 @@ export function toIsoBerlin(value: string): string {
   const time = `${String(p.hour).padStart(2, "0")}:${String(p.minute).padStart(2, "0")}`;
   return `${day}T${time}:00${zone}`;
 }
+
+/**
+ * Projektdatum in der Genauigkeit, in der es bekannt ist:
+ * „2026“, „Juni 2026“ bzw. „June 2026“ oder „1. Juni 2026“.
+ */
+export function formatProjectDate(value: string, locale: Locale): string {
+  if (/^\d{4}$/.test(value)) return value;
+  if (/^\d{4}-\d{2}$/.test(value)) {
+    const [year, month] = value.split("-").map(Number);
+    return new Intl.DateTimeFormat(INTL_LOCALE[locale], { timeZone: "UTC", month: "long", year: "numeric" }).format(
+      new Date(Date.UTC(year, month - 1, 1)),
+    );
+  }
+  return formatDate(value, locale, { time: false });
+}

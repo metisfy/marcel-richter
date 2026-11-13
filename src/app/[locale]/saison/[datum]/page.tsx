@@ -72,6 +72,25 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
+/**
+ * Halle in Google Maps bzw. Apple Maps öffnen (reine Links – geladen wird erst
+ * beim Klick). Google sucht nach Name und Adresse und zeigt so den Ort mit
+ * Namen; Apple setzt die Nadel auf die Koordinaten vom BVV.
+ */
+function mapLinks(venue: NonNullable<Matchday["venue"]>): { label: string; url: string }[] {
+  const address = [venue.name, venue.street, venue.city].filter(Boolean).join(", ");
+  const hasPoint = venue.lat !== undefined && venue.lng !== undefined;
+  return [
+    { label: "Google Maps", url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` },
+    {
+      label: "Apple Maps",
+      url: hasPoint
+        ? `https://maps.apple.com/?q=${encodeURIComponent(venue.name)}&ll=${venue.lat},${venue.lng}`
+        : `https://maps.apple.com/?address=${encodeURIComponent(address)}`,
+    },
+  ];
+}
+
 /** Kachel in der Zahlenleiste */
 function Fact({ label, value, sub, highlight }: { label: string; value: string | number; sub?: string; highlight?: "accent" | "win" }) {
   const box = highlight === "accent" ? "border-transparent bg-accent-soft" : highlight === "win" ? "border-transparent bg-win-soft" : "";
@@ -405,16 +424,25 @@ export default async function MatchdayPage({ params }: Props) {
                 {day.venue.street ? <span className="block text-muted">{day.venue.street}</span> : null}
                 {day.venue.city ? <span className="block text-muted">{day.venue.city}</span> : null}
               </address>
-              {day.venue.lat !== undefined && day.venue.lng !== undefined ? (
-                <a
-                  href={`https://www.openstreetmap.org/?mlat=${day.venue.lat}&mlon=${day.venue.lng}#map=16/${day.venue.lat}/${day.venue.lng}`}
-                  rel="noopener"
-                  className="arrow-link mt-4 text-[15px]"
-                  title={t("mapNote")}
-                >
-                  {t("map")}
-                </a>
-              ) : null}
+              <ul className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-1" aria-label={t("map")}>
+                {mapLinks(day.venue).map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.url}
+                      rel="noopener"
+                      className="group flex items-center justify-between gap-2 rounded-xl border border-line px-3 py-2.5 text-[14.5px] font-medium whitespace-nowrap transition-colors hover:bg-surface"
+                    >
+                      {link.label}
+                      <ExternalIcon
+                        width={14}
+                        height={14}
+                        aria-hidden="true"
+                        className="shrink-0 text-muted transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
 

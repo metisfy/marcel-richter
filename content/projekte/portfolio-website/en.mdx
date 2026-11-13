@@ -1,24 +1,28 @@
 ---
-title: This website
-summary: Bilingual, statically generated Next.js website. Every push is checked and shipped as a Docker image.
-coverAlt: Code editor and browser window showing this website (placeholder image)
-role: Design & development
+title: "This website"
+summary: "Personal website with live TSV Pfuhl fixtures – bilingual, fast, accessible and deployed automatically."
+coverAlt: "Home page of this website with name, introduction and season window (screenshot)"
+role: "Concept & development"
+client: "Own project"
+category: "Websites"
+tags: ["Next.js", "Design system", "Live data (BVV)", "Docker"]
 links:
-  - label: Source code
-    url: https://github.com/beispielprofil/marcel-richter
+  - label: "Source code on GitHub"
+    url: https://github.com/metisfy/marcel-richter
 ---
 
-**Placeholder text.** Please replace it with the real project description.
+My personal website, with a design based on [metisone.de](https://metisone.de). My role: concept
+and development.
 
-## Goals
+## What it does
 
-- Lighthouse 95+ in every category
-- Accessible to WCAG AA, light and dark theme
-- Edit content without touching code
+- Fixtures, results, league table and my appearances are refreshed hourly from the Bavarian
+  Volleyball Association, plus a page with statistics and a report for every matchday
+- German and English, light and dark theme, accessible to WCAG AA
+- Lighthouse 96–100 in every category, no cookies, no tracking
 
 ## Tech
 
-The site is built with Next.js (App Router) and fully pre-rendered at build time. Projects
-and texts live as MDX and YAML files in the repository; fixtures and the league table are
-refreshed hourly from the Bavarian Volleyball Association. Every push to `main` is
-checked, built into a Docker image and deployed to the server automatically.
+Next.js (App Router) with statically generated pages that refresh hourly in the background.
+Projects and texts live as MDX and YAML files in the repository. Every push to `main` is
+checked, built into a Docker image and published to the GitHub Container Registry.
