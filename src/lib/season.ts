@@ -5,7 +5,7 @@ import { cache } from "react";
 
 import type { Locale } from "@/i18n/routing";
 
-import { type BvvLeague, type BvvMatch, parseBvvLeague } from "./bvv";
+import { type BvvLeague, type BvvMatch, parseBvvLeague, parseBvvLineups } from "./bvv";
 import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
 
 /*
@@ -26,13 +26,19 @@ import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
  */
 
 const REVALIDATE_SECONDS = 3600;
+// Spielberichte gespielter Spiele ändern sich kaum noch: seltener abrufen.
+const MATCH_REVALIDATE_SECONDS = 6 * 3600;
 
-async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt: string }> {
-  const response = await fetch(url, {
+function fetchBvv(url: string, revalidate: number) {
+  return fetch(url, {
     headers: { accept: "text/html", "user-agent": "Mozilla/5.0 (compatible; spielplan-abruf/1.0)" },
-    next: { revalidate: REVALIDATE_SECONDS, tags: ["bvv"] },
+    next: { revalidate, tags: ["bvv"] },
     signal: AbortSignal.timeout(15_000),
   });
+}
+
+async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt: string }> {
+  const response = await fetchBvv(url, REVALIDATE_SECONDS);
   if (!response.ok) throw new Error(`BVV antwortet mit HTTP ${response.status} (${url})`);
   const league = parseBvvLeague(await response.text());
   // Das Date-Header bleibt im Fetch-Cache erhalten und zeigt so, wann die
@@ -49,7 +55,7 @@ function hostOf(match: BvvMatch, sameDay: BvvMatch[]): string | undefined {
   return other.host === "A" ? other.teamA : other.teamB;
 }
 
-function withLeague(season: Season, source: { url: string; team: string }, league: BvvLeague, updatedAt: string): Season {
+function withLeague(season: Season, source: NonNullable<Season["source"]>, league: BvvLeague, updatedAt: string): Season {
   const { team } = source;
   const own = league.matches.filter((match) => match.teamA === team || match.teamB === team);
   if (own.length === 0) {
@@ -71,6 +77,7 @@ function withLeague(season: Season, source: { url: string; team: string }, leagu
       result: match.result,
       sets: match.sets,
       outcome: match.result ? outcomeOf(ownIndex, match.result) : undefined,
+      url: match.url,
     };
   });
 
@@ -89,12 +96,58 @@ function withLeague(season: Season, source: { url: string; team: string }, leagu
   };
 }
 
+const sameName = (a: string, b: string) => a.trim().localeCompare(b.trim(), "de", { sensitivity: "base" }) === 0;
+
+/** Eigener Einsatz in einem gespielten Spiel laut Spielbericht; ohne Spielbericht undefined. */
+async function appearanceIn(fixture: Fixture, source: NonNullable<Season["source"]>): Promise<Fixture["appearance"]> {
+  if (!fixture.result || !fixture.url) return undefined;
+  try {
+    const response = await fetchBvv(fixture.url, MATCH_REVALIDATE_SECONDS);
+    if (!response.ok) return undefined;
+    const lineup = parseBvvLineups(await response.text()).find((entry) => entry.team === source.team);
+    if (!lineup || lineup.players.length === 0) return undefined;
+    const me = lineup.players.find(
+      (player) => sameName(player.lastName, source.player.lastName) && sameName(player.firstName, source.player.firstName),
+    );
+    if (!me) return { status: "absent", libero: false };
+    return { status: me.played ? "played" : "squad", libero: me.libero };
+  } catch {
+    // Einzelner Spielbericht nicht erreichbar: Spiel ohne Einsatz-Angabe anzeigen
+    return undefined;
+  }
+}
+
+/** Liest die Spielberichte aller gespielten Spiele (höchstens vier gleichzeitig). */
+async function withAppearances(season: Season): Promise<Season> {
+  const { source } = season;
+  if (!source) return season;
+  const fixtures = [...season.fixtures];
+  const pending = fixtures.map((fixture, index) => ({ fixture, index })).filter(({ fixture }) => fixture.result && fixture.url);
+  for (let i = 0; i < pending.length; i += 4) {
+    const batch = pending.slice(i, i + 4);
+    const results = await Promise.all(batch.map(({ fixture }) => appearanceIn(fixture, source)));
+    batch.forEach(({ index }, position) => {
+      fixtures[index] = { ...fixtures[index], appearance: results[position] };
+    });
+  }
+  const known = fixtures.filter((fixture) => fixture.appearance);
+  const appearances =
+    known.length > 0
+      ? {
+          played: known.filter((fixture) => fixture.appearance?.status === "played").length,
+          squad: known.filter((fixture) => fixture.appearance?.status !== "absent").length,
+          matches: known.length,
+        }
+      : undefined;
+  return { ...season, fixtures, appearances };
+}
+
 async function resolve(season: Season): Promise<Season> {
   const { source } = season;
   if (!source) return season;
   try {
     const { league, updatedAt } = await fetchLeague(source.url);
-    return withLeague(season, source, league, updatedAt);
+    return await withAppearances(withLeague(season, source, league, updatedAt));
   } catch (error) {
     const atRuntime = process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD;
     if (atRuntime) throw error;

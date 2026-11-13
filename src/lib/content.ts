@@ -309,6 +309,8 @@ const seasonSchema = z.object({
         ),
       /** Name der eigenen Mannschaft genau wie auf der BVV-Seite; Standard: team.name aus site.yaml */
       team: z.string().optional(),
+      /** Eigener Name wie im Spielbericht, für „Meine Einsätze“; Standard: name aus site.yaml */
+      player: z.object({ lastName: z.string(), firstName: z.string() }).optional(),
     })
     .optional(),
   standing: z
@@ -404,6 +406,14 @@ export type Fixture = {
   /** Einzelne Sätze, Reihenfolge wie `teams`, z. B. ["25:21", "22:25"] */
   sets: string[];
   outcome?: Outcome;
+  /** Spielseite beim Verband */
+  url?: string;
+  /**
+   * Eigener Einsatz laut Spielbericht (nur gespielte Spiele mit BVV-Daten):
+   * played = eingesetzt, squad = im Spielbericht, aber nicht eingesetzt,
+   * absent = nicht im Spielbericht
+   */
+  appearance?: { status: "played" | "squad" | "absent"; libero: boolean };
 };
 
 export type TableRow = {
@@ -430,8 +440,10 @@ export type Season = {
   table: TableRow[];
   /** Bilanz der eigenen Mannschaft (nur mit Live-Daten) */
   record?: Pick<TableRow, "played" | "won" | "lost" | "sets" | "balls">;
+  /** Eigene Einsätze: eingesetzt in `played` von `matches` Spielen mit Spielbericht */
+  appearances?: { played: number; squad: number; matches: number };
   /** Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist */
-  source?: { url: string; team: string; updatedAt?: string };
+  source?: { url: string; team: string; player: { lastName: string; firstName: string }; updatedAt?: string };
 };
 
 export function outcomeOf(own: 0 | 1, result: [number, number]): Outcome {
@@ -439,7 +451,11 @@ export function outcomeOf(own: 0 | 1, result: [number, number]): Outcome {
 }
 
 export const getSeasons = cache((locale: Locale): Season[] => {
-  const teamName = getSite(locale).team.name;
+  const site = getSite(locale);
+  const teamName = site.team.name;
+  // „Marcel Richter“ → Vorname „Marcel“, Nachname „Richter“
+  const nameParts = site.name.trim().split(/\s+/);
+  const defaultPlayer = { lastName: nameParts.at(-1) ?? site.name, firstName: nameParts.slice(0, -1).join(" ") };
   return fs
     .readdirSync(SEASON_DIR)
     .filter((file) => file.endsWith(".yaml"))
@@ -458,7 +474,7 @@ export const getSeasons = cache((locale: Locale): Season[] => {
           value: stat.value,
         })),
         table: [],
-        source: raw.bvv ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName } : undefined,
+        source: raw.bvv ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName, player: raw.bvv.player ?? defaultPlayer } : undefined,
         fixtures: raw.fixtures
           .map((fixture): Fixture => {
             const own = fixture.home ? 0 : 1;

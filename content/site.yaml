@@ -62,8 +62,8 @@ email: hallo@example.com
 
 portrait: /images/portrait.jpg
 portraitAlt:
-  de: Porträt von Marcel Richter im Trikot mit der Nummer 7 (Platzhalterbild)
-  en: Portrait of Marcel Richter wearing the number 7 shirt (placeholder image)
+  de: Marcel Richter im hellen Poloshirt vor grünen Weidenzweigen
+  en: Marcel Richter in a light polo shirt in front of green willow branches
 
 # Copyright-Vermerk in der Fußzeile: „© <Jahr> metisCode · metisOne“
 copyright:

@@ -185,6 +185,15 @@ stats:                                   # optional, eigene Zahlen als zusätzli
 - Die Website liest dort alle Spiele, Ergebnisse, Sätze und die Tabelle. Daraus entstehen auf der
   Saisonseite Bilanz, Spielplan (mit Ausrichter des Spieltags) und Tabelle, auf der Startseite
   letztes Spiel, nächster Spieltag und Tabellenplatz.
+- **Meine Einsätze:** Für jedes gespielte Spiel liest die Website zusätzlich den Spielbericht
+  (Spielerliste mit „eingesetzt“ und „Libero“) und sucht dort den eigenen Namen. Daraus entstehen
+  die Kachel „Meine Einsätze“, die Spalte „Einsatz“ im Spielplan (✓ eingesetzt, „Kader“ = im
+  Bericht, aber nicht eingesetzt, – = nicht im Bericht) und die Angabe in der Leiste auf der
+  Startseite. Gesucht wird nach `name` aus `site.yaml` (letztes Wort = Nachname); weicht die
+  Schreibweise im Spielbericht ab, in der Saisondatei angeben:
+  `bvv: { …, player: { lastName: Richter, firstName: Marcel } }`. Spielberichte werden höchstens
+  alle sechs Stunden neu abgerufen; ist einer nicht erreichbar, fehlt nur die Angabe zu diesem
+  Spiel.
 - **Aktualisierung:** Startseite und Saisonseite werden höchstens einmal pro Stunde im Hintergrund
   neu erzeugt (`export const revalidate = 3600`). Neue Ergebnisse erscheinen also spätestens nach
   etwa einer Stunde, **ohne neues Deployment**. Der BVV wird dabei höchstens einmal pro Stunde
@@ -448,7 +457,8 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   erreicht auf Weiß nur 3,7:1 und ist deshalb nur für Flächen, Icons und große Überschriften gedacht.
 - **Animationen:** wie auf metisone.de, alles am Ende von `src/app/globals.css`. Beim Laden
   erscheinen Kopfbereich und Seitenüberschriften gestaffelt (`.rise`, Verzögerung über
-  `[--delay:0.1s]`). Beim Scrollen blenden Elemente mit `data-reveal` (Varianten `pop`, `left`,
+  `[--delay:0.1s]`). Große Überschriften nutzen `.rise-focus` (gleiten hoch und werden scharf,
+  ohne unsichtbar zu sein), damit Lighthouse sie sofort als sichtbar zählt. Beim Scrollen blenden Elemente mit `data-reveal` (Varianten `pop`, `left`,
   `right`, `zoom`) bzw. deren Kinder mit `data-reveal-stagger` ein; ausgelöst von
   `src/components/reveal-observer.tsx`. Was beim Laden schon sichtbar ist, wird nie versteckt,
   ohne JavaScript ist alles sichtbar, und bei „Bewegung reduzieren“ ist alles aus.
@@ -491,7 +501,8 @@ deploy/                  Beispielkonfiguration Nginx
 
 - [ ] `content/site.yaml`: echte Daten (Texte, E-Mail, Social-Links, Position, Rückennummer);
       Vereinslogo nur mit Erlaubnis des TSV Pfuhl einbinden
-- [ ] `public/images/portrait.jpg` und alle Beispielbilder ersetzen
+- [ ] Beispielbilder der Projekte ersetzen (`public/images/portrait.jpg` ist bereits dein Foto
+      von metisone.de, 1200 × 1500 px, ohne Metadaten)
 - [ ] Projekte und „Über mich“ in `content/` mit echten Inhalten füllen
 - [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,
       Auslieferung über Cloudflare) rechtlich prüfen lassen

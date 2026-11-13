@@ -24,7 +24,8 @@
     "position": "Position",
     "number": "Nummer",
     "club": "Verein",
-    "league": "Liga"
+    "league": "Liga",
+    "appearances": "Einsätze"
   },
   "home": {
     "ctaProjects": "Zu den Projekten",
@@ -49,7 +50,9 @@
     "seasonWindow": "Saison {season}",
     "lastSets": "Sätze",
     "nextMatchday": "Nächster Spieltag",
-    "live": "Live vom BVV"
+    "live": "Live vom BVV",
+    "appearancesCount": "{count, plural, one {# Einsatz} other {# Einsätze}} {season}",
+    "lastPlayed": "Eingesetzt"
   },
   "projects": {
     "title": "Projekte",
@@ -101,7 +104,14 @@
     "source": "Quelle: Bayerischer Volleyball-Verband, Stand {updated} Uhr.",
     "unavailable": "Der Spielplan des Verbands ist gerade nicht erreichbar.",
     "sourceLink": "Zur Ligaseite beim BVV",
-    "nextUp": "Als Nächstes"
+    "nextUp": "Als Nächstes",
+    "appearances": "Meine Einsätze",
+    "appearancesOf": "in {matches, plural, one {# Spiel} other {# Spielen}}",
+    "appearanceColumn": "Einsatz",
+    "appearancePlayed": "eingesetzt",
+    "appearanceLibero": "Libero",
+    "appearanceSquad": "Kader",
+    "appearanceAbsent": "nicht dabei"
   },
   "contact": {
     "title": "Kontakt",

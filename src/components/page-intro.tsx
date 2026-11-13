@@ -14,7 +14,7 @@ export function PageIntro({
   return (
     <div className="max-w-3xl pt-14 pb-12 sm:pt-20">
       {eyebrow ? <p className="eyebrow rise mb-4">{eyebrow}</p> : null}
-      <h1 className="rise text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
+      <h1 className="rise-focus text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
         {title}
       </h1>
       {lead ? <p className="rise mt-5 text-lg leading-relaxed text-pretty text-muted [--delay:0.14s]">{lead}</p> : null}

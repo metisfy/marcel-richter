@@ -458,6 +458,14 @@
     transform: translateY(18px);
   }
 }
+/* Für große Überschriften: ohne Unsichtbar-Phase, damit der Text sofort
+   gezeichnet wird (wichtig für Largest Contentful Paint) */
+@keyframes rise-focus {
+  from {
+    transform: translateY(14px);
+    filter: blur(8px);
+  }
+}
 @keyframes reveal {
   from {
     opacity: 0;
@@ -615,6 +623,10 @@
   /* 1. Einstieg beim Laden */
   .rise {
     animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--delay, 0s);
+  }
+  .rise-focus {
+    animation: rise-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: var(--delay, 0s);
   }
   .bar-grow {

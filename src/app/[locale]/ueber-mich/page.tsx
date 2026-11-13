@@ -18,5 +18,6 @@ export async function generateMetadata({ params }: LocaleParams) {
 
 export default async function UeberMichPage({ params }: LocaleParams) {
   const locale = await initLocale(params);
-  return <ContentPage name="ueber-mich" locale={locale} />;
+  const site = getSite(locale);
+  return <ContentPage name="ueber-mich" locale={locale} image={{ src: site.portrait, alt: site.portraitAlt }} />;
 }

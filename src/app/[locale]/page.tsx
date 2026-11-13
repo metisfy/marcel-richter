@@ -75,6 +75,12 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
               <p className="mt-3 flex items-center gap-3">
                 <span className="text-4xl font-semibold tracking-[-0.02em] tabular-nums">{latest.result.join(":")}</span>
                 <OutcomeBadge outcome={latest.outcome} />
+                {latest.appearance?.status === "played" ? (
+                  <span className="inline-flex h-6 items-center gap-1.5 rounded-full border border-line px-2.5 font-mono text-[11.5px] text-muted">
+                    <CheckIcon width={11} height={11} strokeWidth={3} className="text-win" />
+                    {t("lastPlayed")}
+                  </span>
+                ) : null}
               </p>
               <p className="mt-1.5 text-[15px] text-muted">
                 {matchTitle(latest)}
@@ -176,6 +182,10 @@ export default async function HomePage({ params }: LocaleParams) {
     { label: tPlayer("number"), value: site.team.number !== undefined ? `#${site.team.number}` : undefined },
     { label: tPlayer("club"), value: site.team.name },
     { label: tPlayer("league"), value: site.team.league },
+    {
+      label: tPlayer("appearances"),
+      value: season?.appearances ? t("appearancesCount", { count: season.appearances.played, season: season.season }) : undefined,
+    },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   return (
@@ -194,9 +204,9 @@ export default async function HomePage({ params }: LocaleParams) {
             {roleLine(site)}
           </p>
           <h1 className="mt-7 text-[clamp(3rem,0.9rem+8.6vw,6.5rem)] leading-[0.98] font-bold tracking-[-0.03em]">
-            <span className="rise block [--delay:0.06s]">{nameParts.join(" ")}</span>
+            <span className="rise-focus block [--delay:0.04s]">{nameParts.join(" ")}</span>
             {lastName ? (
-              <span className="rise block pb-[0.08em] [--delay:0.13s]">
+              <span className="rise-focus block pb-[0.08em] [--delay:0.1s]">
                 {" "}
                 <span className="gradient-text">{lastName}</span>
               </span>
@@ -253,7 +263,6 @@ export default async function HomePage({ params }: LocaleParams) {
               src={site.portrait}
               alt={site.portraitAlt}
               fill
-              priority
               sizes="(min-width: 1024px) 440px, (min-width: 448px) 448px, 100vw"
               className="object-cover"
             />

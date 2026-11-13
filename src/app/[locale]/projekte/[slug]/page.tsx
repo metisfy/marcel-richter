@@ -68,7 +68,7 @@ export default async function ProjectPage({ params }: Props) {
           {project.date.slice(0, 4)}
           {project.role ? ` · ${project.role}` : null}
         </p>
-        <h1 className="rise text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
+        <h1 className="rise-focus text-[clamp(2rem,1.4rem+2.6vw,3rem)] leading-[1.08] font-semibold tracking-[-0.02em] text-balance [--delay:0.06s]">
           {project.title}
         </h1>
         <p className="rise mt-5 text-lg leading-relaxed text-pretty text-muted [--delay:0.14s]">{project.summary}</p>

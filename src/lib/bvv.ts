@@ -29,7 +29,20 @@ export type BvvMatch = {
   result?: [number, number];
   /** Einzelne Sätze aus Sicht von Team A, z. B. ["25:21", "22:25"] */
   sets: string[];
+  /** Spielseite beim BVV (Halle, Schiedsgericht, Spielerlisten) */
+  url?: string;
 };
+
+export type BvvPlayer = {
+  lastName: string;
+  firstName: string;
+  /** Spalte „eingesetzt“ im Spielbericht */
+  played: boolean;
+  libero: boolean;
+};
+
+/** Spielerliste einer Mannschaft auf der Spielseite */
+export type BvvLineup = { team: string; players: BvvPlayer[] };
 
 export type BvvTableRow = {
   position: number;
@@ -105,6 +118,14 @@ const toInt = (value: string) => {
 // ---------------------------------------------------------------------------
 
 const HOST_MARK = /\s*\(H\)\s*$/;
+const ORIGIN = "https://volleyball.bayern";
+
+/** Nur Links auf volleyball.bayern übernehmen – die Website ruft sie später serverseitig ab. */
+function matchUrl(href: string | undefined): string | undefined {
+  if (!href) return undefined;
+  const url = new URL(decode(href), ORIGIN);
+  return url.origin === ORIGIN ? url.toString() : undefined;
+}
 
 function parseDate(value: string): string | undefined {
   const day = /(\d{1,2})\.(\d{1,2})\.(\d{4})/.exec(value);
@@ -133,6 +154,7 @@ function parseMatches(table: string): BvvMatch[] {
       .split(/[,\s]+/)
       .filter((set) => /^\d+:\d+$/.test(set));
     const number = toInt(cells[at.number] ?? "");
+    const link = /href="([^"]*\/spiel-\d+)"/.exec(row)?.[1];
 
     matches.push({
       number: number || undefined,
@@ -142,6 +164,7 @@ function parseMatches(table: string): BvvMatch[] {
       host: HOST_MARK.test(rawA) ? "A" : HOST_MARK.test(rawB) ? "B" : undefined,
       result: result ? [Number(result[1]), Number(result[2])] : undefined,
       sets: result ? sets : [],
+      url: matchUrl(link),
     });
   }
   return matches;
@@ -172,6 +195,46 @@ function parseTable(table: string): BvvTableRow[] {
       sets: quotients[0] ? cells[quotients[0] - 1] : "",
       balls: quotients[1] ? cells[quotients[1] - 1] : "",
     }));
+}
+
+// ---------------------------------------------------------------------------
+// Spielseite: Spielerlisten beider Mannschaften
+// ---------------------------------------------------------------------------
+
+const TEAM_LINK = /<a\b[^>]*href="[^"]*\/team-\d+"[^>]*>([\s\S]*?)<\/a>/gi;
+const YES = /title="Ja"/i;
+
+/**
+ * Liest die Tabellen „Name | Vorname | eingesetzt | Libero“ einer Spielseite.
+ * Zu welcher Mannschaft eine Tabelle gehört, steht im Team-Link direkt davor.
+ */
+export function parseBvvLineups(html: string): BvvLineup[] {
+  const lineups: BvvLineup[] = [];
+  let searchFrom = 0;
+  for (const table of tablesOf(html)) {
+    const start = html.indexOf(table, searchFrom);
+    searchFrom = start + table.length;
+    const header = headerOf(table);
+    const at = { last: header.indexOf("Name"), first: header.indexOf("Vorname"), played: header.indexOf("eingesetzt"), libero: header.indexOf("Libero") };
+    if (at.last < 0 || at.first < 0 || at.played < 0) continue;
+
+    const before = html.slice(Math.max(0, start - 4000), start);
+    const team = [...before.matchAll(TEAM_LINK)].at(-1)?.[1];
+    if (!team) continue;
+
+    const players = rowsOf(section(table, "tbody"))
+      .map(cellsOf)
+      .filter((cells) => cells.length > at.played)
+      .map((cells) => ({
+        lastName: text(cells[at.last]),
+        firstName: text(cells[at.first]),
+        played: YES.test(cells[at.played]),
+        libero: at.libero >= 0 && YES.test(cells[at.libero] ?? ""),
+      }))
+      .filter((player) => player.lastName);
+    lineups.push({ team: text(team), players });
+  }
+  return lineups;
 }
 
 // ---------------------------------------------------------------------------

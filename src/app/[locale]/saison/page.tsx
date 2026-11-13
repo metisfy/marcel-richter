@@ -36,7 +36,6 @@ async function SeasonFacts({ season }: { season: Season }) {
           { label: t("won"), value: season.record.won },
           { label: t("lost"), value: season.record.lost },
           { label: t("setsShort"), value: season.record.sets },
-          { label: t("balls"), value: season.record.balls },
         ]
       : []),
     ...season.stats,
@@ -56,6 +55,15 @@ async function SeasonFacts({ season }: { season: Season }) {
               {t("of", { teams: season.standing.teams })}
               {season.standing.points !== undefined ? ` · ${t("points", { points: season.standing.points })}` : null}
             </span>
+          </dd>
+        </div>
+      ) : null}
+      {season.appearances ? (
+        <div className="card col-span-2 border-transparent bg-win-soft p-5 sm:col-span-1">
+          <dt className="eyebrow">{t("appearances")}</dt>
+          <dd className="mt-2">
+            <span className="block text-4xl font-semibold tracking-[-0.02em] text-win tabular-nums">{season.appearances.played}</span>
+            <span className="mt-1 block text-sm text-muted">{t("appearancesOf", { matches: season.appearances.matches })}</span>
           </dd>
         </div>
       ) : null}

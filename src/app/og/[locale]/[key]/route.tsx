@@ -26,14 +26,14 @@ export function generateStaticParams() {
   ]);
 }
 
-async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; title: string; text: string } | null> {
+async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; title: string; text: string; photo?: boolean } | null> {
   const site = getSite(locale);
   const nav = await getTranslations({ locale, namespace: "nav" });
 
-  if (key === "home") return { eyebrow: roleLine(site), title: site.name, text: site.tagline };
+  if (key === "home") return { eyebrow: roleLine(site), title: site.name, text: site.tagline, photo: true };
   if (key === "ueber-mich" || key === "impressum" || key === "datenschutz") {
     const page = getPage(key, locale);
-    return { eyebrow: site.jobTitle, title: page.title, text: page.description };
+    return { eyebrow: site.jobTitle, title: page.title, text: page.description, photo: key === "ueber-mich" };
   }
   if (key === "projekte") {
     const t = await getTranslations({ locale, namespace: "projects" });
@@ -54,6 +54,14 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   return null;
 }
 
+/** Kürzt an einer Wortgrenze: „… am Wochenende…“ statt „… Wochenende spie…“ */
+function shorten(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).replace(/[\s,.;:–-]+$/, "")}…`;
+}
+
 // Schriften liegen als statische TTF im Repo (Inter, JetBrains Mono – beide
 // SIL Open Font License), denn Satori kann weder WOFF2 noch variable Schriften.
 const FONT_DIR = path.join(process.cwd(), "src/app/og/fonts");
@@ -70,7 +78,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   if (!content) return new Response("Not found", { status: 404 });
   const site = getSite(locale);
   const [bold, regular, mono] = await fonts;
-  const titleSize = content.title.length > 30 ? 68 : content.title.length > 18 ? 84 : 104;
+  // Porträt rechts unten (Startseite, Über mich) – als Data-URL, Satori lädt nichts nach.
+  const photo = content.photo
+    ? `data:image/jpeg;base64,${(await readFile(path.join(process.cwd(), "public", site.portrait))).toString("base64")}`
+    : undefined;
+  const titleSize = content.title.length > 30 ? 68 : content.title.length > 18 || photo ? 84 : 104;
   const nameParts = site.name.split(" ");
   const lastName = nameParts.length > 1 ? nameParts.pop() : undefined;
 
@@ -131,13 +143,25 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
             {content.eyebrow}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-          <div style={{ display: "flex", fontSize: titleSize, fontWeight: 700, lineHeight: 1.02, letterSpacing: -titleSize * 0.03 }}>
-            {content.title}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 48 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 26, flex: 1 }}>
+            <div style={{ display: "flex", fontSize: titleSize, fontWeight: 700, lineHeight: 1.02, letterSpacing: -titleSize * 0.03 }}>
+              {content.title}
+            </div>
+            <div style={{ display: "flex", fontSize: 30, color: "#666666", lineHeight: 1.45, maxWidth: photo ? 720 : 980 }}>
+              {shorten(content.text, photo ? 110 : 130)}
+            </div>
           </div>
-          <div style={{ display: "flex", fontSize: 30, color: "#666666", lineHeight: 1.45, maxWidth: 980 }}>
-            {content.text.length > 130 ? `${content.text.slice(0, 127)}…` : content.text}
-          </div>
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Satori rendert nur <img>
+            <img
+              src={photo}
+              alt=""
+              width={240}
+              height={300}
+              style={{ borderRadius: 28, border: "1px solid #e7e9ee", objectFit: "cover" }}
+            />
+          ) : null}
         </div>
       </div>
     ),

@@ -24,7 +24,8 @@
     "position": "Position",
     "number": "Number",
     "club": "Club",
-    "league": "League"
+    "league": "League",
+    "appearances": "Appearances"
   },
   "home": {
     "ctaProjects": "See projects",
@@ -49,7 +50,9 @@
     "seasonWindow": "Season {season}",
     "lastSets": "Sets",
     "nextMatchday": "Next matchday",
-    "live": "Live from BVV"
+    "live": "Live from BVV",
+    "appearancesCount": "{count, plural, one {# appearance} other {# appearances}} {season}",
+    "lastPlayed": "Played"
   },
   "projects": {
     "title": "Projects",
@@ -101,7 +104,14 @@
     "source": "Source: Bavarian Volleyball Association, as of {updated}.",
     "unavailable": "The association's fixtures are unavailable right now.",
     "sourceLink": "League page on volleyball.bayern",
-    "nextUp": "Up next"
+    "nextUp": "Up next",
+    "appearances": "My appearances",
+    "appearancesOf": "in {matches, plural, one {# match} other {# matches}}",
+    "appearanceColumn": "Played",
+    "appearancePlayed": "played",
+    "appearanceLibero": "Libero",
+    "appearanceSquad": "Squad",
+    "appearanceAbsent": "not involved"
   },
   "contact": {
     "title": "Contact",

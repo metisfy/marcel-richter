@@ -4,6 +4,8 @@ import type { Locale } from "@/i18n/routing";
 import type { Fixture, Outcome, Season, TableRow } from "@/lib/content";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
+import { CheckIcon } from "./icons";
+
 const OUTCOME_STYLE: Record<Outcome, string> = {
   win: "bg-win-soft text-win",
   loss: "bg-loss-soft text-loss",
@@ -42,6 +44,30 @@ export async function OutcomeBadge({ outcome }: { outcome: Outcome }) {
   );
 }
 
+/** Eigener Einsatz laut Spielbericht: grünes Häkchen, „Kader“ oder Strich */
+export async function AppearanceMark({ appearance }: { appearance: NonNullable<Fixture["appearance"]> }) {
+  const t = await getTranslations("season");
+  if (appearance.status === "played") {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-mono text-[11.5px] font-medium text-win">
+        <span aria-hidden="true" className="grid size-5 place-items-center rounded-full bg-win-soft">
+          <CheckIcon width={11} height={11} strokeWidth={3} />
+        </span>
+        {appearance.libero ? t("appearanceLibero") : <span className="sr-only">{t("appearancePlayed")}</span>}
+      </span>
+    );
+  }
+  if (appearance.status === "squad") {
+    return <span className="font-mono text-[11.5px] text-muted">{t("appearanceSquad")}</span>;
+  }
+  return (
+    <span className="font-mono text-[12.5px] text-muted">
+      <span aria-hidden="true">–</span>
+      <span className="sr-only">{t("appearanceAbsent")}</span>
+    </span>
+  );
+}
+
 /** Satzergebnisse, z. B. „25:21 · 22:25 · 25:19“ */
 export async function SetScores({ sets, className = "" }: { sets: string[]; className?: string }) {
   if (sets.length === 0) return null;
@@ -68,6 +94,7 @@ export async function FixtureTable({
   if (fixtures.length === 0) return <p className="text-muted">{t("noFixtures")}</p>;
 
   const showCompetition = fixtures.some((fixture) => fixture.competition);
+  const showAppearance = fixtures.some((fixture) => fixture.appearance);
   // Nächster Spieltag: erstes Spiel ohne Ergebnis und alle weiteren am selben Tag
   const nextDay = fixtures.find((fixture) => !fixture.result)?.date.slice(0, 10);
   const places = await Promise.all(fixtures.map(matchPlace));
@@ -91,6 +118,7 @@ export async function FixtureTable({
             <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("date")}</th>
             <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("match")}</th>
             {showCompetition ? <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("competition")}</th> : null}
+            {showAppearance ? <th scope="col" className="eyebrow table-cell px-3 py-3 text-center font-normal">{t("appearanceColumn")}</th> : null}
             <th scope="col" className="eyebrow table-cell px-5 py-3 text-right font-normal">{t("result")}</th>
           </tr>
         </thead>
@@ -122,6 +150,11 @@ export async function FixtureTable({
                 </th>
                 {showCompetition ? (
                   <td className={`px-5 text-muted ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>{fixture.competition ?? "–"}</td>
+                ) : null}
+                {showAppearance ? (
+                  <td className={`px-3 text-center ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
+                    {fixture.appearance ? <AppearanceMark appearance={fixture.appearance} /> : null}
+                  </td>
                 ) : null}
                 <td className={`px-5 text-right whitespace-nowrap ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
                   {fixture.result && fixture.outcome ? (
