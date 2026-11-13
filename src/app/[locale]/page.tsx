@@ -191,7 +191,9 @@ export default async function HomePage({ params }: LocaleParams) {
   return (
     <>
       {/* Kopf: zentriert wie auf metisone.de */}
-      <section className="relative isolate overflow-x-clip">
+      {/* -mt-16/pt-16: Der Kopfbereich reicht unter die (oben durchsichtige)
+          Kopfzeile, damit der Farbverlauf bis an den oberen Rand läuft. */}
+      <section className="relative isolate -mt-16 overflow-x-clip pt-16">
         {/* Schwebende Farbflächen statt eines starren Verlaufs */}
         <div aria-hidden="true" className="hero-blobs">
           <span className="blob blob-a" />

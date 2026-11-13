@@ -586,7 +586,7 @@
     position: absolute;
     inset: 0 0 auto;
     z-index: -1;
-    height: 40rem;
+    height: 44rem;
     overflow: hidden;
     pointer-events: none;
     mask-image: linear-gradient(to bottom, #000 45%, transparent);
@@ -597,21 +597,21 @@
     will-change: transform;
   }
   .blob-a {
-    top: -16rem;
+    top: -12rem;
     left: calc(50% - 34rem);
     width: 40rem;
     height: 40rem;
     background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-bright) 22%, transparent), transparent);
   }
   .blob-b {
-    top: -10rem;
+    top: -6rem;
     left: calc(50% + 2rem);
     width: 34rem;
     height: 34rem;
     background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent);
   }
   .blob-c {
-    top: 6rem;
+    top: 10rem;
     left: calc(50% - 12rem);
     width: 24rem;
     height: 24rem;
@@ -714,6 +714,22 @@
       animation-range: 0 140px;
     }
   }
+}
+
+/* Kopfzeile oben auf der Seite durchsichtig (data-top setzt das Skript in
+   src/lib/theme-script.ts), beim Scrollen deckend mit Unschärfe und Linie.
+   Außerhalb aller Layer, damit die Regel die Tailwind-Klassen überstimmt. */
+.site-header {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+html[data-top] .site-header {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @media print {
