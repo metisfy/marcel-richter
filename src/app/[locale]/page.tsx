@@ -1,25 +1,21 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
-import { matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
+import { matchPlace, matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
 import { ArrowRightIcon, CalendarIcon, CheckIcon } from "@/components/icons";
 import { SectionHead } from "@/components/page-intro";
 import { ProjectCard } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import {
-  currentSeason,
-  getAlbums,
-  getProjects,
-  getSite,
-  lastResult,
-  nextFixture,
-  type Season,
-  type Site,
-} from "@/lib/content";
+import { getProjects, getSite, lastResult, nextMatchday, ownSets, type Season } from "@/lib/content";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
+import { loadCurrentSeason } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
+
+// Das Saison-Fenster zeigt Live-Daten vom BVV: höchstens stündlich neu bauen
+// (siehe src/lib/season.ts). Muss eine Zahl sein, kein Ausdruck.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: LocaleParams) {
   const locale = await initLocale(params);
@@ -41,17 +37,16 @@ export async function generateMetadata({ params }: LocaleParams) {
  * Produktvorschau auf metisone.de. Links das letzte Spiel mit den Sätzen als
  * Balken, rechts nächstes Spiel und Tabellenplatz.
  */
-async function SeasonWindow({ season, site, locale }: { season: Season; site: Site; locale: Locale }) {
+async function SeasonWindow({ season, locale }: { season: Season; locale: Locale }) {
   const t = await getTranslations("home");
   const tSeason = await getTranslations("season");
-  const upcoming = nextFixture(season);
+  const matchday = nextMatchday(season);
+  const upcoming = matchday[0];
   const latest = lastResult(season);
+  const places = upcoming ? await Promise.all(matchday.map(matchPlace)) : [];
 
   // Sätze aus eigener Sicht: [eigene Punkte, Punkte des Gegners]
-  const sets = (latest?.sets ?? []).map((set) => {
-    const [home, away] = set.split(":").map(Number);
-    return latest?.home ? [home, away] : [away, home];
-  });
+  const sets = latest ? ownSets(latest) : [];
   const max = Math.max(25, ...sets.flat());
 
   return (
@@ -71,12 +66,13 @@ async function SeasonWindow({ season, site, locale }: { season: Season; site: Si
           {latest?.result && latest.outcome ? (
             <>
               <p className="mt-3 flex items-center gap-3">
-                <span className="text-4xl font-semibold tracking-[-0.02em] tabular-nums">
-                  {latest.result.home}:{latest.result.away}
-                </span>
+                <span className="text-4xl font-semibold tracking-[-0.02em] tabular-nums">{latest.result.join(":")}</span>
                 <OutcomeBadge outcome={latest.outcome} />
               </p>
-              <p className="mt-1.5 text-[15px] text-muted">{matchTitle(latest, site.team.name).join(" – ")}</p>
+              <p className="mt-1.5 text-[15px] text-muted">
+                {matchTitle(latest)}
+                <span className="sr-only"> ({formatShortDate(latest.date, locale)})</span>
+              </p>
 
               {sets.length > 0 ? (
                 <div className="mt-7">
@@ -107,7 +103,7 @@ async function SeasonWindow({ season, site, locale }: { season: Season; site: Si
 
         <div className="divide-y divide-line">
           <div className="p-6 sm:p-7">
-            <h3 className="eyebrow">{t("nextGame")}</h3>
+            <h3 className="eyebrow">{matchday.length > 1 ? t("nextMatchday") : t("nextGame")}</h3>
             {upcoming ? (
               <>
                 <p className="mt-3 text-2xl font-semibold tracking-[-0.02em]">
@@ -116,10 +112,12 @@ async function SeasonWindow({ season, site, locale }: { season: Season; site: Si
                     <span className="ml-2 font-mono text-sm font-normal text-muted">{formatTime(upcoming.date, locale)}</span>
                   ) : null}
                 </p>
-                <p className="mt-1.5 text-[15px] font-medium">{matchTitle(upcoming, site.team.name).join(" – ")}</p>
-                <p className="text-sm text-muted">
-                  {[upcoming.home ? tSeason("home") : tSeason("away"), upcoming.venue].filter(Boolean).join(" · ")}
-                </p>
+                <ul className="mt-1.5 space-y-0.5 text-[15px] font-medium">
+                  {matchday.map((fixture) => (
+                    <li key={`${fixture.date}-${fixture.opponent}`}>{matchTitle(fixture)}</li>
+                  ))}
+                </ul>
+                <p className="mt-1 text-sm text-muted">{places[0]}</p>
               </>
             ) : (
               <p className="mt-3 text-muted">{t("noUpcoming")}</p>
@@ -152,16 +150,13 @@ export default async function HomePage({ params }: LocaleParams) {
   const t = await getTranslations("home");
   const tPlayer = await getTranslations("player");
   const site = getSite(locale);
-  const season = currentSeason(locale);
+  const season = await loadCurrentSeason(locale);
 
   const projects = getProjects(locale);
   const featured = [
     ...projects.filter((project) => project.featured),
     ...projects.filter((project) => !project.featured),
   ].slice(0, 3);
-  const photos = getAlbums(locale)
-    .flatMap((album) => album.photos)
-    .slice(0, 5);
 
   const nameParts = site.name.split(" ");
   const lastName = nameParts.length > 1 ? nameParts.pop() : undefined;
@@ -210,7 +205,7 @@ export default async function HomePage({ params }: LocaleParams) {
 
         {season ? (
           <div className="container-page pb-16 sm:pb-20">
-            <SeasonWindow season={season} site={site} locale={locale} />
+            <SeasonWindow season={season} locale={locale} />
           </div>
         ) : null}
       </section>
@@ -295,38 +290,6 @@ export default async function HomePage({ params }: LocaleParams) {
               ))}
             </div>
           </div>
-        </section>
-      ) : null}
-
-      {/* Fotos */}
-      {photos.length > 0 ? (
-        <section aria-labelledby="fotos-titel" className="container-page py-20 sm:py-24">
-          <SectionHead
-            eyebrow={t("photosHeading")}
-            title={t("photosTitle")}
-            id="fotos-titel"
-            action={
-              <Link href="/fotos" className="arrow-link">
-                {t("allPhotos")}
-              </Link>
-            }
-          />
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {photos.map((photo, index) => (
-              <li
-                key={photo.src}
-                className={`relative aspect-square overflow-hidden rounded-2xl border border-line bg-surface ${index === 0 ? "col-span-2 row-span-2" : ""}`}
-              >
-                <Image
-                  src={photo.src}
-                  alt={photo.alt}
-                  fill
-                  sizes={index === 0 ? "(min-width: 1168px) 560px, (min-width: 640px) 50vw, 100vw" : "(min-width: 1168px) 280px, 25vw"}
-                  className="object-cover"
-                />
-              </li>
-            ))}
-          </ul>
         </section>
       ) : null}
 

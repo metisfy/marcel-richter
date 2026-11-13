@@ -421,40 +421,4 @@
     margin-top: 0.6rem;
     font-size: 0.875rem;
   }
-
-  /* Lightbox (natives <dialog>) */
-  .lightbox {
-    width: 100vw;
-    max-width: none;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #f4f5f7;
-  }
-  .lightbox[open] {
-    display: flex;
-    flex-direction: column;
-  }
-  .lightbox::backdrop {
-    background-color: rgb(12 14 17 / 0.95);
-  }
-  .lightbox-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    background-color: rgb(255 255 255 / 0.12);
-    color: #f4f5f7;
-  }
-  .lightbox-btn:hover {
-    background-color: rgb(255 255 255 / 0.22);
-  }
-  .lightbox-btn:focus-visible {
-    outline-color: #f4f5f7;
-  }
 }

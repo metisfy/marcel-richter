@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import type { Locale } from "@/i18n/routing";
-import type { Fixture, Outcome } from "@/lib/content";
+import type { Fixture, Outcome, Season, TableRow } from "@/lib/content";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
 const OUTCOME_STYLE: Record<Outcome, string> = {
@@ -9,12 +9,31 @@ const OUTCOME_STYLE: Record<Outcome, string> = {
   loss: "bg-loss-soft text-loss",
 };
 
-export function matchTitle(fixture: Fixture, teamName: string): [string, string] {
-  return fixture.home ? [teamName, fixture.opponent] : [fixture.opponent, teamName];
+/** „SSV Bobingen – TSV Pfuhl“ in der offiziellen Reihenfolge */
+export function matchTitle(fixture: Fixture): string {
+  return fixture.teams.join(" – ");
+}
+
+/** Begegnung mit hervorgehobener eigener Mannschaft */
+export function MatchTeams({ fixture }: { fixture: Fixture }) {
+  return (
+    <>
+      <span className={fixture.own === 0 ? "font-semibold" : undefined}>{fixture.teams[0]}</span>
+      <span className="text-muted"> – </span>
+      <span className={fixture.own === 1 ? "font-semibold" : undefined}>{fixture.teams[1]}</span>
+    </>
+  );
+}
+
+/** „Heim“, „Spieltag bei SSV Bobingen“ oder „Auswärts“, dazu Halle und Notiz */
+export async function matchPlace(fixture: Fixture): Promise<string> {
+  const t = await getTranslations("season");
+  const where = fixture.home ? t("home") : fixture.host ? t("hostedBy", { team: fixture.host }) : t("away");
+  return [where, fixture.venue, fixture.note].filter(Boolean).join(" · ");
 }
 
 /** Sieg/Niederlage als kleine Pille („Sieg“ / „Niederlage“). */
-export async function OutcomeBadge({ outcome }: { outcome: Outcome; locale?: Locale }) {
+export async function OutcomeBadge({ outcome }: { outcome: Outcome }) {
   const t = await getTranslations("season");
   return (
     <span className={`inline-flex h-6 items-center rounded-full px-2.5 font-mono text-[11.5px] font-medium ${OUTCOME_STYLE[outcome]}`}>
@@ -38,17 +57,18 @@ export async function SetScores({ sets, className = "" }: { sets: string[]; clas
 export async function FixtureTable({
   fixtures,
   season,
-  teamName,
   locale,
 }: {
   fixtures: Fixture[];
   season: string;
-  teamName: string;
   locale: Locale;
 }) {
   const t = await getTranslations("season");
 
   if (fixtures.length === 0) return <p className="text-muted">{t("noFixtures")}</p>;
+
+  const showCompetition = fixtures.some((fixture) => fixture.competition);
+  const places = await Promise.all(fixtures.map(matchPlace));
 
   return (
     // Fokussierbar, damit sich die Tabelle auf schmalen Bildschirmen auch
@@ -67,44 +87,44 @@ export async function FixtureTable({
           <tr>
             <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("date")}</th>
             <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("match")}</th>
-            <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("competition")}</th>
+            {showCompetition ? <th scope="col" className="eyebrow table-cell px-5 py-3 font-normal">{t("competition")}</th> : null}
             <th scope="col" className="eyebrow table-cell px-5 py-3 text-right font-normal">{t("result")}</th>
           </tr>
         </thead>
         <tbody>
-          {fixtures.map((fixture) => {
-            const [home, away] = matchTitle(fixture, teamName);
+          {fixtures.map((fixture, index) => {
             const time = formatTime(fixture.date, locale);
+            // Zweites Spiel desselben Spieltags: Datum nicht noch einmal sichtbar wiederholen
+            const sameDayAsPrevious = index > 0 && fixtures[index - 1].date.slice(0, 10) === fixture.date.slice(0, 10);
             return (
-              <tr key={`${fixture.date}-${fixture.opponent}`} className="border-b border-line align-top last:border-0">
-                <td className="px-5 py-4 whitespace-nowrap">
+              <tr
+                key={`${fixture.date}-${fixture.number ?? ""}-${fixture.opponent}`}
+                className={`align-top ${sameDayAsPrevious ? "" : "border-t border-line first:border-t-0"}`}
+              >
+                <td className={`px-5 whitespace-nowrap ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
                   <time dateTime={toIsoBerlin(fixture.date)}>
                     <span className="sr-only">{formatDate(fixture.date, locale, { weekday: true })}</span>
-                    <span aria-hidden="true" className="font-medium">
-                      {formatShortDate(fixture.date, locale)}
-                      {time ? <span className="block font-mono text-[12.5px] font-normal text-muted">{time}</span> : null}
-                    </span>
+                    {sameDayAsPrevious ? null : (
+                      <span aria-hidden="true" className="font-medium">
+                        {formatShortDate(fixture.date, locale)}
+                        {time ? <span className="block font-mono text-[12.5px] font-normal text-muted">{time}</span> : null}
+                      </span>
+                    )}
                   </time>
                 </td>
-                <th scope="row" className="px-5 py-4 font-normal">
-                  <span className={fixture.home ? "font-semibold" : undefined}>{home}</span>
-                  <span className="text-muted"> – </span>
-                  <span className={!fixture.home ? "font-semibold" : undefined}>{away}</span>
-                  <span className="block text-sm text-muted">
-                    {fixture.home ? t("home") : t("away")}
-                    {fixture.venue ? ` · ${fixture.venue}` : null}
-                    {fixture.note ? ` · ${fixture.note}` : null}
-                  </span>
+                <th scope="row" className={`px-5 font-normal ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
+                  <MatchTeams fixture={fixture} />
+                  <span className="block text-sm text-muted">{places[index]}</span>
                 </th>
-                <td className="px-5 py-4 text-muted">{fixture.competition ?? "–"}</td>
-                <td className="px-5 py-4 text-right whitespace-nowrap">
+                {showCompetition ? (
+                  <td className={`px-5 text-muted ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>{fixture.competition ?? "–"}</td>
+                ) : null}
+                <td className={`px-5 text-right whitespace-nowrap ${sameDayAsPrevious ? "pt-1 pb-4" : "py-4"}`}>
                   {fixture.result && fixture.outcome ? (
                     <>
                       <span className="inline-flex items-center gap-2.5">
                         <OutcomeBadge outcome={fixture.outcome} />
-                        <span className="text-lg font-semibold tracking-tight tabular-nums">
-                          {fixture.result.home}:{fixture.result.away}
-                        </span>
+                        <span className="text-lg font-semibold tracking-tight tabular-nums">{fixture.result.join(":")}</span>
                       </span>
                       <SetScores sets={fixture.sets} className="mt-0.5 block text-[12px] text-muted" />
                     </>
@@ -118,5 +138,70 @@ export async function FixtureTable({
         </tbody>
       </table>
     </div>
+  );
+}
+
+export async function LeagueTable({ rows, league }: { rows: TableRow[]; league: string }) {
+  const t = await getTranslations("season");
+  const numeric = "px-3 py-3 text-right tabular-nums sm:px-4";
+
+  return (
+    <div className="card relative overflow-x-auto" role="region" aria-label={t("tableCaption", { league })} tabIndex={0}>
+      <table className="w-full min-w-[36rem] border-collapse text-left text-[15px]">
+        <caption className="sr-only">{t("tableCaption", { league })}</caption>
+        <thead className="border-b border-line bg-surface">
+          <tr>
+            <th scope="col" className="eyebrow table-cell py-3 pr-2 pl-5 font-normal">
+              <abbr title={t("position")} className="no-underline">#</abbr>
+            </th>
+            <th scope="col" className="eyebrow table-cell px-3 py-3 font-normal">{t("team")}</th>
+            <th scope="col" className={`eyebrow table-cell font-normal ${numeric}`}>{t("played")}</th>
+            <th scope="col" className={`eyebrow table-cell font-normal ${numeric}`}>{t("won")}</th>
+            <th scope="col" className={`eyebrow table-cell font-normal ${numeric}`}>{t("lost")}</th>
+            <th scope="col" className={`eyebrow table-cell font-normal ${numeric}`}>{t("setsShort")}</th>
+            <th scope="col" className={`eyebrow table-cell font-normal ${numeric}`}>{t("balls")}</th>
+            <th scope="col" className={`eyebrow table-cell py-3 pr-5 pl-3 text-right font-normal`}>{t("pointsShort")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.team} className={`border-b border-line last:border-0 ${row.own ? "bg-accent-soft font-semibold" : ""}`}>
+              <td className="py-3 pr-2 pl-5 tabular-nums">{row.position}.</td>
+              <th scope="row" className={`px-3 py-3 ${row.own ? "font-semibold" : "font-normal"}`}>{row.team}</th>
+              <td className={numeric}>{row.played}</td>
+              <td className={numeric}>{row.won}</td>
+              <td className={numeric}>{row.lost}</td>
+              <td className={`${numeric} font-mono text-[13.5px]`}>{row.sets}</td>
+              <td className={`${numeric} font-mono text-[13.5px]`}>{row.balls}</td>
+              <td className={`py-3 pr-5 pl-3 text-right tabular-nums ${row.own ? "text-accent" : ""}`}>{row.points}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/** „Quelle: Bayerischer Volleyball-Verband · Stand …“ bzw. Hinweis bei Ausfall */
+export async function SourceNote({ source, locale }: { source: NonNullable<Season["source"]>; locale: Locale }) {
+  const t = await getTranslations("season");
+  const updated = source.updatedAt
+    ? new Intl.DateTimeFormat(locale === "de" ? "de-DE" : "en-GB", {
+        timeZone: "Europe/Berlin",
+        weekday: "short",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(source.updatedAt))
+    : undefined;
+
+  return (
+    <p className="mt-4 text-sm text-muted">
+      {updated ? t("source", { updated }) : t("unavailable")}{" "}
+      <a href={source.url} rel="noopener" className="font-medium text-accent underline-offset-4 hover:underline">
+        {t("sourceLink")}
+      </a>
+    </p>
   );
 }

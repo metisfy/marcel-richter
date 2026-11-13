@@ -1,13 +1,18 @@
 import { getTranslations } from "next-intl/server";
 
-import { FixtureTable } from "@/components/fixtures";
+import { FixtureTable, LeagueTable, SourceNote } from "@/components/fixtures";
 import { JsonLd } from "@/components/json-ld";
 import { PageIntro, SectionHead } from "@/components/page-intro";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import type { Locale } from "@/i18n/routing";
-import { getSeasons, getSite, type Season } from "@/lib/content";
+import { getSite, type Season } from "@/lib/content";
+import { loadSeasons } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
 import { seasonEvents } from "@/lib/structured-data";
+
+// Spielplan und Tabelle kommen live vom BVV: höchstens stündlich neu bauen
+// (siehe src/lib/season.ts). Muss eine Zahl sein, kein Ausdruck.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: LocaleParams) {
   const locale = await initLocale(params);
@@ -24,7 +29,19 @@ export async function generateMetadata({ params }: LocaleParams) {
 
 async function SeasonFacts({ season }: { season: Season }) {
   const t = await getTranslations("season");
-  if (!season.standing && season.stats.length === 0) return null;
+  const facts = [
+    ...(season.record
+      ? [
+          { label: t("played"), value: season.record.played },
+          { label: t("won"), value: season.record.won },
+          { label: t("lost"), value: season.record.lost },
+          { label: t("setsShort"), value: season.record.sets },
+          { label: t("balls"), value: season.record.balls },
+        ]
+      : []),
+    ...season.stats,
+  ];
+  if (!season.standing && facts.length === 0) return null;
 
   return (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -42,10 +59,12 @@ async function SeasonFacts({ season }: { season: Season }) {
           </dd>
         </div>
       ) : null}
-      {season.stats.map((stat) => (
-        <div key={stat.label} className="card p-5">
-          <dt className="eyebrow">{stat.label}</dt>
-          <dd className="mt-2 text-4xl font-semibold tracking-[-0.02em] tabular-nums">{stat.value}</dd>
+      {facts.map((fact) => (
+        <div key={fact.label} className="card p-5">
+          <dt className="eyebrow">{fact.label}</dt>
+          <dd className="mt-2 text-[clamp(1.75rem,1.4rem+1vw,2.25rem)] font-semibold tracking-[-0.02em] whitespace-nowrap tabular-nums">
+            {fact.value}
+          </dd>
         </div>
       ))}
     </dl>
@@ -56,7 +75,7 @@ export default async function SeasonPage({ params }: LocaleParams) {
   const locale: Locale = await initLocale(params);
   const t = await getTranslations("season");
   const site = getSite(locale);
-  const [current, ...previous] = getSeasons(locale);
+  const [current, ...previous] = await loadSeasons(locale);
 
   if (!current) {
     return (
@@ -68,7 +87,7 @@ export default async function SeasonPage({ params }: LocaleParams) {
 
   return (
     <div className="container-page">
-      <JsonLd data={seasonEvents(site, current, locale)} />
+      {current.fixtures.length > 0 ? <JsonLd data={seasonEvents(site, current, locale)} /> : null}
       <PageIntro
         eyebrow={`${site.team.name} · ${current.league}`}
         title={t("heading", { season: current.season })}
@@ -84,8 +103,18 @@ export default async function SeasonPage({ params }: LocaleParams) {
 
       <section aria-labelledby="spielplan" className="mb-20">
         <SectionHead eyebrow={t("heading", { season: current.season })} title={t("fixtures")} id="spielplan" />
-        <FixtureTable fixtures={current.fixtures} season={current.season} teamName={site.team.name} locale={locale} />
+        {current.source && !current.source.updatedAt ? null : (
+          <FixtureTable fixtures={current.fixtures} season={current.season} locale={locale} />
+        )}
+        {current.source ? <SourceNote source={current.source} locale={locale} /> : null}
       </section>
+
+      {current.table.length > 0 ? (
+        <section aria-labelledby="tabelle" className="mb-20">
+          <SectionHead eyebrow={current.league} title={t("table")} id="tabelle" />
+          <LeagueTable rows={current.table} league={current.league} />
+        </section>
+      ) : null}
 
       {previous.length > 0 ? (
         <section aria-labelledby="archiv">
@@ -105,7 +134,8 @@ export default async function SeasonPage({ params }: LocaleParams) {
                 <div className="space-y-6 border-t border-line p-5 sm:p-6">
                   {season.summary ? <p className="max-w-2xl text-muted">{season.summary}</p> : null}
                   <SeasonFacts season={season} />
-                  <FixtureTable fixtures={season.fixtures} season={season.season} teamName={site.team.name} locale={locale} />
+                  <FixtureTable fixtures={season.fixtures} season={season.season} locale={locale} />
+                  {season.table.length > 0 ? <LeagueTable rows={season.table} league={season.league} /> : null}
                 </div>
               </details>
             ))}

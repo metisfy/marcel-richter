@@ -4,7 +4,8 @@
 #   feld: { de: "Deutsch", en: "English" }
 # Fehlt "en", wird der deutsche Text angezeigt.
 #
-# ALLE ANGABEN HIER SIND PLATZHALTER – bitte durch echte Daten ersetzen.
+# Verein und Liga sind echt (TSV Pfuhl, Bezirksliga Schwaben). Alles mit
+# „Platzhalter“ markierte bitte durch echte Daten ersetzen.
 
 name: Marcel Richter
 
@@ -13,12 +14,12 @@ jobTitle:
   en: Software developer and volleyball player
 
 tagline:
-  de: Ich entwickle Websites und Web-Apps. Abends und am Wochenende spiele ich Volleyball beim TV Musterstadt.
-  en: I build websites and web apps. In the evenings and at weekends I play volleyball for TV Musterstadt.
+  de: Ich entwickle Websites und Web-Apps. Abends und am Wochenende spiele ich Volleyball beim TSV Pfuhl.
+  en: I build websites and web apps. In the evenings and at weekends I play volleyball for TSV Pfuhl.
 
 intro:
-  de: Hier stehen meine Projekte, Fotos aus der Halle und der Spielplan der laufenden Saison.
-  en: This is where you'll find my projects, photos from the gym and this season's fixtures.
+  de: Hier stehen meine Projekte und der aktuelle Spielplan der ersten Herrenmannschaft des TSV Pfuhl.
+  en: This is where you'll find my projects and the current fixtures of TSV Pfuhl's first men's team.
 
 # Drei nummerierte Karten im Abschnitt „Über mich“ auf der Startseite
 highlights:
@@ -28,16 +29,11 @@ highlights:
       en: Websites and web apps built with Next.js and TypeScript. Fast, accessible, no tracking.
   - title: { de: Volleyball, en: Volleyball }
     text:
-      de: Außenangriff beim TV Musterstadt, nach dem Aufstieg jetzt in der Oberliga.
-      en: Outside hitter for TV Musterstadt, now in the Oberliga after promotion.
-  - title: { de: Fotografie, en: Photography }
-    text:
-      de: Spiele, Training und alles dazwischen, festgehalten mit der Kamera.
-      en: Matches, training and everything in between, captured on camera.
+      de: Erste Herrenmannschaft des TSV Pfuhl, aktuell in der Bezirksliga Schwaben.
+      en: First men's team of TSV Pfuhl, currently in the Bezirksliga Schwaben.
 
-location:
-  de: Musterstadt
-  en: Musterstadt, Germany
+# Wohnort (optional, erscheint in den strukturierten Daten)
+# location: { de: Neu-Ulm, en: "Neu-Ulm, Germany" }
 
 email: hallo@example.com
 
@@ -61,18 +57,19 @@ socials:
   - label: LinkedIn
     url: https://www.linkedin.com/in/beispielprofil
 
+# Spielplan und Tabelle kommen live vom BVV, siehe content/saison/*.yaml.
 team:
-  name: TV Musterstadt
+  name: TSV Pfuhl
   sport:
     de: Volleyball
     en: Volleyball
   league:
-    de: Oberliga Musterland
-    en: Oberliga Musterland
-  url: https://example.com
-  logo: /images/team-logo.svg
+    de: Bezirksliga Schwaben
+    en: Bezirksliga Schwaben (Bavaria)
+  # url: Website des Vereins (optional)
+  # logo: /images/vereinslogo.svg (optional, nur mit Erlaubnis des Vereins)
+  # Platzhalter: Position und Rückennummer
   position:
     de: Außenangriff
     en: Outside hitter
   number: 7
-  since: 2018

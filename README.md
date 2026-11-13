@@ -1,14 +1,17 @@
 # Marcel Richter – Website
 
-Persönliche Website mit Projekten, Fotos und Saison-Infos. Zweisprachig (Deutsch als Standard,
-Englisch unter `/en`), vollständig statisch generiert, ausgeliefert als Docker-Container.
+Persönliche Website mit Projekten und dem aktuellen Spielplan des TSV Pfuhl (1. Herren, Volleyball,
+Bezirksliga Schwaben). Zweisprachig (Deutsch als Standard, Englisch unter `/en`), statisch
+generiert, ausgeliefert als Docker-Container. Spielplan, Ergebnisse und Tabelle kommen live vom
+Bayerischen Volleyball-Verband.
 
 - **Stack:** Next.js 16 (App Router), TypeScript, Tailwind CSS 4, next-intl, MDX/YAML-Inhalte
 - **Betrieb:** Docker-Image in der GitHub Container Registry, Deployment per GitHub Actions + SSH
 - **Qualität:** Lighthouse (mobil) 97–100 in allen Kategorien, WCAG AA, helles/dunkles Design,
   strukturierte Daten (Person, SportsTeam, SportsEvent, CreativeWork), OG-Bilder je Seite
 
-> **Alle Inhalte und Bilder sind Platzhalter.** Was du ersetzen musst, steht unter
+> **Texte und Bilder sind größtenteils Platzhalter** (Verein, Liga und Spielplan sind echt). Was du
+> ersetzen musst, steht unter
 > [Vor dem Livegang](#vor-dem-livegang).
 
 ---
@@ -93,10 +96,9 @@ label: { de: Asse, en: Aces }        # Kurzschreibweise
 ### Stammdaten: `content/site.yaml`
 
 Name, Berufsbezeichnung, Kurzvorstellung, E-Mail, Porträt, Social-Profile, Copyright-Vermerk und
-Verein (Name, Sportart, Liga, Position, Rückennummer, Logo). Diese Angaben stehen auf der
-Startseite, in der Fußzeile, auf der Kontaktseite und in den strukturierten Daten für
-Suchmaschinen. Die Rückennummer erscheint zusätzlich als orangefarbenes Feld neben dem Namen und
-am Porträt.
+Verein (Name, Sportart, Liga, Position, Rückennummer, optional Website und Logo). Diese Angaben
+stehen auf der Startseite, in der Fußzeile, auf der Kontaktseite und in den strukturierten Daten
+für Suchmaschinen. Die Rückennummer erscheint zusätzlich im blauen Feld neben dem Namen.
 
 ```yaml
 copyright:                           # Fußzeile: „© 2026 metisCode · metisOne“
@@ -106,13 +108,13 @@ copyright:                           # Fußzeile: „© 2026 metisCode · metisO
     url: https://metisone.de
 ```
 
-Die drei nummerierten Karten im Abschnitt „Über mich“ auf der Startseite (01, 02, 03) kommen aus
+Die nummerierten Karten im Abschnitt „Über mich“ auf der Startseite (01, 02, …) kommen aus
 `highlights`:
 
 ```yaml
 highlights:
   - title: { de: Volleyball, en: Volleyball }
-    text: { de: Außenangriff beim TV Musterstadt …, en: Outside hitter for … }
+    text: { de: Erste Herrenmannschaft des TSV Pfuhl …, en: First men's team of TSV Pfuhl … }
 ```
 
 ### Projekte: `content/projekte/<slug>/de.mdx` (+ `en.mdx`)
@@ -122,7 +124,7 @@ Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/vereins-app`,
 
 ```mdx
 ---
-title: Vereins-App für den SV Musterstadt
+title: Vereins-App für einen Sportverein
 summary: Ein Satz für Übersicht, Suchmaschinen und Vorschaubild.
 date: 2026-05-01                        # sortiert die Liste (neueste zuerst)
 cover: /images/projekte/vereins-app.jpg
@@ -148,40 +150,52 @@ Hier steht der Text in **Markdown**. Überschriften mit `##`, Listen mit `-`.
 - Für Bilder im Text `<Figure … />` verwenden. Die Bilder werden dann automatisch in passenden
   Größen und modernen Formaten (AVIF/WebP) ausgeliefert.
 
-### Fotos: `content/fotos.yaml`
-
-Alben mit Fotos. Neueste Alben (nach `date`) stehen oben. Die ersten sechs Fotos erscheinen auch auf
-der Startseite.
-
-```yaml
-albums:
-  - slug: hinrunde-2026-27
-    date: 2026-11-08
-    title: { de: Hinrunde 2026/27, en: First half of 2026/27 }
-    description: { de: …, en: … }       # optional
-    photos:
-      - src: /images/fotos/spiel-01.jpg
-        alt: { de: Doppelblock am Netz, en: Double block at the net }   # Pflicht
-        caption: { de: Heimspiel gegen …, en: Home game against … } # optional
-```
-
-Bilder vorher auf etwa 2000 px Kantenlänge verkleinern. Die Website rechnet sie zwar selbst
-herunter, große Originale verlangsamen aber den ersten Aufruf.
-
 ### Saison: `content/saison/<JJJJ-JJ>.yaml`
 
 Eine Datei pro Saison. **Die Datei mit dem höchsten Namen ist die aktuelle Saison**, alle anderen
 erscheinen unter „Frühere Saisons“. Für eine neue Saison die alte Datei kopieren, z. B.
 `2027-28.yaml`, und anpassen.
 
+#### Spielplan live vom BVV (Standard)
+
 ```yaml
 season: "2026/27"
-league: { de: Oberliga Musterland, en: Oberliga Musterland }
+league: { de: Bezirksliga Schwaben, en: Bezirksliga Schwaben (Bavaria) }
 summary: { de: …, en: … }                # optional
-standing: { position: 3, teams: 16, points: 17 }   # optional
-stats:                                   # optional, beliebig viele Kacheln
+bvv:
+  url: https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600
+  team: TSV Pfuhl                        # genau wie auf der BVV-Seite geschrieben
+stats:                                   # optional, eigene Zahlen als zusätzliche Kacheln
   - label: { de: Asse, en: Aces }
     value: 11
+```
+
+- **Woher kommt die URL?** Auf [volleyball.bayern](https://volleyball.bayern/ergebnisse) unter
+  Ergebnisse → Erwachsene → Bezirk → Liga. Die Adresse endet auf `/wettbewerb-<Nummer>` und ändert
+  sich mit jeder Saison, also für `2027-28.yaml` die neue Ligaseite eintragen.
+- Die Website liest dort alle Spiele, Ergebnisse, Sätze und die Tabelle. Daraus entstehen auf der
+  Saisonseite Bilanz, Spielplan (mit Ausrichter des Spieltags) und Tabelle, auf der Startseite
+  letztes Spiel, nächster Spieltag und Tabellenplatz.
+- **Aktualisierung:** Startseite und Saisonseite werden höchstens einmal pro Stunde im Hintergrund
+  neu erzeugt (`export const revalidate = 3600`). Neue Ergebnisse erscheinen also spätestens nach
+  etwa einer Stunde, **ohne neues Deployment**. Der BVV wird dabei höchstens einmal pro Stunde
+  abgefragt, egal wie viele Besucher kommen.
+- **Wenn der BVV nicht erreichbar ist:** Im laufenden Betrieb bleibt einfach der letzte Stand
+  stehen. Beim Build läuft das Deployment trotzdem durch, die Seite zeigt dann einen Hinweis mit
+  Link zur Ligaseite und lädt die Daten eine Stunde später nach.
+- **Wenn der BVV seine Seite umbaut,** findet der Parser (`src/lib/bvv.ts`) keine Spiele mehr. Im
+  Build-Log steht dann „⚠ Spielplan vom BVV nicht geladen …“.
+- Der BVV bietet Vereinen auch eine offizielle Schnittstelle mit API-Key an
+  ([Tools für die Vereinshomepage](https://volleyball.bayern/service/vereinshilfen/tools-fuer-deine-vereinshomepage)).
+  Den Key kann nur die Abteilungsleitung im BVV-Portal anlegen. Gibt es ihn, kann `src/lib/bvv.ts`
+  darauf umgestellt werden.
+
+#### Spiele von Hand eintragen (ohne BVV, z. B. für ein Archiv)
+
+```yaml
+season: "2025/26"
+league: { de: …, en: … }
+standing: { position: 3, teams: 16, points: 17 }   # optional
 fixtures:
   - date: "2026-11-15 14:30"             # deutsche Ortszeit, Uhrzeit optional
     opponent: SG Wiesental
@@ -193,8 +207,8 @@ fixtures:
     note: { de: Meisterschaft perfekt, en: Title secured }  # optional
 ```
 
-- **„Nächstes Spiel“** auf der Startseite ist das erste Spiel ohne `result`. Nach dem Spiel also
-  einfach das Ergebnis eintragen.
+- **„Nächstes Spiel“** auf der Startseite ist das erste Spiel ohne `result` (bei mehreren Spielen
+  am selben Tag der ganze Spieltag). Nach dem Spiel also einfach das Ergebnis eintragen.
 - Sieg und Niederlage werden aus `result` und `home` berechnet. Ein Unentschieden lehnt die
   Prüfung ab, das gibt es im Volleyball nicht.
 - Passen die einzelnen Sätze in `sets` nicht zum Endstand in `result`, bricht der Build mit einer
@@ -223,11 +237,10 @@ Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen 
 
 | Seite       | Deutsch                | Englisch                   |
 | ----------- | ---------------------- | -------------------------- |
-| Start       | `/`                    | `/en`                      |
+| Home        | `/`                    | `/en`                      |
 | Über mich   | `/ueber-mich`          | `/en/about`                |
 | Projekte    | `/projekte`            | `/en/projects`             |
 | Projekt     | `/projekte/<slug>`     | `/en/projects/<slug>`      |
-| Fotos       | `/fotos`               | `/en/photos`               |
 | Saison      | `/saison`              | `/en/season`               |
 | Kontakt     | `/kontakt`             | `/en/contact`              |
 | Impressum   | `/impressum`           | `/en/legal-notice`         |
@@ -407,8 +420,10 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 ## Technische Hinweise
 
 - **Statisch:** Alle Seiten, OG-Bilder, Sitemap und robots.txt entstehen beim Build. Zur Laufzeit
-  rendert der Server praktisch nichts. Nur `src/proxy.ts` ordnet jede Anfrage einer Sprache zu und
-  übersetzt die Pfade.
+  rendert der Server nur Startseite und Saisonseite neu, und zwar höchstens stündlich im
+  Hintergrund (ISR, wegen der BVV-Daten). `src/proxy.ts` ordnet jede Anfrage einer Sprache zu und
+  übersetzt die Pfade. Der Container braucht dafür ausgehend Zugriff auf `volleyball.bayern`
+  (HTTPS).
 - **`skipProxyUrlNormalize: true` in `next.config.ts` nicht entfernen.** Ohne diese Option
   erzeugt Next.js 16 im Standalone-Server (also im Container) für jede deutsche Seite eine
   307-Endlosschleife und hinter dem Reverse Proxy einen 500er. `next dev` ist davon nicht
@@ -427,7 +442,8 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
   TTF-Schnitte in `src/app/og/fonts/`.
 - **Sicherheit:** Container ohne Root, ohne Linux-Capabilities, `no-new-privileges`. Dazu
   Sicherheits-Header (`X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
-  `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen.
+  `X-Content-Type-Options`), keine Cookies, keine externen Ressourcen im Browser (die BVV-Daten
+  holt der Server).
 - **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
   `engines` in `package.json`.
 
@@ -443,6 +459,8 @@ src/app/api/health/      Healthcheck
 src/components/          UI-Komponenten
 src/i18n/                Sprachen, übersetzte Pfade, Navigation
 src/lib/content.ts       Lädt und prüft alle Inhalte
+src/lib/bvv.ts           Liest Spielplan und Tabelle von der BVV-Ligaseite
+src/lib/season.ts        Führt Saisondatei und BVV-Daten zusammen (stündlich)
 src/lib/structured-data.ts  schema.org / JSON-LD
 src/proxy.ts             Sprach-Routing
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)
@@ -456,9 +474,10 @@ deploy/                  Beispielkonfiguration Nginx
 
 ## Vor dem Livegang
 
-- [ ] `content/site.yaml`: echte Daten (Name, Texte, E-Mail, Social-Links, Verein, Sportart)
-- [ ] `public/images/portrait.jpg`, `team-logo.svg` und alle Beispielbilder ersetzen
-- [ ] Projekte, Fotos und Saison in `content/` mit echten Inhalten füllen
+- [ ] `content/site.yaml`: echte Daten (Texte, E-Mail, Social-Links, Position, Rückennummer);
+      Vereinslogo nur mit Erlaubnis des TSV Pfuhl einbinden
+- [ ] `public/images/portrait.jpg` und alle Beispielbilder ersetzen
+- [ ] Projekte und „Über mich“ in `content/` mit echten Inhalten füllen
 - [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,
       Auslieferung über Cloudflare) rechtlich prüfen lassen
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen

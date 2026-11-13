@@ -16,7 +16,6 @@ export async function SiteHeader({ name, number }: { name: string; number?: numb
     { href: "/", label: t("home") },
     { href: "/ueber-mich", label: t("about") },
     { href: "/projekte", label: t("projects") },
-    { href: "/fotos", label: t("photos") },
     { href: "/saison", label: t("season") },
   ];
 

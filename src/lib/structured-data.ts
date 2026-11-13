@@ -73,21 +73,23 @@ export function seasonEvents(site: Site, season: Season, locale: Locale): JsonLd
   const own = { "@type": "SportsTeam", "@id": TEAM_ID, name: site.team.name };
   const event = (fixture: Fixture): JsonLd => {
     const opponent = { "@type": "SportsTeam", name: fixture.opponent };
-    const homeTeam = fixture.home ? own : opponent;
-    const awayTeam = fixture.home ? opponent : own;
+    const competitors = fixture.own === 0 ? [own, opponent] : [opponent, own];
+    // homeTeam/awayTeam nur, wenn eine der beiden Mannschaften wirklich zu
+    // Hause spielt – bei Spieltagen mit drei Teams ist das oft keine.
+    const host = fixture.home ? site.team.name : fixture.host;
+    const homeIndex = host === undefined ? -1 : fixture.teams.indexOf(host);
     return {
       "@type": "SportsEvent",
-      name: `${homeTeam.name} – ${awayTeam.name}`,
+      name: fixture.teams.join(" – "),
       startDate: toIsoBerlin(fixture.date),
       sport: site.team.sport,
       eventStatus: "https://schema.org/EventScheduled",
       eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-      homeTeam,
-      awayTeam,
-      competitor: [homeTeam, awayTeam],
+      competitor: competitors,
+      ...(homeIndex >= 0 ? { homeTeam: competitors[homeIndex], awayTeam: competitors[1 - homeIndex] } : {}),
       location: {
         "@type": "Place",
-        name: fixture.venue ?? (fixture.home ? site.team.name : fixture.opponent),
+        name: fixture.venue ?? host ?? fixture.opponent,
       },
       ...(fixture.competition ? { superEvent: { "@type": "SportsEvent", name: fixture.competition } } : {}),
       url: localizedUrl(locale, "/saison"),

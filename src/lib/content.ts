@@ -262,56 +262,11 @@ export const getPage = cache((name: PageName, locale: Locale) => {
 });
 
 // ---------------------------------------------------------------------------
-// Fotos: content/fotos.yaml
-// ---------------------------------------------------------------------------
-
-const photosSchema = z.object({
-  albums: z.array(
-    z.object({
-      slug,
-      title: localized,
-      description: localized.optional(),
-      date: isoDate,
-      photos: z
-        .array(
-          z.object({
-            src: imageSrc,
-            alt: localized,
-            caption: localized.optional(),
-          }),
-        )
-        .min(1, "Ein Album braucht mindestens ein Foto"),
-    }),
-  ),
-});
-
-export type Photo = { src: string; alt: string; caption?: string };
-export type Album = {
-  slug: string;
-  title: string;
-  description?: string;
-  date: string;
-  photos: Photo[];
-};
-
-export const getAlbums = cache((locale: Locale): Album[] =>
-  loadYaml("fotos.yaml", photosSchema)
-    .albums.map((album) => ({
-      slug: album.slug,
-      title: pick(album.title, locale),
-      description: pick(album.description, locale),
-      date: album.date,
-      photos: album.photos.map((photo) => ({
-        src: photo.src,
-        alt: pick(photo.alt, locale),
-        caption: pick(photo.caption, locale),
-      })),
-    }))
-    .sort((a, b) => b.date.localeCompare(a.date)),
-);
-
-// ---------------------------------------------------------------------------
 // Saisons: content/saison/<JJJJ-JJ>.yaml — die neueste Datei ist die aktuelle
+//
+// Spielplan, Ergebnisse und Tabelle kommen entweder aus der Datei selbst
+// (fixtures, standing) oder live vom Bayerischen Volleyball-Verband (bvv).
+// Das Zusammenführen mit den Live-Daten übernimmt src/lib/season.ts.
 // ---------------------------------------------------------------------------
 
 const SEASON_DIR = path.join(CONTENT_DIR, "saison");
@@ -320,6 +275,18 @@ const seasonSchema = z.object({
   season: z.string(),
   league: localized,
   summary: localized.optional(),
+  bvv: z
+    .object({
+      url: z
+        .url()
+        .regex(
+          /^https:\/\/volleyball\.bayern\/ergebnisse\/.+\/wettbewerb-\d+$/,
+          'Ligaseite des BVV angeben, z. B. "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600"',
+        ),
+      /** Name der eigenen Mannschaft genau wie auf der BVV-Seite; Standard: team.name aus site.yaml */
+      team: z.string().optional(),
+    })
+    .optional(),
   standing: z
     .object({
       position: z.number().int().positive(),
@@ -394,16 +361,37 @@ export type Outcome = "win" | "loss";
 export type Fixture = {
   /** "JJJJ-MM-TT" oder "JJJJ-MM-TT HH:MM", deutsche Ortszeit */
   date: string;
+  /** Spielnummer laut Verband */
+  number?: number;
+  /** Beide Mannschaften in der offiziellen Reihenfolge (Heim bzw. Team A zuerst) */
+  teams: [string, string];
+  /** Position der eigenen Mannschaft in `teams` */
+  own: 0 | 1;
   opponent: string;
+  /** Gespielt in der eigenen Halle (Heimspiel bzw. eigener Spieltag) */
   home: boolean;
+  /** Ausrichter des Spieltags, falls nicht die eigene Mannschaft */
+  host?: string;
   venue?: string;
   competition?: string;
   note?: string;
-  /** Endstand in Sätzen, aus Sicht der Heimmannschaft */
-  result?: { home: number; away: number };
-  /** Einzelne Sätze, aus Sicht der Heimmannschaft, z. B. ["25:21", "22:25"] */
+  /** Endstand in Sätzen, Reihenfolge wie `teams` */
+  result?: [number, number];
+  /** Einzelne Sätze, Reihenfolge wie `teams`, z. B. ["25:21", "22:25"] */
   sets: string[];
   outcome?: Outcome;
+};
+
+export type TableRow = {
+  position: number;
+  team: string;
+  played: number;
+  won: number;
+  lost: number;
+  points: number;
+  sets: string;
+  balls: string;
+  own: boolean;
 };
 
 export type Season = {
@@ -414,16 +402,21 @@ export type Season = {
   standing?: { position: number; teams: number; points?: number };
   stats: { label: string; value: string | number }[];
   fixtures: Fixture[];
+  /** Ligatabelle (nur mit Live-Daten) */
+  table: TableRow[];
+  /** Bilanz der eigenen Mannschaft (nur mit Live-Daten) */
+  record?: Pick<TableRow, "played" | "won" | "lost" | "sets" | "balls">;
+  /** Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist */
+  source?: { url: string; team: string; updatedAt?: string };
 };
 
-function outcomeOf(home: boolean, result: { home: number; away: number }): Outcome {
-  const own = home ? result.home : result.away;
-  const other = home ? result.away : result.home;
-  return own > other ? "win" : "loss";
+export function outcomeOf(own: 0 | 1, result: [number, number]): Outcome {
+  return result[own] > result[own === 0 ? 1 : 0] ? "win" : "loss";
 }
 
-export const getSeasons = cache((locale: Locale): Season[] =>
-  fs
+export const getSeasons = cache((locale: Locale): Season[] => {
+  const teamName = getSite(locale).team.name;
+  return fs
     .readdirSync(SEASON_DIR)
     .filter((file) => file.endsWith(".yaml"))
     .sort()
@@ -440,13 +433,16 @@ export const getSeasons = cache((locale: Locale): Season[] =>
           label: pick(stat.label, locale),
           value: stat.value,
         })),
+        table: [],
+        source: raw.bvv ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName } : undefined,
         fixtures: raw.fixtures
           .map((fixture): Fixture => {
-            const [home, away] = fixture.result?.split(":").map(Number) ?? [];
-            const result =
-              fixture.result !== undefined ? { home, away } : undefined;
+            const own = fixture.home ? 0 : 1;
+            const result = fixture.result?.split(":").map(Number) as [number, number] | undefined;
             return {
               date: fixture.date,
+              teams: fixture.home ? [teamName, fixture.opponent] : [fixture.opponent, teamName],
+              own,
               opponent: fixture.opponent,
               home: fixture.home,
               venue: fixture.venue,
@@ -454,24 +450,34 @@ export const getSeasons = cache((locale: Locale): Season[] =>
               note: pick(fixture.note, locale),
               result,
               sets: fixture.sets?.split(" ") ?? [],
-              outcome: result ? outcomeOf(fixture.home, result) : undefined,
+              outcome: result ? outcomeOf(own, result) : undefined,
             };
           })
           .sort((a, b) => a.date.localeCompare(b.date)),
       };
-    }),
-);
+    });
+});
 
-export function currentSeason(locale: Locale): Season | undefined {
-  return getSeasons(locale)[0];
-}
-
-/** Nächstes Spiel = erstes Spiel ohne eingetragenes Ergebnis. */
-export function nextFixture(season: Season | undefined): Fixture | undefined {
-  return season?.fixtures.find((fixture) => !fixture.result);
+/**
+ * Nächster Spieltag = alle Spiele ohne Ergebnis am Tag des ersten Spiels ohne
+ * Ergebnis (im Volleyball spielt man oft zwei Spiele an einem Spieltag).
+ */
+export function nextMatchday(season: Season | undefined): Fixture[] {
+  const first = season?.fixtures.find((fixture) => !fixture.result);
+  if (!season || !first) return [];
+  const day = first.date.slice(0, 10);
+  return season.fixtures.filter((fixture) => !fixture.result && fixture.date.startsWith(day));
 }
 
 /** Letztes Ergebnis = letztes Spiel mit eingetragenem Ergebnis. */
 export function lastResult(season: Season | undefined): Fixture | undefined {
   return season?.fixtures.findLast((fixture) => fixture.result);
+}
+
+/** Sätze aus Sicht der eigenen Mannschaft: [eigene Punkte, Punkte des Gegners] */
+export function ownSets(fixture: Fixture): [number, number][] {
+  return fixture.sets.map((set) => {
+    const [first, second] = set.split(":").map(Number);
+    return fixture.own === 0 ? [first, second] : [second, first];
+  });
 }

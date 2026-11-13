@@ -1,107 +1,32 @@
 # Saison 2026/27 – die Datei mit dem höchsten Namen ist die aktuelle Saison.
 #
-# Spiele:
-#   date:    "JJJJ-MM-TT HH:MM" (deutsche Ortszeit) oder nur "JJJJ-MM-TT"
-#   home:    true = Heimspiel, false = Auswärtsspiel
-#   result:  Sätze, immer "Heim:Gast" (wie in jeder Tabelle), z. B. "3:1"
-#   sets:    optional, die einzelnen Sätze ebenfalls aus Sicht der
-#            Heimmannschaft, mit Leerzeichen getrennt: "25:21 22:25 25:19 25:17"
-#   Ohne result gilt das Spiel als noch nicht gespielt – das erste Spiel
-#   ohne Ergebnis wird als „Nächstes Spiel“ angezeigt.
+# Spielplan, Ergebnisse und Tabelle kommen live von der Ligaseite des
+# Bayerischen Volleyball-Verbands (BVV). Die Website ruft sie höchstens einmal
+# pro Stunde ab; neue Ergebnisse erscheinen also ohne neues Deployment.
 #
-# ALLE ANGABEN SIND PLATZHALTER.
+#   bvv.url:  Ligaseite auf volleyball.bayern (Ergebnisse → Erwachsene →
+#             Bezirk → Liga), endet auf /wettbewerb-<Nummer>
+#   bvv.team: Name der eigenen Mannschaft genau wie dort geschrieben
+#             (ohne Angabe gilt team.name aus content/site.yaml)
+#
+# Für eine Saison ohne BVV (z. B. ein Archiv) stattdessen die Spiele von Hand
+# eintragen, siehe README → „Saison“.
 
 season: "2026/27"
 
 league:
-  de: Oberliga Musterland
-  en: Oberliga Musterland
+  de: Bezirksliga Schwaben
+  en: Bezirksliga Schwaben (Bavaria)
 
 summary:
-  de: Erste Saison nach dem Aufstieg. Ziel ist der Klassenerhalt, nach sechs Ligaspielen stehen wir im oberen Mittelfeld.
-  en: Our first season after promotion. The aim is to stay up, and after six league games we're in the top half.
+  de: Die erste Herrenmannschaft des TSV Pfuhl. Gespielt wird an Spieltagen mit jeweils drei Mannschaften, jede spielt zweimal.
+  en: TSV Pfuhl's first men's team. Matches are played on matchdays with three teams each, every team plays twice.
 
-standing:
-  position: 4
-  teams: 10
-  points: 10
+bvv:
+  url: https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600
+  team: TSV Pfuhl
 
-stats:
-  - label: { de: Spiele, en: Matches }
-    value: 7
-  - label: { de: Sätze, en: Sets }
-    value: 28
-  - label: { de: Punkte, en: Points }
-    value: 98
-  - label: { de: Asse, en: Aces }
-    value: 11
-  - label: { de: Blockpunkte, en: Blocks }
-    value: 9
-
-fixtures:
-  - date: "2026-09-26 19:30"
-    opponent: TSV Neudorf
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
-    result: "3:1"
-    sets: "25:21 22:25 25:19 25:17"
-  - date: "2026-10-03 19:00"
-    opponent: VfB Seeberg
-    home: false
-    venue: Seehalle Seeberg
-    competition: { de: Liga, en: League }
-    result: "2:3"
-    sets: "25:23 20:25 25:22 21:25 12:15"
-  - date: "2026-10-11 15:00"
-    opponent: SC Altheim
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
-    result: "3:0"
-    sets: "25:18 25:20 25:16"
-  - date: "2026-10-17 19:30"
-    opponent: VC Grünwiese
-    home: false
-    competition: { de: Liga, en: League }
-    result: "3:1"
-    sets: "25:22 25:27 25:20 25:23"
-  - date: "2026-10-24 19:30"
-    opponent: USC Bergdorf
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
-    result: "3:2"
-    sets: "25:20 23:25 25:27 25:19 15:11"
-  - date: "2026-11-01 16:00"
-    opponent: SSC Talheim
-    home: false
-    competition: { de: Verbandspokal, en: Regional cup }
-    result: "0:3"
-    sets: "19:25 22:25 20:25"
-  - date: "2026-11-07 19:30"
-    opponent: DJK Eichenau
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
-    result: "1:3"
-    sets: "25:23 19:25 22:25 21:25"
-  - date: "2026-11-14 19:30"
-    opponent: TuS Steinbach
-    home: false
-    venue: Dreifachhalle Steinbach
-    competition: { de: Liga, en: League }
-  - date: "2026-11-22 15:00"
-    opponent: VSG Wiesental
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
-  - date: "2026-11-28 19:30"
-    opponent: TSG Rotbach
-    home: false
-    competition: { de: Liga, en: League }
-  - date: "2026-12-05 19:30"
-    opponent: MTV Lindenberg
-    home: true
-    venue: Sporthalle am Rosenweg
-    competition: { de: Liga, en: League }
+# Eigene Zahlen (optional), erscheinen neben der Bilanz der Mannschaft:
+# stats:
+#   - label: { de: Asse, en: Aces }
+#     value: 11

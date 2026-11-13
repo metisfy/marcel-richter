@@ -17,7 +17,7 @@ import { getPage, getProjects, getSite } from "@/lib/content";
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
-const PAGE_KEYS = ["home", "ueber-mich", "projekte", "fotos", "saison", "kontakt", "impressum", "datenschutz"] as const;
+const PAGE_KEYS = ["home", "ueber-mich", "projekte", "saison", "kontakt", "impressum", "datenschutz"] as const;
 
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) => [
@@ -37,10 +37,6 @@ async function textFor(locale: Locale, key: string): Promise<{ eyebrow: string; 
   }
   if (key === "projekte") {
     const t = await getTranslations({ locale, namespace: "projects" });
-    return { eyebrow: site.jobTitle, title: t("title"), text: t("description") };
-  }
-  if (key === "fotos") {
-    const t = await getTranslations({ locale, namespace: "photos" });
     return { eyebrow: site.jobTitle, title: t("title"), text: t("description") };
   }
   if (key === "saison") {

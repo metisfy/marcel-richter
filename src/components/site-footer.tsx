@@ -28,7 +28,6 @@ export async function SiteFooter({ site }: { site: Site }) {
             <ul className="mt-4 space-y-2.5">
               <li><Link href="/ueber-mich" className={LINK}>{tNav("about")}</Link></li>
               <li><Link href="/projekte" className={LINK}>{tNav("projects")}</Link></li>
-              <li><Link href="/fotos" className={LINK}>{tNav("photos")}</Link></li>
               <li><Link href="/saison" className={LINK}>{tNav("season")}</Link></li>
             </ul>
           </nav>
