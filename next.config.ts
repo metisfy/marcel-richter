@@ -12,13 +12,22 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 // Theme-Skript im <head>. Bewusst ohne upgrade-insecure-requests, damit die
 // Seite auch intern über http://<ip>:3100 vollständig lädt.
 const isDev = process.env.NODE_ENV === "development";
+// Optionale Besucherstatistik (src/lib/analytics.ts): deren Adresse zulassen
+const analyticsOrigin = (() => {
+  try {
+    const src = process.env.NEXT_PUBLIC_UMAMI_SRC?.trim();
+    return src && process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID?.trim() ? new URL(src).origin : "";
+  } catch {
+    return "";
+  }
+})();
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${analyticsOrigin ? ` ${analyticsOrigin}` : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data:",
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self'${analyticsOrigin ? ` ${analyticsOrigin}` : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

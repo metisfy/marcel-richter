@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
 import { CheckIcon, ChevronRightIcon } from "./icons";
+import { LiveFixtureStatus } from "./live";
 
 const OUTCOME_STYLE: Record<Outcome, string> = {
   win: "bg-win-soft text-win",
@@ -183,10 +184,13 @@ export async function FixtureTable({
                       <SetScores sets={fixture.sets} className="mt-0.5 block text-[12px] text-muted" />
                     </>
                   ) : upNext ? (
-                    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-bg px-2.5 py-1 font-mono text-[11.5px] font-medium">
-                      <span aria-hidden="true" className="live-dot" />
-                      {t("nextUp")}
-                    </span>
+                    // Am Spieltag selbst: Live-Stand vom Ticker statt „Als Nächstes“
+                    <LiveFixtureStatus datum={fixture.date.slice(0, 10)} teams={fixture.teams}>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-line bg-bg px-2.5 py-1 font-mono text-[11.5px] font-medium">
+                        <span aria-hidden="true" className="live-dot" />
+                        {t("nextUp")}
+                      </span>
+                    </LiveFixtureStatus>
                   ) : (
                     <span className="font-mono text-[12.5px] text-muted">{t("open")}</span>
                   )}

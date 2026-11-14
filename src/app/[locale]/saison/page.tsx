@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { CalendarLinks } from "@/components/calendar-links";
+import { LiveTodayPanel } from "@/components/live";
 import { FixtureTable, LeagueTable, SourceNote } from "@/components/fixtures";
 import { RankingChart } from "@/components/match";
 import { JsonLd } from "@/components/json-ld";
@@ -103,6 +104,9 @@ export default async function SeasonPage({ params }: LocaleParams) {
         title={t("heading", { season: current.season })}
         lead={current.summary}
       />
+
+      {/* Live-Ticker am Spieltag – unabhängig von den Saisondaten des BVV */}
+      <LiveTodayPanel ownTeam={current.source?.team ?? site.team.name} />
 
       <section aria-labelledby="statistik" className="mb-20">
         <h2 id="statistik" className="sr-only">

@@ -208,5 +208,33 @@
     "rankingCaption": "League position after each matchday",
     "rankingPoint": "{date}: position {position}",
     "dayPoints": "Points from the matchday"
+  },
+  "live": {
+    "title": "Live ticker",
+    "source": "Live from the BVV ticker",
+    "startsAt": "Starts {time}",
+    "running": "In progress",
+    "final": "Final",
+    "setShort": "Set {set}",
+    "serving": "Serving",
+    "showLineup": "Show court & line-up",
+    "hideLineup": "Hide court & line-up",
+    "lineupLater": "The line-up appears at the start of the match.",
+    "events": "Match events",
+    "scoresheet": "Official scoresheet (PDF)",
+    "startingSix": "Starting line-up, set {set}",
+    "courtHint": "Positions I–VI · C = captain",
+    "courtLabel": "Volleyball court with both teams' starting line-ups in set {set}, names in the legend below",
+    "captain": "captain",
+    "libero": "libero",
+    "bench": "Bench",
+    "coach": "Coach",
+    "eventStart": "Match started",
+    "eventSetStart": "Set {set} starts",
+    "eventSetWon": "{team} win set {set} ({score})",
+    "eventMatchWon": "{team} win the match",
+    "eventTimeout": "Timeout {team} ({score})",
+    "eventSubstitution": "Substitution {team}: {in} for {out}",
+    "follow": "Follow live"
   }
 }

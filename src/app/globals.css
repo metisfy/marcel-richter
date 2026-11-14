@@ -24,6 +24,8 @@
   --btn-hover: #2f53bf;
   --care: #2fa98c;
   --win: #12704f;
+  --live: #e5484d;
+  --live-text: #b42318;
   --win-soft: #e3f5ee;
   --loss: #b42318;
   --loss-soft: #fdecec;
@@ -43,6 +45,8 @@
     --accent-2: #8f82f7;
     --accent-soft: #182033;
     --win: #5fd3a6;
+    --live: #ff6369;
+    --live-text: #ff8a80;
     --win-soft: #13221f;
     --loss: #ff8a80;
     --loss-soft: #2a1716;
@@ -62,6 +66,8 @@
   --accent-2: #8f82f7;
   --accent-soft: #182033;
   --win: #5fd3a6;
+  --live: #ff6369;
+  --live-text: #ff8a80;
   --win-soft: #13221f;
   --loss: #ff8a80;
   --loss-soft: #2a1716;
@@ -571,6 +577,38 @@
     transform: translateY(calc(-100% + var(--shot-height)));
   }
 }
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes live-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--live) 22%, transparent);
+  }
+}
+@keyframes court-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+}
+@keyframes court-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
 @keyframes header-shadow {
   to {
     box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.35);
@@ -593,6 +631,168 @@
   .lazy-cards > :nth-child(n + 3) {
     content-visibility: auto;
     contain-intrinsic-size: auto 30rem;
+  }
+
+  /* ---------- Live-Ticker ---------- */
+  /* Pulsierendes „LIVE“ (rot, mit sich ausbreitendem Ring) */
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 24px;
+    padding: 0 10px 0 9px;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--live) 12%, var(--bg));
+    color: var(--live-text);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+  }
+  .live-badge-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--live);
+  }
+  .live-badge-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--live);
+  }
+  .live-card {
+    border-color: color-mix(in srgb, var(--live) 45%, var(--line));
+  }
+  .live-strip {
+    border-color: color-mix(in srgb, var(--live) 40%, var(--line));
+    background-color: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  /* Kleiner Ball neben der aufschlagenden Mannschaft */
+  .serve-ball {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, #ffe27a 0 35%, transparent 36%),
+      conic-gradient(#ffd23f 0 33%, #2f6fdf 0 66%, #ffd23f 0);
+    box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 2.5px color-mix(in srgb, var(--fg) 25%, transparent);
+  }
+
+  /* Volleyballfeld (18 × 9 m, also 2:1) mit Netz und Angriffslinien */
+  .court {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    border: 2px solid color-mix(in srgb, var(--fg) 55%, transparent);
+    border-radius: 6px;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--accent-bright) 10%, transparent), color-mix(in srgb, var(--accent-2) 10%, transparent)),
+      color-mix(in srgb, #f2a65a 22%, var(--bg));
+    overflow: hidden;
+  }
+  .court-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1.5px dashed color-mix(in srgb, var(--fg) 35%, transparent);
+  }
+  .court-net {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: calc(50% - 2px);
+    width: 4px;
+    background: repeating-linear-gradient(180deg, var(--fg) 0 4px, transparent 4px 7px);
+    opacity: 0.75;
+  }
+  .court-player {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%);
+  }
+  .court-number {
+    display: grid;
+    place-items: center;
+    width: clamp(26px, 6vw, 38px);
+    height: clamp(26px, 6vw, 38px);
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--fg) 85%, transparent);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: clamp(11px, 2.4vw, 14px);
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
+  }
+  .court-player.is-own .court-number {
+    background-color: var(--btn);
+    color: #fff;
+  }
+  .court-name {
+    display: none;
+    max-width: 9ch;
+    margin-top: 3px;
+    overflow: hidden;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+    padding: 0 4px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (min-width: 640px) {
+    .court-name {
+      display: block;
+    }
+  }
+  .court-captain {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .court-serve {
+    position: absolute;
+    bottom: -2px;
+    left: -10px;
+  }
+  .court-team {
+    position: absolute;
+    bottom: 6px;
+    max-width: 42%;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--fg) 65%, transparent);
+  }
+  .court-team-left {
+    left: 8px;
+  }
+  .court-team-right {
+    right: 8px;
+    text-align: right;
   }
 
   /* Browserfenster mit durchlaufendem Seiten-Screenshot (Projektseiten) */
@@ -720,6 +920,21 @@
   .shot-frame:hover .shot-scroll,
   .shot-frame:focus-visible .shot-scroll {
     animation-play-state: paused;
+  }
+
+  /* Live-Ticker */
+  .live-badge-dot::after {
+    animation: live-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .live-card,
+  .live-strip {
+    animation: live-glow 2.4s ease-in-out infinite;
+  }
+  .court-player {
+    animation: court-pop 0.45s cubic-bezier(0.34, 1.5, 0.5, 1) both;
+  }
+  .court-in {
+    animation: court-open 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   /* 3. Dauerhaft und dezent */

@@ -4,10 +4,11 @@ import { getTranslations } from "next-intl/server";
 
 import { matchPlace, matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
 import { ArrowRightIcon, CalendarIcon, CheckIcon } from "@/components/icons";
+import { LiveFixtureStatus, LiveTodayStrip } from "@/components/live";
 import { SectionHead } from "@/components/page-intro";
 import { ProjectCard } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
-import { Link } from "@/i18n/navigation";
+import { getPathname, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProjects, getSite, lastResult, nextMatchday, ownSets, roleLine, type Season } from "@/lib/content";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
@@ -138,7 +139,11 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
                 </p>
                 <ul className="mt-1.5 space-y-0.5 text-[15px] font-medium">
                   {matchday.map((fixture) => (
-                    <li key={`${fixture.date}-${fixture.opponent}`}>{matchTitle(fixture)}</li>
+                    <li key={`${fixture.date}-${fixture.opponent}`} className="flex flex-wrap items-center justify-between gap-x-3">
+                      {matchTitle(fixture)}
+                      {/* am Spieltag: LIVE-Stand */}
+                      <LiveFixtureStatus datum={fixture.date.slice(0, 10)} teams={fixture.teams} />
+                    </li>
                   ))}
                 </ul>
                 <p className="mt-1 text-sm text-muted">{places[0]}</p>
@@ -241,6 +246,11 @@ export default async function HomePage({ params }: LocaleParams) {
               </Link>
             ) : null}
           </div>
+          {/* Am Spieltag während des Spiels: pulsierende Live-Leiste */}
+          <LiveTodayStrip
+            ownTeam={season?.source?.team ?? site.team.name}
+            hrefPattern={getPathname({ locale, href: { pathname: "/saison/[datum]", params: { datum: "DATUM" } } })}
+          />
         </div>
 
         {season ? (

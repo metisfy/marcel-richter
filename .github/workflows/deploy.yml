@@ -77,6 +77,8 @@ jobs:
           build-args: |
             SITE_URL=${{ vars.SITE_URL }}
             GIT_SHA=${{ github.sha }}
+            UMAMI_SRC=${{ vars.UMAMI_SRC }}
+            UMAMI_WEBSITE_ID=${{ vars.UMAMI_WEBSITE_ID }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}

@@ -1,6 +1,7 @@
 import "../globals.css";
 
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -11,6 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { routing } from "@/i18n/routing";
+import { ANALYTICS } from "@/lib/analytics";
 import { getSite } from "@/lib/content";
 import { fontVariables } from "@/lib/fonts";
 import { SITE_URL } from "@/lib/site-url";
@@ -69,6 +71,10 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <JsonLd data={siteGraph(site, locale)} />
         <RevealObserver />
+        {/* Besucherstatistik nur, wenn beim Build eingeschaltet (src/lib/analytics.ts) */}
+        {ANALYTICS ? (
+          <Script src={ANALYTICS.src} data-website-id={ANALYTICS.websiteId} data-do-not-track="true" strategy="afterInteractive" />
+        ) : null}
       </body>
     </html>
   );

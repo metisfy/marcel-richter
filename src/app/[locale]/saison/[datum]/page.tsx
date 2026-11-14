@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { AppearanceMark, MatchTeams, OutcomeBadge } from "@/components/fixtures";
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, ExternalIcon } from "@/components/icons";
 import { JsonLd } from "@/components/json-ld";
+import { LiveMatchdayPanel } from "@/components/live";
 import { FormChips, SetBars, SetTable } from "@/components/match";
 import { MdxContent } from "@/components/mdx-content";
 import { initLocale } from "@/i18n/locale";
@@ -316,6 +317,9 @@ export default async function MatchdayPage({ params }: Props) {
         </h1>
         {lead ? <p className="rise mt-5 text-lg leading-relaxed text-pretty text-muted [--delay:0.14s]">{lead}</p> : null}
       </header>
+
+      {/* Live-Ticker: erscheint nur am Spieltag selbst (fragt /api/live/<datum> ab) */}
+      <LiveMatchdayPanel datum={datum} ownTeam={season.source?.team ?? site.team.name} />
 
       {/* Zahlenleiste */}
       <section aria-label={t("summary")} className="mb-12">

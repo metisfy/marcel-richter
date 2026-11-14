@@ -59,10 +59,21 @@ async function limited<T>(task: () => Promise<T>): Promise<T> {
 type Page = { ok: boolean; status: number; text: string; date: string | null };
 const inFlight = new Map<string, Promise<Page>>();
 
+// Sicherung: Ist der Verband nicht erreichbar (Zeitüberschreitung,
+// Verbindungsabbruch), versucht es dieser Prozess beim Build gar nicht mehr
+// und im Betrieb erst nach einer Minute wieder – sonst wartet jede Seite
+// einzeln auf ihre Zeitüberschreitungen und der Build läuft in sein Zeitlimit.
+const isBuild = () => process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD;
+let unreachableUntil = 0;
+const markUnreachable = () => {
+  unreachableUntil = isBuild() ? Number.POSITIVE_INFINITY : Date.now() + 60_000;
+};
+
 /** Seite beim BVV abrufen – gemeinsam genutzt, begrenzt, mit einem zweiten Versuch bei Abbruch. */
 function fetchPage(url: string, revalidate: number): Promise<Page> {
   const pending = inFlight.get(url);
   if (pending) return pending;
+  if (Date.now() < unreachableUntil) return Promise.reject(new Error("BVV gerade nicht erreichbar (übersprungen)"));
   const load = async (): Promise<Page> => {
     const response = await fetchBvv(url, revalidate);
     return { ok: response.ok, status: response.status, text: response.ok ? await response.text() : "", date: response.headers.get("date") };
@@ -74,7 +85,12 @@ function fetchPage(url: string, revalidate: number): Promise<Page> {
       return page;
     } catch {
       await wait(2000);
-      return load();
+      try {
+        return await load();
+      } catch (error) {
+        markUnreachable();
+        throw error;
+      }
     }
   });
   inFlight.set(url, promise);
@@ -93,7 +109,9 @@ function fetchBvv(url: string, revalidate: number) {
       "user-agent": "Mozilla/5.0 (compatible; spielplan-abruf/1.0)",
     },
     next: { revalidate, tags: ["bvv"] },
-    signal: AbortSignal.timeout(25_000),
+    // Beim Build kürzer warten: lieber ohne Daten bauen (die Seite holt sie
+    // nach dem Start selbst nach) als das Zeitlimit der Pipeline zu reißen.
+    signal: AbortSignal.timeout(isBuild() ? 15_000 : 25_000),
   });
 }
 

@@ -232,6 +232,17 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   Was am Spieltag passiert ist, in Markdown …
   ```
 
+- **Live-Ticker am Spieltag:** Spielstand, Aufschlag, Sätze, Spielverlauf (Auszeiten, Wechsel)
+  und auf Klick das **Feld mit der Startaufstellung** beider Mannschaften samt Namen-Legende,
+  aktualisiert alle 10 Sekunden. Zu sehen auf der Saisonseite (oben), der Spieltagsseite und als
+  pulsierende Leiste auf der Startseite, im Spielplan steht „LIVE 1:0 18:15“ statt „Als Nächstes“.
+  Quelle ist der BVV-Live-Ticker (bvv.sams-ticker.de): Der Server hält eine WebSocket-Verbindung
+  (`src/lib/live.ts`), Browser fragen nur `/api/live/<datum>` ab (nur für gestern, heute und
+  morgen). **Wichtig:** Das Ticker-Backend antwortet nur Anfragen mit dem `Origin` der
+  offiziellen Ticker-Seite; die Website sendet diesen Header mit (Entscheidung vom 14.11.2026).
+  Dafür sollte eine Erlaubnis beim BVV bzw. SAMS eingeholt werden. Sperrt der Anbieter das, zeigt
+  die Seite einfach keinen Live-Stand, alles andere läuft weiter. Testen mit einer Mannschaft, die
+  gerade spielt: `LIVE_TEST_TEAM="SG Rödental" npm run dev` (nur in der Entwicklung).
 - **Kalender-Abo:** `/spielplan.ics` (Deutsch) und `/fixtures.ics` (Englisch), ein Termin pro
   Spieltag mit Halle, Adresse, Koordinaten und, sobald gespielt, den Ergebnissen. Auf der
   Saisonseite gibt es dafür „Abonnieren“ (webcal), „Google Kalender“ und „.ics laden“. Google
@@ -239,6 +250,9 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   Livegang.
 - **Vorschaubilder je Spieltag:** `/og/<sprache>/spieltag/<JJJJ-MM-TT>`, mit Ergebnissen bzw.
   Gegnern und Uhrzeit; wird beim Teilen eines Spieltags angezeigt.
+- **Eigenen Bericht mit Vorlage starten:** `npm run dev`, dann in einem zweiten Terminal
+  `npm run bericht -- 2026-10-10` (optional `en`). Das legt `content/spieltage/<datum>.de.mdx`
+  mit dem automatischen Bericht als Ausgangstext an; vorhandene Dateien werden nie überschrieben.
 - **Tabellenverlauf:** Die Saisonseite zeigt den Tabellenplatz nach jedem Spieltag als Linie
   (Daten aus dem Tabellenverlauf der BVV-Spielseiten).
 - **Aktualisierung:** Startseite, Saison- und Spieltagsseiten werden höchstens alle fünf Minuten im
@@ -246,6 +260,9 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   davon im Fetch-Cache: Ligaseite höchstens einmal pro Stunde, Spielseiten höchstens alle sechs
   Stunden. Neue Ergebnisse erscheinen also spätestens nach etwa einer Stunde, **ohne neues
   Deployment**, und der Verband wird nicht öfter abgefragt, egal wie viele Besucher kommen.
+- **Wenn der BVV nicht antwortet,** versucht es derselbe Prozess beim Build gar nicht mehr (sonst
+  läuft die Pipeline in ihr Zeitlimit) und im Betrieb erst nach einer Minute wieder. Samstags ist
+  der Ergebnisdienst des Verbands oft stark ausgelastet.
 - **Wenn der Build keine Daten bekommt** (z. B. weil der BVV die Server von GitHub Actions nicht
   bedient), zeigt die Seite zunächst den Hinweis und holt die Daten wenige Minuten nach dem Start
   des Containers selbst nach. Den Grund verrät das Attribut `data-bvv-error` am Hinweis im
@@ -556,6 +573,16 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 - **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
   `engines` in `package.json`.
 
+### Besucherstatistik (optional, standardmäßig aus)
+
+Für eine Statistik ohne Cookies ist [Umami](https://umami.is) vorbereitet (selbst gehostet). Dafür
+in GitHub unter Settings → Variables `UMAMI_SRC` (z. B. `https://statistik.example.com/script.js`)
+und `UMAMI_WEBSITE_ID` setzen. Beim nächsten Build werden dann das Skript geladen, die
+Content-Security-Policy erweitert und in der Datenschutzerklärung der Abschnitt „13.
+Besucherstatistik“ eingeblendet (`<Tracking />` und `<Besucherstatistik />` in den MDX-Dateien).
+**Vorher rechtlich prüfen lassen:** Auch eine Statistik ohne Cookies liest Informationen vom Gerät
+(Bildschirmgröße, Sprache); ob dafür nach § 25 TDDDG eine Einwilligung nötig ist, ist umstritten.
+
 ### Projektstruktur
 
 ```
@@ -571,6 +598,8 @@ src/lib/content.ts       Lädt und prüft alle Inhalte
 src/lib/bvv.ts           Liest Spielplan und Tabelle von der BVV-Ligaseite
 src/lib/season.ts        Führt Saisondatei und BVV-Daten zusammen (stündlich)
 src/lib/matchday.ts      Spieltage, Statistik je Spiel, automatischer Bericht
+src/lib/live.ts          Live-Ticker (WebSocket zum BVV-Ticker), /api/live/<datum>
+src/components/live.tsx  Live-Anzeige, Feld mit Startaufstellung, Legende
 src/lib/structured-data.ts  schema.org / JSON-LD
 src/proxy.ts             Sprach-Routing
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)

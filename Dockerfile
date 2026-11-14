@@ -34,9 +34,14 @@ COPY . .
 # (Footer + /api/health). Kommen als Build-Args aus der Pipeline.
 ARG SITE_URL=""
 ARG GIT_SHA="dev"
+# Optionale Besucherstatistik (leer = aus), siehe src/lib/analytics.ts
+ARG UMAMI_SRC=""
+ARG UMAMI_WEBSITE_ID=""
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     NEXT_PUBLIC_SITE_URL=${SITE_URL} \
+    NEXT_PUBLIC_UMAMI_SRC=${UMAMI_SRC} \
+    NEXT_PUBLIC_UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID} \
     GIT_SHA=${GIT_SHA}
 
 RUN npm run build

@@ -208,5 +208,33 @@
     "rankingCaption": "Tabellenplatz nach jedem Spieltag",
     "rankingPoint": "{date}: Platz {position}",
     "dayPoints": "Punkte aus dem Spieltag"
+  },
+  "live": {
+    "title": "Live-Ticker",
+    "source": "Live vom BVV-Ticker",
+    "startsAt": "Beginn {time} Uhr",
+    "running": "Läuft",
+    "final": "Endstand",
+    "setShort": "Satz {set}",
+    "serving": "Aufschlag",
+    "showLineup": "Feld & Aufstellung anzeigen",
+    "hideLineup": "Feld & Aufstellung ausblenden",
+    "lineupLater": "Die Aufstellung erscheint mit dem Anpfiff.",
+    "events": "Spielverlauf",
+    "scoresheet": "Spielberichtsbogen (PDF)",
+    "startingSix": "Startaufstellung Satz {set}",
+    "courtHint": "Positionen I–VI · C = Kapitän",
+    "courtLabel": "Volleyballfeld mit der Startaufstellung beider Mannschaften in Satz {set}, Namen in der Legende darunter",
+    "captain": "Kapitän",
+    "libero": "Libero",
+    "bench": "Bank",
+    "coach": "Trainer",
+    "eventStart": "Anpfiff",
+    "eventSetStart": "Satz {set} beginnt",
+    "eventSetWon": "{team} gewinnt Satz {set} ({score})",
+    "eventMatchWon": "{team} gewinnt das Spiel",
+    "eventTimeout": "Auszeit {team} ({score})",
+    "eventSubstitution": "Wechsel {team}: {in} für {out}",
+    "follow": "Live verfolgen"
   }
 }
