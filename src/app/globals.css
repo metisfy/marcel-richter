@@ -168,7 +168,8 @@
     width: 26px;
     height: 26px;
     border-radius: 7px;
-    background-color: var(--accent-bright);
+    /* dunkleres metis-Blau: Weiß darauf erfüllt WCAG AA (5,3:1) */
+    background-color: var(--btn);
     color: #fff;
     font-family: var(--font-mono);
     font-size: 11.5px;
@@ -587,9 +588,9 @@
     background-color: var(--care);
   }
 
-  /* Lange Kartenlisten: Karten ab der vierten erst zeichnen (und ihre Bilder
+  /* Lange Kartenlisten: Karten ab der dritten erst zeichnen (und ihre Bilder
      erst laden), wenn sie in die Nähe des Bildschirms kommen */
-  .lazy-cards > :nth-child(n + 4) {
+  .lazy-cards > :nth-child(n + 3) {
     content-visibility: auto;
     contain-intrinsic-size: auto 30rem;
   }

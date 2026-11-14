@@ -171,7 +171,8 @@ function parseMatches(table: string): BvvMatch[] {
       .split(/[,\s]+/)
       .filter((set) => /^\d+:\d+$/.test(set));
     const number = toInt(cells[at.number] ?? "");
-    const link = /href="([^"]*\/spiel-\d+)"/.exec(row)?.[1];
+    // Laufende Saison: …/spiel-417563, Archiv: …/spiel-377210?…&cHash=…
+    const link = /href="([^"]*\/spiel-\d+(?:\?[^"]*)?)"/.exec(row)?.[1];
 
     matches.push({
       number: number || undefined,

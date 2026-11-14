@@ -134,9 +134,12 @@ Ein Ordner pro Projekt. Der Ordnername wird zur URL (`/projekte/metiscode`,
 `/en/projects/metiscode`), also nur Kleinbuchstaben, Ziffern und Bindestriche verwenden.
 
 Die Projekte stammen von [metisone.de/projekte](https://metisone.de/projekte) (Texte, Eckdaten,
-Screenshots). `role` sagt, wie ich beteiligt war: „Konzept & Entwicklung“ bzw. „Entwicklung“, wo
-ich selbst Code beigetragen habe, sonst „Geschäftsführung“. Neue Projekte auf metisone.de bitte
-hier als neuen Ordner ergänzen.
+Screenshots) und aus den metisCode-Kundenprojekten (T-Orga, Kunstschmiede Bischoff, Gartenpflege
+Heidenheim, Campingplatz Bürgel, Dorfhaus Lauterburg, NUFA, metisTable). `role` sagt, wie ich
+beteiligt war: „Konzept & Entwicklung“ bzw. „Entwicklung“, wo ich selbst Code beigetragen habe,
+sonst „Geschäftsführung“. Screenshots der Live-Seiten: Seite in 1440 px Breite komplett
+aufnehmen (Cookie-Banner vorher schließen), daraus `<slug>.jpg` (oberer Ausschnitt 16:10) und
+`<slug>-seite.jpg` (ganze Seite, 1200 px breit).
 
 ```mdx
 ---
@@ -586,7 +589,7 @@ deploy/                  Beispielkonfiguration Nginx
 
 - [x] Kontakt: `hello@metiscode.com` (wie im Impressum); Profile, Position und Rückennummer bei
       Bedarf in `content/site.yaml` ergänzen. Vereinslogo nur mit Erlaubnis des TSV Pfuhl
-- [x] Porträt (dein Foto von metisone.de) und Projekte (von metisone.de)
+- [x] Porträt (dein Foto von metisone.de) und Projekte (metisone.de + metisCode-Kundenprojekte)
 - [ ] Auf dem Server prüfen, ob der Container `volleyball.bayern` erreicht (siehe oben)
 - [ ] `auto-update.sh` per cron einrichten (Abschnitt „Automatisch ausrollen“)
 - [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,

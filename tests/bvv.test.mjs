@@ -58,6 +58,18 @@ describe("Ligaseite", () => {
     assert.deepEqual(row, { position: 3, team: "TSV Pfuhl", played: 4, won: 2, lost: 2, points: 7, sets: "8:8", balls: "344:347" });
   });
 
+  it("übernimmt Archiv-Links samt Prüfsumme (…/spiel-123?…&cHash=…)", () => {
+    const archive = parseBvvLeague(`<table><thead><tr><th>Datum</th><th>Nr.</th><th>Team A</th><th>Team B</th><th>Ergebnis</th><th>Sätze</th><th></th></tr></thead>
+      <tbody><tr><td>Samstag, 18.10.2025<br>13:00 Uhr</td><td>12</td><td><a href="/ergebnisse/ergebnis-archiv/team-1">TSV Pfuhl</a> (H)</td><td>DJK Augsburg Hochzoll II</td>
+      <td>1:3</td><td>22:25, 25:23, 20:25, 24:25</td>
+      <td><a href="/ergebnisse/ergebnis-archiv/spiel-377213?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&amp;cHash=abc123">→</a></td></tr></tbody></table>`);
+    assert.equal(
+      archive.matches[0].url,
+      "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377213?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=abc123",
+    );
+    assert.equal(archive.matches[0].host, "A");
+  });
+
   it("wirft einen Fehler, wenn keine Spiele gefunden werden", () => {
     assert.throws(() => parseBvvLeague("<html><body><p>Wartung</p></body></html>"), /keine Spiele gefunden/);
   });

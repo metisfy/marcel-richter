@@ -33,6 +33,57 @@ import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
 const REVALIDATE_SECONDS = 3600;
 // Spielseiten ändern sich kaum noch (Halle, Spielbericht): seltener abrufen.
 const MATCH_REVALIDATE_SECONDS = 6 * 3600;
+// Abgeschlossene Saisons im Ergebnis-Archiv ändern sich nicht mehr.
+const ARCHIVE_REVALIDATE_SECONDS = 30 * 24 * 3600;
+
+const isArchive = (url: string) => url.includes("/ergebnis-archiv/");
+
+// Rücksicht auf den Server des Verbands: höchstens drei Abrufe gleichzeitig
+// (pro Prozess) und dieselbe Adresse nie doppelt parallel – beim Build
+// erzeugen mehrere Seiten gleichzeitig dieselben Daten.
+const MAX_PARALLEL = 3;
+let running = 0;
+const queue: (() => void)[] = [];
+
+async function limited<T>(task: () => Promise<T>): Promise<T> {
+  if (running >= MAX_PARALLEL) await new Promise<void>((resolve) => queue.push(resolve));
+  running += 1;
+  try {
+    return await task();
+  } finally {
+    running -= 1;
+    queue.shift()?.();
+  }
+}
+
+type Page = { ok: boolean; status: number; text: string; date: string | null };
+const inFlight = new Map<string, Promise<Page>>();
+
+/** Seite beim BVV abrufen – gemeinsam genutzt, begrenzt, mit einem zweiten Versuch bei Abbruch. */
+function fetchPage(url: string, revalidate: number): Promise<Page> {
+  const pending = inFlight.get(url);
+  if (pending) return pending;
+  const load = async (): Promise<Page> => {
+    const response = await fetchBvv(url, revalidate);
+    return { ok: response.ok, status: response.status, text: response.ok ? await response.text() : "", date: response.headers.get("date") };
+  };
+  const promise = limited(async () => {
+    try {
+      const page = await load();
+      if (page.status >= 500) throw new Error(`HTTP ${page.status}`);
+      return page;
+    } catch {
+      await wait(2000);
+      return load();
+    }
+  });
+  inFlight.set(url, promise);
+  promise.then(
+    () => setTimeout(() => inFlight.delete(url), 30_000),
+    () => inFlight.delete(url),
+  );
+  return promise;
+}
 
 function fetchBvv(url: string, revalidate: number) {
   return fetch(url, {
@@ -49,28 +100,19 @@ function fetchBvv(url: string, revalidate: number) {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt: string }> {
-  // Ein zweiter Versuch nach kurzer Pause: Die Ligaseite ist groß und der
-  // Server des Verbands antwortet nicht immer gleich schnell.
-  let response: Response;
-  try {
-    response = await fetchBvv(url, REVALIDATE_SECONDS);
-    if (response.status >= 500) throw new Error(`HTTP ${response.status}`);
-  } catch {
-    await wait(3000);
-    response = await fetchBvv(url, REVALIDATE_SECONDS);
-  }
-  if (!response.ok) throw new Error(`BVV antwortet mit HTTP ${response.status} (${url})`);
-  const league = parseBvvLeague(await response.text());
+  const page = await fetchPage(url, isArchive(url) ? ARCHIVE_REVALIDATE_SECONDS : REVALIDATE_SECONDS);
+  if (!page.ok) throw new Error(`BVV antwortet mit HTTP ${page.status} (${url})`);
+  const league = parseBvvLeague(page.text);
   // Das Date-Header bleibt im Fetch-Cache erhalten und zeigt so, wann die
   // Daten wirklich abgerufen wurden.
-  const date = new Date(response.headers.get("date") ?? Date.now());
+  const date = new Date(page.date ?? Date.now());
   return { league, updatedAt: (Number.isNaN(date.getTime()) ? new Date() : date).toISOString() };
 }
 
 async function fetchMatchDetail(url: string): Promise<BvvMatchDetail | undefined> {
   try {
-    const response = await fetchBvv(url, MATCH_REVALIDATE_SECONDS);
-    return response.ok ? parseBvvMatchDetail(await response.text()) : undefined;
+    const page = await fetchPage(url, isArchive(url) ? ARCHIVE_REVALIDATE_SECONDS : MATCH_REVALIDATE_SECONDS);
+    return page.ok ? parseBvvMatchDetail(page.text) : undefined;
   } catch {
     return undefined;
   }
@@ -190,6 +232,12 @@ async function withDetails(season: Season): Promise<Season> {
   }
 
   const known = fixtures.filter((fixture) => fixture.appearance);
+  // In keinem einzigen Spielbericht: in dieser Saison nicht im Team – dann
+  // gar keine Einsatz-Angaben statt „0 von 18“.
+  const inSquad = known.some((fixture) => fixture.appearance?.status !== "absent");
+  if (!inSquad) {
+    return { ...season, fixtures: fixtures.map((fixture) => ({ ...fixture, appearance: undefined })), appearances: undefined, ranking };
+  }
   const appearances =
     known.length > 0
       ? {

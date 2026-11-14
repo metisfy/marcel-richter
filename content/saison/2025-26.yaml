@@ -1,0 +1,13 @@
+# Saison 2025/26 – abgeschlossen, Daten aus dem Ergebnis-Archiv des BVV
+# (Ergebnisse → Ergebnis-Archiv → 2025 → Schwaben → Erwachsene).
+# Archivdaten ändern sich nicht mehr und werden nur alle 30 Tage abgerufen.
+
+season: "2025/26"
+
+league:
+  de: Bezirksliga Schwaben
+  en: Bezirksliga Schwaben (Bavaria)
+
+bvv:
+  url: https://volleyball.bayern/ergebnisse/ergebnis-archiv/wettbewerb-38655
+  team: TSV Pfuhl
