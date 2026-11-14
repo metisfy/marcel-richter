@@ -54,11 +54,12 @@ type TickerState = {
   eventHistory: TickerEvent[];
   teamLineups?: { team1: Lineup; team2: Lineup };
 };
-type TickerMatch = { id: string; teamDescription1: string; teamDescription2: string; date: number };
+type TickerMatch = { id: string; teamDescription1: string; teamDescription2: string; date: number; matchSeries?: string };
 
 // Ein Zustand pro Server-Prozess (auch über Hot-Reloads in der Entwicklung)
 type Hub = {
-  team?: string;
+  /** Mannschaft (und Liga), für die die Spiele geladen sind */
+  key?: string;
   matches: Map<string, TickerMatch>;
   states: Map<string, TickerState>;
   loadedAt: number;
@@ -70,11 +71,12 @@ type Hub = {
 const globalHub = globalThis as unknown as { __liveHub?: Hub };
 const hub: Hub = (globalHub.__liveHub ??= { matches: new Map(), states: new Map(), loadedAt: 0, lastUsed: 0 });
 
-async function loadSnapshot(team: string) {
+async function loadSnapshot(team: string, series?: string) {
   const response = await fetch(REST_URL, { headers: HEADERS, cache: "no-store", signal: AbortSignal.timeout(30_000) });
   if (!response.ok) throw new Error(`Ticker antwortet mit HTTP ${response.status}`);
   const data = (await response.json()) as {
     matchDays: { matches: TickerMatch[] }[];
+    matchSeries?: Record<string, { name?: string }>;
     matchStates: Record<string, TickerState>;
   };
   hub.matches.clear();
@@ -82,12 +84,14 @@ async function loadSnapshot(team: string) {
   for (const day of data.matchDays) {
     for (const match of day.matches) {
       if (match.teamDescription1 !== team && match.teamDescription2 !== team) continue;
+      // Gleichnamige Mannschaften anderer Ligen (Damen, Jugend) auslassen
+      if (series && data.matchSeries?.[match.matchSeries ?? ""]?.name !== series) continue;
       hub.matches.set(match.id, { id: match.id, teamDescription1: match.teamDescription1, teamDescription2: match.teamDescription2, date: match.date });
       const state = data.matchStates[match.id];
       if (state) hub.states.set(match.id, state);
     }
   }
-  hub.team = team;
+  hub.key = keyOf(team, series);
   hub.loadedAt = Date.now();
 }
 
@@ -124,11 +128,13 @@ function openSocket() {
 }
 
 /** Sorgt für aktuelle Daten: Schnappschuss (höchstens jede Minute neu, solange keine Verbindung steht) + Verbindung. */
-async function ensure(team: string) {
+const keyOf = (team: string, series?: string) => `${team}|${series ?? ""}`;
+
+async function ensure(team: string, series?: string) {
   hub.lastUsed = Date.now();
-  const stale = hub.team !== team || !hub.loadedAt || (!hub.socket && Date.now() - hub.loadedAt > 60_000);
+  const stale = hub.key !== keyOf(team, series) || !hub.loadedAt || (!hub.socket && Date.now() - hub.loadedAt > 60_000);
   if (stale) {
-    hub.loading ??= loadSnapshot(team).finally(() => {
+    hub.loading ??= loadSnapshot(team, series).finally(() => {
       hub.loading = undefined;
     });
     await hub.loading;
@@ -177,7 +183,7 @@ const berlinDay = (time: number) => new Intl.DateTimeFormat("sv-SE", { timeZone:
 function toLive(match: TickerMatch, state: TickerState | undefined): LiveMatch {
   const teams: [string, string] = [match.teamDescription1, match.teamDescription2];
   const base: LiveMatch = { teams, start: match.date, status: "pre", sets: [0, 0], setScores: [], events: [] };
-  if (!state || !state.started) return base;
+  if (!state) return base;
 
   const history = [...(state.eventHistory ?? [])].sort((a, b) => a.timestamp - b.timestamp);
   const squadEvents: [TeamSquad | undefined, TeamSquad | undefined] = [undefined, undefined];
@@ -202,6 +208,15 @@ function toLive(match: TickerMatch, state: TickerState | undefined): LiveMatch {
       .map((player) => playerOf(index, player.uuid)!)
       .sort((a, b) => Number(a.number) - Number(b.number)),
   ) as [LivePlayer[], LivePlayer[]];
+
+  const coach = (index: 0 | 1) => {
+    const trainer = squadEvents[index]?.officials.find((official) => official.function === "TRAINER");
+    return trainer ? tidy(`${trainer.firstName} ${trainer.lastName}`) : undefined;
+  };
+  // Vor dem Anpfiff: Kader, sobald die Mannschaften ihn im Ticker bestätigt haben
+  if (!state.started) {
+    return squads.some((squad) => squad.length > 0) ? { ...base, squads, coaches: [coach(0), coach(1)] } : base;
+  }
 
   // Startaufstellung: Beginn des laufenden Satzes (START_SET), sonst Spielbeginn
   const lineupEvent = [...history].reverse().find((event) => (event.type === "START_SET" || event.type === "START_MATCH") && event.lineups);
@@ -232,10 +247,6 @@ function toLive(match: TickerMatch, state: TickerState | undefined): LiveMatch {
     }
   }
 
-  const coach = (index: 0 | 1) => {
-    const trainer = squadEvents[index]?.officials.find((official) => official.function === "TRAINER");
-    return trainer ? tidy(`${trainer.firstName} ${trainer.lastName}`) : undefined;
-  };
   const sets = state.matchSets ?? [];
   const last = sets.at(-1);
   return {
@@ -254,9 +265,12 @@ function toLive(match: TickerMatch, state: TickerState | undefined): LiveMatch {
   };
 }
 
-/** Live-Stand aller Spiele der eigenen Mannschaft an einem Tag (JJJJ-MM-TT). */
-export async function liveMatchday(team: string, date: string): Promise<LiveMatch[]> {
-  await ensure(team);
+/**
+ * Live-Stand aller Spiele der eigenen Mannschaft an einem Tag (JJJJ-MM-TT).
+ * `series`: Name der Liga im Ticker, trennt gleichnamige Mannschaften.
+ */
+export async function liveMatchday(team: string, date: string, series?: string): Promise<LiveMatch[]> {
+  await ensure(team, series);
   return [...hub.matches.values()]
     .filter((match) => berlinDay(match.date) === date)
     .sort((a, b) => a.date - b.date)

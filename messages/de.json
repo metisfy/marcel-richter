@@ -121,7 +121,9 @@
     "calendarText": "Alle Spieltage mit Halle und Ergebnissen – Verschiebungen kommen automatisch an.",
     "calendarSubscribe": "Abonnieren",
     "calendarGoogle": "Google Kalender",
-    "calendarDownload": ".ics laden"
+    "calendarDownload": ".ics laden",
+    "stale": "Der Verband antwortet gerade nicht – letzter bekannter Stand vom {updated} Uhr.",
+    "unavailableShort": "Spielplan gerade nicht erreichbar."
   },
   "contact": {
     "title": "Kontakt",
@@ -219,7 +221,7 @@
     "serving": "Aufschlag",
     "showLineup": "Feld & Aufstellung anzeigen",
     "hideLineup": "Feld & Aufstellung ausblenden",
-    "lineupLater": "Die Aufstellung erscheint mit dem Anpfiff.",
+    "lineupLater": "Kader und Aufstellung erscheinen kurz vor dem Anpfiff.",
     "events": "Spielverlauf",
     "scoresheet": "Spielberichtsbogen (PDF)",
     "startingSix": "Startaufstellung Satz {set}",
@@ -235,6 +237,16 @@
     "eventMatchWon": "{team} gewinnt das Spiel",
     "eventTimeout": "Auszeit {team} ({score})",
     "eventSubstitution": "Wechsel {team}: {in} für {out}",
-    "follow": "Live verfolgen"
+    "follow": "Live verfolgen",
+    "startsAtShort": "{time} Uhr",
+    "today": "HEUTE",
+    "toMatchday": "Zum Spieltag",
+    "kickoffSoon": "Anpfiff steht bevor",
+    "kickoffInMinutes": "Anpfiff in {minutes} Min.",
+    "kickoffInHours": "Anpfiff in {hours} Std. {minutes} Min.",
+    "showSquad": "Gemeldeten Kader anzeigen",
+    "hideSquad": "Kader ausblenden",
+    "squadTitle": "Gemeldeter Kader",
+    "squadPending": "Noch nicht gemeldet."
   }
 }

@@ -47,6 +47,8 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
   const upcoming = matchday[0];
   const latest = lastResult(season);
   const places = upcoming ? await Promise.all(matchday.map(matchPlace)) : [];
+  // Verband nicht erreichbar und kein letzter Stand: nicht „kein Spiel“ behaupten
+  const missing = Boolean(season.source && !season.source.updatedAt);
 
   // Sätze aus eigener Sicht: [eigene Punkte, Punkte des Gegners]
   const sets = latest ? ownSets(latest) : [];
@@ -61,7 +63,7 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
         <h2 className="ml-3 truncate font-mono text-[12px] text-muted">
           {t("seasonWindow", { season: season.season })} · {season.league}
         </h2>
-        {season.source?.updatedAt ? (
+        {season.source?.updatedAt && !season.source.stale ? (
           <span className="ml-auto hidden shrink-0 items-center gap-2 font-mono text-[11.5px] text-muted sm:inline-flex">
             <span aria-hidden="true" className="live-dot" />
             {t("live")}
@@ -122,7 +124,7 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
               ) : null}
             </>
           ) : (
-            <p className="mt-3 text-muted">{t("noResult")}</p>
+            <p className="mt-3 text-muted">{missing ? tSeason("unavailable") : t("noResult")}</p>
           )}
         </div>
 
@@ -152,7 +154,7 @@ async function SeasonWindow({ season, locale }: { season: Season; locale: Locale
                 </Link>
               </>
             ) : (
-              <p className="mt-3 text-muted">{t("noUpcoming")}</p>
+              <p className="mt-3 text-muted">{missing ? tSeason("unavailableShort") : t("noUpcoming")}</p>
             )}
           </div>
           <div className="p-6 sm:p-7">

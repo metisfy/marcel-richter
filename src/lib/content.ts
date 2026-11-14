@@ -342,6 +342,8 @@ const seasonSchema = z.object({
       team: z.string().optional(),
       /** Eigener Name wie im Spielbericht, für „Meine Einsätze“; Standard: name aus site.yaml */
       player: z.object({ lastName: z.string(), firstName: z.string() }).optional(),
+      /** Name der Liga im BVV-Live-Ticker (bvv.sams-ticker.de), z. B. "Sch - Bezirksliga Männer" – trennt gleichnamige Mannschaften anderer Ligen */
+      ticker: z.string().optional(),
     })
     .optional(),
   standing: z
@@ -498,8 +500,19 @@ export type Season = {
   ranking: { date: string; position: number }[];
   /** Eigene Einsätze: eingesetzt in `played` von `matches` Spielen mit Spielbericht */
   appearances?: { played: number; squad: number; matches: number };
-  /** Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist */
-  source?: { url: string; team: string; player: { lastName: string; firstName: string }; updatedAt?: string; error?: string };
+  /**
+   * Live-Quelle; `updatedAt` fehlt, wenn der Abruf gescheitert ist. `stale`:
+   * Der Verband hat nicht geantwortet, die Daten sind der letzte bekannte Stand.
+   */
+  source?: {
+    url: string;
+    team: string;
+    player: { lastName: string; firstName: string };
+    ticker?: string;
+    updatedAt?: string;
+    stale?: boolean;
+    error?: string;
+  };
 };
 
 export function outcomeOf(own: 0 | 1, result: [number, number]): Outcome {
@@ -532,7 +545,9 @@ export const getSeasons = cache((locale: Locale): Season[] => {
         table: [],
         matches: [],
         ranking: [],
-        source: raw.bvv ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName, player: raw.bvv.player ?? defaultPlayer } : undefined,
+        source: raw.bvv
+          ? { url: raw.bvv.url, team: raw.bvv.team ?? teamName, player: raw.bvv.player ?? defaultPlayer, ticker: raw.bvv.ticker }
+          : undefined,
         fixtures: raw.fixtures
           .map((fixture): Fixture => {
             const own = fixture.home ? 0 : 1;

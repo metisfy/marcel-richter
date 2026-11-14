@@ -240,7 +240,10 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   (`src/lib/live.ts`), Browser fragen nur `/api/live/<datum>` ab (nur für gestern, heute und
   morgen). **Wichtig:** Das Ticker-Backend antwortet nur Anfragen mit dem `Origin` der
   offiziellen Ticker-Seite; die Website sendet diesen Header mit (Entscheidung vom 14.11.2026).
-  Dafür sollte eine Erlaubnis beim BVV bzw. SAMS eingeholt werden. Sperrt der Anbieter das, zeigt
+  Dafür sollte eine Erlaubnis beim BVV bzw. SAMS eingeholt werden. Im Ticker gibt es mehrere
+  Mannschaften „TSV Pfuhl“ (Damen, Jugend); welche gemeint ist, legt `bvv.ticker` (Name der Liga
+  im Ticker, z. B. „Sch - Bezirksliga Männer“) in `content/saison/<saison>.yaml` fest. Vor dem
+  Anpfiff zeigt die Karte einen Countdown und, sobald gemeldet, den Kader beider Mannschaften. Sperrt der Anbieter das, zeigt
   die Seite einfach keinen Live-Stand, alles andere läuft weiter. Testen mit einer Mannschaft, die
   gerade spielt: `LIVE_TEST_TEAM="SG Rödental" npm run dev` (nur in der Entwicklung).
 - **Kalender-Abo:** `/spielplan.ics` (Deutsch) und `/fixtures.ics` (Englisch), ein Termin pro
@@ -262,7 +265,12 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   Deployment**, und der Verband wird nicht öfter abgefragt, egal wie viele Besucher kommen.
 - **Wenn der BVV nicht antwortet,** versucht es derselbe Prozess beim Build gar nicht mehr (sonst
   läuft die Pipeline in ihr Zeitlimit) und im Betrieb erst nach einer Minute wieder. Samstags ist
-  der Ergebnisdienst des Verbands oft stark ausgelastet.
+  der Ergebnisdienst des Verbands oft stark ausgelastet (Antwortzeiten über 30 Sekunden).
+- **Letzter bekannter Stand:** `content/saison/<saison>.bvv.json`. Antwortet der Verband beim
+  Build nicht, baut die Website damit statt ohne Spielplan („letzter bekannter Stand vom …“);
+  fehlt nur eine Spielseite, kommen deren Angaben (Halle, Einsätze) von dort. Aktualisieren:
+  `npm run dev`, dann `npm run bvv:stand`, committen. Darin stehen nur Mannschaften, Ergebnisse,
+  Tabelle und die eigenen Einsätze, keine Namen anderer Spieler.
 - **Wenn der Build keine Daten bekommt** (z. B. weil der BVV die Server von GitHub Actions nicht
   bedient), zeigt die Seite zunächst den Hinweis und holt die Daten wenige Minuten nach dem Start
   des Containers selbst nach. Den Grund verrät das Attribut `data-bvv-error` am Hinweis im

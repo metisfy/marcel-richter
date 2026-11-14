@@ -1,0 +1,2618 @@
+{
+  "updatedAt": "2026-11-14T09:42:50.000Z",
+  "fixtures": [
+    {
+      "date": "2025-10-18 13:00",
+      "number": 10,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "own": 0,
+      "opponent": "DJK Augsburg Hochzoll II",
+      "home": true,
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:22",
+        "23:25",
+        "21:25",
+        "22:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377213?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "SSV Bobingen",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          91,
+          97
+        ],
+        "squad": {
+          "listed": 11,
+          "played": 10
+        }
+      }
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 11,
+      "teams": [
+        "TSV Pfuhl",
+        "SSV Bobingen"
+      ],
+      "own": 0,
+      "opponent": "SSV Bobingen",
+      "home": true,
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "17:25",
+        "25:23",
+        "21:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377214?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "DJK Augsburg Hochzoll II",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          84,
+          98
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 1,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "DJK Augsburg Hochzoll II",
+      "home": false,
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "26:24",
+        "23:25",
+        "23:25"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377204?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "DJK Augsburg Hochzoll",
+        "venue": {
+          "name": "Zwölf Apostel Halle",
+          "street": "Zwölf Apostel Platz 3",
+          "city": "86163 Augsburg",
+          "lat": 48.34334182852518,
+          "lng": 10.945324753303566
+        },
+        "balls": [
+          93,
+          99
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 3,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll"
+      ],
+      "own": 0,
+      "opponent": "DJK Augsburg Hochzoll",
+      "home": false,
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "16:25",
+        "13:25",
+        "26:24",
+        "28:26",
+        "8:15"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377206?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "DJK Augsburg Hochzoll II",
+        "venue": {
+          "name": "Zwölf Apostel Halle",
+          "street": "Zwölf Apostel Platz 3",
+          "city": "86163 Augsburg",
+          "lat": 48.34334182852518,
+          "lng": 10.945324753303566
+        },
+        "balls": [
+          91,
+          115
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 19,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Nördlingen"
+      ],
+      "own": 0,
+      "opponent": "TSV Nördlingen",
+      "home": true,
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:18",
+        "16:25",
+        "16:25",
+        "25:23",
+        "15:10"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377222?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "VfL Großkötz",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          97,
+          101
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 20,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "own": 0,
+      "opponent": "VfL Großkötz",
+      "home": true,
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "16:25",
+        "21:25",
+        "19:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377223?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TSV Nördlingen",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          81,
+          96
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2025-11-29 13:00",
+      "number": 29,
+      "teams": [
+        "TSV Nördlingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TSV Nördlingen",
+      "home": false,
+      "host": "TSV Nördlingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "26:28",
+        "25:18",
+        "21:25"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377232?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TV 1862 Dillingen",
+        "venue": {
+          "name": "Hermann Keßler Halle",
+          "street": "A.-Jaumann-Industriepark 6",
+          "city": "86720 Nördlingen",
+          "lat": 48.83966,
+          "lng": 10.504301
+        },
+        "balls": [
+          93,
+          96
+        ],
+        "squad": {
+          "listed": 7,
+          "played": 7
+        }
+      }
+    },
+    {
+      "date": "2025-11-29 13:00",
+      "number": 30,
+      "teams": [
+        "TV 1862 Dillingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TV 1862 Dillingen",
+      "home": false,
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:17",
+        "25:11",
+        "25:18"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377233?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TSV Nördlingen",
+        "venue": {
+          "name": "Hermann Keßler Halle",
+          "street": "A.-Jaumann-Industriepark 6",
+          "city": "86720 Nördlingen",
+          "lat": 48.83966,
+          "lng": 10.504301
+        },
+        "balls": [
+          75,
+          46
+        ],
+        "squad": {
+          "listed": 7,
+          "played": 7
+        }
+      }
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 37,
+      "teams": [
+        "Team Schwaben",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "Team Schwaben",
+      "home": false,
+      "host": "Team Schwaben",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "15:25",
+        "16:25",
+        "19:25"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377240?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "VfL Großkötz",
+        "venue": {
+          "name": "Realschule Affing-Bergen",
+          "street": "Gloggerberg 1",
+          "city": "86444 Affing",
+          "lat": 48.44066,
+          "lng": 10.94587
+        },
+        "balls": [
+          50,
+          75
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 8
+        }
+      }
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 39,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "own": 0,
+      "opponent": "VfL Großkötz",
+      "home": false,
+      "host": "Team Schwaben",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:19",
+        "23:25",
+        "19:25",
+        "27:25",
+        "15:11"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377242?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "Team Schwaben",
+        "venue": {
+          "name": "Realschule Affing-Bergen",
+          "street": "Gloggerberg 1",
+          "city": "86444 Affing",
+          "lat": 48.44066,
+          "lng": 10.94587
+        },
+        "balls": [
+          109,
+          105
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 7
+        }
+      }
+    },
+    {
+      "date": "2026-01-17 13:00",
+      "number": 64,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SVS Türkheim II",
+      "home": true,
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:18",
+        "25:15",
+        "25:19"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377267?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TV 1862 Dillingen",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          75,
+          52
+        ],
+        "squad": {
+          "listed": 8,
+          "played": 8
+        }
+      }
+    },
+    {
+      "date": "2026-01-17 13:00",
+      "number": 66,
+      "teams": [
+        "TSV Pfuhl",
+        "TV 1862 Dillingen"
+      ],
+      "own": 0,
+      "opponent": "TV 1862 Dillingen",
+      "home": true,
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "29:31",
+        "24:26",
+        "21:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377269?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "SVS Türkheim II",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          74,
+          82
+        ],
+        "squad": {
+          "listed": 8,
+          "played": 8
+        }
+      }
+    },
+    {
+      "date": "2026-01-31 14:30",
+      "number": 46,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SSV Bobingen",
+      "home": false,
+      "host": "SSV Bobingen",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:21",
+        "17:25",
+        "12:25",
+        "25:18",
+        "15:9"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377249?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "SVS Türkheim II",
+        "venue": {
+          "name": "Jahnhalle",
+          "street": "Jahnstraße 13",
+          "city": "86399 Bobingen",
+          "lat": 48.26777915011134,
+          "lng": 10.833818507934552
+        },
+        "balls": [
+          94,
+          98
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 9
+        }
+      }
+    },
+    {
+      "date": "2026-01-31 14:30",
+      "number": 48,
+      "teams": [
+        "TSV Pfuhl",
+        "SVS Türkheim II"
+      ],
+      "own": 0,
+      "opponent": "SVS Türkheim II",
+      "home": false,
+      "host": "SSV Bobingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "26:28",
+        "26:28",
+        "26:24",
+        "14:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377251?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "SSV Bobingen",
+        "venue": {
+          "name": "Jahnhalle",
+          "street": "Jahnstraße 13",
+          "city": "86399 Bobingen",
+          "lat": 48.26777915011134,
+          "lng": 10.833818507934552
+        },
+        "balls": [
+          92,
+          105
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 10
+        }
+      }
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 73,
+      "teams": [
+        "TSV Pfuhl",
+        "Team Schwaben"
+      ],
+      "own": 0,
+      "opponent": "Team Schwaben",
+      "home": true,
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:18",
+        "25:16",
+        "25:11"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377276?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TSV Haunstetten II",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          75,
+          45
+        ],
+        "squad": {
+          "listed": 11,
+          "played": 11
+        }
+      }
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 74,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Haunstetten II"
+      ],
+      "own": 0,
+      "opponent": "TSV Haunstetten II",
+      "home": true,
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "15:25",
+        "26:24",
+        "18:25",
+        "22:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377277?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "Team Schwaben",
+        "venue": {
+          "name": "Sporthalle Schulzentrum Pfuhl",
+          "street": "Heerstraße 107",
+          "city": "89233 Neu-Ulm",
+          "lat": 48.412577695260175,
+          "lng": 10.054541920999114
+        },
+        "balls": [
+          81,
+          99
+        ],
+        "squad": {
+          "listed": 11,
+          "played": 11
+        }
+      }
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 82,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TSV Haunstetten II",
+      "home": false,
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "17:25",
+        "21:25",
+        "24:26"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377285?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "DJK Augsburg Hochzoll",
+        "venue": {
+          "name": "Sporthalle Haunstetten",
+          "street": "Karl-Rommel-Weg 11",
+          "city": "86179 Augsburg",
+          "lat": 48.301001399014616,
+          "lng": 10.897631287033093
+        },
+        "balls": [
+          87,
+          97
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 7
+        }
+      }
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 84,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll"
+      ],
+      "own": 0,
+      "opponent": "DJK Augsburg Hochzoll",
+      "home": false,
+      "host": "TSV Haunstetten II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "14:25",
+        "17:25"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/ergebnis-archiv/spiel-377287?tx_bvvportal_resultsarchive%5BwettbewerbId%5D=38655&cHash=76c90903c574fd8d0adf37d090e682703a7d5d61db24eee10b391e8a0a3a2400",
+      "details": {
+        "referee": "TSV Haunstetten II",
+        "venue": {
+          "name": "Sporthalle Haunstetten",
+          "street": "Karl-Rommel-Weg 11",
+          "city": "86179 Augsburg",
+          "lat": 48.301001399014616,
+          "lng": 10.897631287033093
+        },
+        "balls": [
+          49,
+          75
+        ],
+        "squad": {
+          "listed": 9,
+          "played": 8
+        }
+      }
+    }
+  ],
+  "matches": [
+    {
+      "date": "2025-10-04 13:00",
+      "number": 7,
+      "teams": [
+        "TV 1862 Dillingen",
+        "SSV Bobingen"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:12",
+        "25:14",
+        "18:25",
+        "20:25",
+        "15:10"
+      ]
+    },
+    {
+      "date": "2025-10-04 13:00",
+      "number": 8,
+      "teams": [
+        "TV 1862 Dillingen",
+        "Team Schwaben"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:9",
+        "25:11",
+        "25:9"
+      ]
+    },
+    {
+      "date": "2025-10-04 13:00",
+      "number": 9,
+      "teams": [
+        "SSV Bobingen",
+        "Team Schwaben"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:8",
+        "25:9",
+        "25:10"
+      ]
+    },
+    {
+      "date": "2025-10-11 13:00",
+      "number": 13,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "TV 1862 Dillingen"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "19:25",
+        "25:22",
+        "28:26",
+        "13:25",
+        "15:7"
+      ]
+    },
+    {
+      "date": "2025-10-11 13:00",
+      "number": 14,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "Team Schwaben"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:0",
+        "25:0",
+        "25:0"
+      ]
+    },
+    {
+      "date": "2025-10-11 13:00",
+      "number": 15,
+      "teams": [
+        "TV 1862 Dillingen",
+        "Team Schwaben"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:0",
+        "25:0",
+        "25:0"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 10,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:22",
+        "23:25",
+        "21:25",
+        "22:25"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 11,
+      "teams": [
+        "TSV Pfuhl",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "17:25",
+        "25:23",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 12,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "20:25",
+        "16:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 16,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Haunstetten II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:20",
+        "25:20",
+        "22:25",
+        "28:26"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 17,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Nördlingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "23:25",
+        "32:30",
+        "25:16",
+        "8:15"
+      ]
+    },
+    {
+      "date": "2025-10-18 13:00",
+      "number": 18,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Nördlingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "19:25",
+        "18:25",
+        "16:25"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 1,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TSV Pfuhl"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "26:24",
+        "23:25",
+        "23:25"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 2,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "15:25",
+        "15:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 3,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "16:25",
+        "13:25",
+        "26:24",
+        "28:26",
+        "8:15"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 4,
+      "teams": [
+        "VfL Großkötz",
+        "SVS Türkheim II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "19:25",
+        "25:14",
+        "25:22",
+        "25:16"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 5,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Haunstetten II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:22",
+        "25:18",
+        "25:22"
+      ]
+    },
+    {
+      "date": "2025-10-25 13:00",
+      "number": 6,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Haunstetten II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:22",
+        "25:21",
+        "25:18"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 19,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:18",
+        "16:25",
+        "16:25",
+        "25:23",
+        "15:10"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 20,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "16:25",
+        "21:25",
+        "19:25"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 21,
+      "teams": [
+        "TSV Nördlingen",
+        "VfL Großkötz"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "22:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 22,
+      "teams": [
+        "SVS Türkheim II",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "16:25",
+        "22:25",
+        "12:25"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 23,
+      "teams": [
+        "SVS Türkheim II",
+        "Team Schwaben"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:0",
+        "25:0",
+        "25:0"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 24,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "Team Schwaben"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:0",
+        "25:0",
+        "25:0"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 25,
+      "teams": [
+        "TV 1862 Dillingen",
+        "TSV Haunstetten II"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:14",
+        "18:25",
+        "25:18",
+        "17:25",
+        "18:16"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 26,
+      "teams": [
+        "TV 1862 Dillingen",
+        "SSV Bobingen"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:17",
+        "18:25",
+        "25:19",
+        "25:22"
+      ]
+    },
+    {
+      "date": "2025-11-15 13:00",
+      "number": 27,
+      "teams": [
+        "TSV Haunstetten II",
+        "SSV Bobingen"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "27:29",
+        "21:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:00",
+      "number": 28,
+      "teams": [
+        "TSV Nördlingen",
+        "TV 1862 Dillingen"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "20:25",
+        "25:20",
+        "27:25",
+        "25:15"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:00",
+      "number": 29,
+      "teams": [
+        "TSV Nördlingen",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "26:28",
+        "25:18",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:00",
+      "number": 30,
+      "teams": [
+        "TV 1862 Dillingen",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:17",
+        "25:11",
+        "25:18"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:30",
+      "number": 34,
+      "teams": [
+        "Team Schwaben",
+        "SVS Türkheim II"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "12:25",
+        "11:25",
+        "14:25"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:30",
+      "number": 35,
+      "teams": [
+        "Team Schwaben",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "10:25",
+        "15:25"
+      ]
+    },
+    {
+      "date": "2025-11-29 13:30",
+      "number": 36,
+      "teams": [
+        "SVS Türkheim II",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:23",
+        "25:19",
+        "25:15"
+      ]
+    },
+    {
+      "date": "2025-12-06 11:00",
+      "number": 31,
+      "teams": [
+        "TSV Haunstetten II",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:15",
+        "19:25",
+        "15:25",
+        "19:25"
+      ]
+    },
+    {
+      "date": "2025-12-06 11:00",
+      "number": 32,
+      "teams": [
+        "TSV Haunstetten II",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "25:22",
+        "26:24",
+        "19:25",
+        "17:25",
+        "11:15"
+      ]
+    },
+    {
+      "date": "2025-12-06 11:00",
+      "number": 33,
+      "teams": [
+        "SSV Bobingen",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "21:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-12-13 13:00",
+      "number": 49,
+      "teams": [
+        "VfL Großkötz",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:19",
+        "25:21",
+        "25:19"
+      ]
+    },
+    {
+      "date": "2025-12-13 13:00",
+      "number": 50,
+      "teams": [
+        "VfL Großkötz",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "25:17",
+        "21:25",
+        "22:25",
+        "25:23",
+        "10:15"
+      ]
+    },
+    {
+      "date": "2025-12-13 13:00",
+      "number": 51,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "23:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 12:00",
+      "number": 40,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "SVS Türkheim II"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:21",
+        "25:14",
+        "25:19"
+      ]
+    },
+    {
+      "date": "2025-12-20 12:00",
+      "number": 41,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "TSV Nördlingen"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "20:25",
+        "16:25",
+        "25:23",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 12:00",
+      "number": 42,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Nördlingen"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "19:25",
+        "18:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 37,
+      "teams": [
+        "Team Schwaben",
+        "TSV Pfuhl"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "15:25",
+        "16:25",
+        "19:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 38,
+      "teams": [
+        "Team Schwaben",
+        "VfL Großkötz"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "10:25",
+        "15:25",
+        "20:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 39,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "host": "Team Schwaben",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:19",
+        "23:25",
+        "19:25",
+        "27:25",
+        "15:11"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 43,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TSV Haunstetten II"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "26:24",
+        "20:25",
+        "16:25",
+        "24:26"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 44,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TV 1862 Dillingen"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "13:25",
+        "13:25",
+        "16:25"
+      ]
+    },
+    {
+      "date": "2025-12-20 13:00",
+      "number": 45,
+      "teams": [
+        "TSV Haunstetten II",
+        "TV 1862 Dillingen"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "22:25",
+        "22:25"
+      ]
+    },
+    {
+      "date": "2026-01-17 13:00",
+      "number": 64,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:18",
+        "25:15",
+        "25:19"
+      ]
+    },
+    {
+      "date": "2026-01-17 13:00",
+      "number": 65,
+      "teams": [
+        "SVS Türkheim II",
+        "TV 1862 Dillingen"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "23:25",
+        "25:21",
+        "18:25"
+      ]
+    },
+    {
+      "date": "2026-01-17 13:00",
+      "number": 66,
+      "teams": [
+        "TSV Pfuhl",
+        "TV 1862 Dillingen"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "29:31",
+        "24:26",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2026-01-17 14:00",
+      "number": 52,
+      "teams": [
+        "TSV Haunstetten II",
+        "Team Schwaben"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:9",
+        "25:9",
+        "25:17"
+      ]
+    },
+    {
+      "date": "2026-01-17 14:00",
+      "number": 53,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "21:25",
+        "21:25",
+        "25:20",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2026-01-17 14:00",
+      "number": 54,
+      "teams": [
+        "Team Schwaben",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "12:25",
+        "13:25",
+        "12:25"
+      ]
+    },
+    {
+      "date": "2026-01-24 11:00",
+      "number": 58,
+      "teams": [
+        "TSV Nördlingen",
+        "TV 1862 Dillingen"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "17:25",
+        "19:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2026-01-24 11:00",
+      "number": 59,
+      "teams": [
+        "TSV Nördlingen",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "17:25",
+        "18:25",
+        "20:25"
+      ]
+    },
+    {
+      "date": "2026-01-24 11:00",
+      "number": 60,
+      "teams": [
+        "TV 1862 Dillingen",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:21",
+        "25:21",
+        "25:21"
+      ]
+    },
+    {
+      "date": "2026-01-24 14:30",
+      "number": 55,
+      "teams": [
+        "SSV Bobingen",
+        "VfL Großkötz"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "26:24",
+        "25:13",
+        "21:25",
+        "19:21"
+      ]
+    },
+    {
+      "date": "2026-01-24 14:30",
+      "number": 56,
+      "teams": [
+        "SSV Bobingen",
+        "Team Schwaben"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:17",
+        "25:11",
+        "25:18"
+      ]
+    },
+    {
+      "date": "2026-01-24 14:30",
+      "number": 57,
+      "teams": [
+        "VfL Großkötz",
+        "Team Schwaben"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:10",
+        "25:14",
+        "25:10"
+      ]
+    },
+    {
+      "date": "2026-01-31 13:00",
+      "number": 70,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TSV Nördlingen"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "22:25",
+        "25:21",
+        "25:23",
+        "21:25",
+        "15:12"
+      ]
+    },
+    {
+      "date": "2026-01-31 13:00",
+      "number": 71,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "Team Schwaben"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:12",
+        "25:23",
+        "25:17"
+      ]
+    },
+    {
+      "date": "2026-01-31 13:00",
+      "number": 72,
+      "teams": [
+        "TSV Nördlingen",
+        "Team Schwaben"
+      ],
+      "host": "DJK Augsburg Hochzoll II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:19",
+        "25:20",
+        "25:11"
+      ]
+    },
+    {
+      "date": "2026-01-31 14:30",
+      "number": 46,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:21",
+        "17:25",
+        "12:25",
+        "25:18",
+        "15:9"
+      ]
+    },
+    {
+      "date": "2026-01-31 14:30",
+      "number": 47,
+      "teams": [
+        "SSV Bobingen",
+        "SVS Türkheim II"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "20:25",
+        "21:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2026-01-31 14:30",
+      "number": 48,
+      "teams": [
+        "TSV Pfuhl",
+        "SVS Türkheim II"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "26:28",
+        "26:28",
+        "26:24",
+        "14:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 73,
+      "teams": [
+        "TSV Pfuhl",
+        "Team Schwaben"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:18",
+        "25:16",
+        "25:11"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 74,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "15:25",
+        "26:24",
+        "18:25",
+        "22:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 75,
+      "teams": [
+        "Team Schwaben",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Pfuhl",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "6:25",
+        "12:25",
+        "12:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 76,
+      "teams": [
+        "TV 1862 Dillingen",
+        "VfL Großkötz"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "27:29",
+        "25:13",
+        "24:26",
+        "16:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 77,
+      "teams": [
+        "TV 1862 Dillingen",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:16",
+        "25:17",
+        "25:16"
+      ]
+    },
+    {
+      "date": "2026-02-21 13:00",
+      "number": 78,
+      "teams": [
+        "VfL Großkötz",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "TV 1862 Dillingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:20",
+        "25:21",
+        "25:14"
+      ]
+    },
+    {
+      "date": "2026-02-21 14:30",
+      "number": 79,
+      "teams": [
+        "SSV Bobingen",
+        "SVS Türkheim II"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "17:25",
+        "25:20",
+        "16:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 14:30",
+      "number": 80,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Nördlingen"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "17:25",
+        "27:25",
+        "18:25"
+      ]
+    },
+    {
+      "date": "2026-02-21 14:30",
+      "number": 81,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Nördlingen"
+      ],
+      "host": "SSV Bobingen",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:22",
+        "18:25",
+        "25:22",
+        "15:25",
+        "15:10"
+      ]
+    },
+    {
+      "date": "2026-02-28 13:00",
+      "number": 67,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "VfL Großkötz"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "24:26",
+        "25:17",
+        "25:22",
+        "25:22"
+      ]
+    },
+    {
+      "date": "2026-02-28 13:00",
+      "number": 68,
+      "teams": [
+        "DJK Augsburg Hochzoll",
+        "SSV Bobingen"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "24:26",
+        "25:20",
+        "23:25",
+        "25:16",
+        "15:11"
+      ]
+    },
+    {
+      "date": "2026-02-28 13:00",
+      "number": 69,
+      "teams": [
+        "VfL Großkötz",
+        "SSV Bobingen"
+      ],
+      "host": "DJK Augsburg Hochzoll",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "20:25",
+        "25:19",
+        "25:18",
+        "25:20"
+      ]
+    },
+    {
+      "date": "2026-03-07 11:00",
+      "number": 61,
+      "teams": [
+        "SVS Türkheim II",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "16:25",
+        "22:25",
+        "25:10",
+        "25:17",
+        "15:12"
+      ]
+    },
+    {
+      "date": "2026-03-07 11:00",
+      "number": 62,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Haunstetten II"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:18",
+        "25:22",
+        "25:10"
+      ]
+    },
+    {
+      "date": "2026-03-07 11:00",
+      "number": 63,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "TSV Haunstetten II"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "19:25",
+        "21:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 82,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "17:25",
+        "21:25",
+        "24:26"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 83,
+      "teams": [
+        "TSV Haunstetten II",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "23:25",
+        "18:25"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 84,
+      "teams": [
+        "TSV Pfuhl",
+        "DJK Augsburg Hochzoll"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "14:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 85,
+      "teams": [
+        "VfL Großkötz",
+        "SVS Türkheim II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:17",
+        "23:25",
+        "25:9",
+        "25:22"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 86,
+      "teams": [
+        "VfL Großkötz",
+        "TV 1862 Dillingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "22:25",
+        "21:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 87,
+      "teams": [
+        "SVS Türkheim II",
+        "TV 1862 Dillingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "18:25",
+        "11:25",
+        "25:19",
+        "20:25"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 88,
+      "teams": [
+        "TSV Nördlingen",
+        "DJK Augsburg Hochzoll II"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:13",
+        "25:10",
+        "25:13"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 89,
+      "teams": [
+        "TSV Nördlingen",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:16",
+        "25:23",
+        "25:14"
+      ]
+    },
+    {
+      "date": "2026-03-14 13:00",
+      "number": 90,
+      "teams": [
+        "DJK Augsburg Hochzoll II",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "27:25",
+        "31:29",
+        "25:19"
+      ]
+    }
+  ],
+  "table": [
+    {
+      "position": 1,
+      "team": "TV 1862 Dillingen",
+      "played": 18,
+      "won": 15,
+      "lost": 3,
+      "points": 44,
+      "sets": "49:17",
+      "balls": "1549:1227",
+      "own": false
+    },
+    {
+      "position": 2,
+      "team": "DJK Augsburg Hochzoll",
+      "played": 18,
+      "won": 16,
+      "lost": 2,
+      "points": 43,
+      "sets": "49:17",
+      "balls": "1533:1198",
+      "own": false
+    },
+    {
+      "position": 3,
+      "team": "VfL Großkötz",
+      "played": 18,
+      "won": 13,
+      "lost": 5,
+      "points": 41,
+      "sets": "46:23",
+      "balls": "1595:1426",
+      "own": false
+    },
+    {
+      "position": 4,
+      "team": "TSV Nördlingen",
+      "played": 18,
+      "won": 11,
+      "lost": 7,
+      "points": 35,
+      "sets": "41:27",
+      "balls": "1554:1371",
+      "own": false
+    },
+    {
+      "position": 5,
+      "team": "SVS Türkheim II",
+      "played": 18,
+      "won": 11,
+      "lost": 7,
+      "points": 31,
+      "sets": "37:27",
+      "balls": "1403:1288",
+      "own": false
+    },
+    {
+      "position": 6,
+      "team": "SSV Bobingen",
+      "played": 18,
+      "won": 7,
+      "lost": 11,
+      "points": 23,
+      "sets": "31:37",
+      "balls": "1457:1469",
+      "own": false
+    },
+    {
+      "position": 7,
+      "team": "TSV Pfuhl",
+      "played": 18,
+      "won": 7,
+      "lost": 11,
+      "points": 21,
+      "sets": "30:40",
+      "balls": "1487:1585",
+      "own": true
+    },
+    {
+      "position": 8,
+      "team": "TSV Haunstetten II",
+      "played": 18,
+      "won": 5,
+      "lost": 13,
+      "points": 17,
+      "sets": "23:41",
+      "balls": "1376:1418",
+      "own": false
+    },
+    {
+      "position": 9,
+      "team": "DJK Augsburg Hochzoll II",
+      "played": 18,
+      "won": 5,
+      "lost": 13,
+      "points": 15,
+      "sets": "19:42",
+      "balls": "1235:1420",
+      "own": false
+    },
+    {
+      "position": 10,
+      "team": "Team Schwaben",
+      "played": 18,
+      "won": 0,
+      "lost": 18,
+      "points": 0,
+      "sets": "0:54",
+      "balls": "563:1350",
+      "own": false
+    }
+  ],
+  "standing": {
+    "position": 7,
+    "teams": 10,
+    "points": 21
+  },
+  "record": {
+    "played": 18,
+    "won": 7,
+    "lost": 11,
+    "sets": "30:40",
+    "balls": "1487:1585"
+  },
+  "ranking": [
+    {
+      "date": "2025-10-04",
+      "position": 3
+    },
+    {
+      "date": "2025-10-11",
+      "position": 4
+    },
+    {
+      "date": "2025-10-18",
+      "position": 8
+    },
+    {
+      "date": "2025-10-25",
+      "position": 6
+    },
+    {
+      "date": "2025-11-15",
+      "position": 7
+    },
+    {
+      "date": "2025-11-29",
+      "position": 7
+    },
+    {
+      "date": "2025-12-06",
+      "position": 7
+    },
+    {
+      "date": "2025-12-13",
+      "position": 7
+    },
+    {
+      "date": "2025-12-20",
+      "position": 6
+    },
+    {
+      "date": "2026-01-17",
+      "position": 7
+    },
+    {
+      "date": "2026-01-24",
+      "position": 7
+    },
+    {
+      "date": "2026-01-31",
+      "position": 7
+    },
+    {
+      "date": "2026-02-21",
+      "position": 7
+    },
+    {
+      "date": "2026-02-28",
+      "position": 7
+    },
+    {
+      "date": "2026-03-07",
+      "position": 7
+    },
+    {
+      "date": "2026-03-14",
+      "position": 7
+    }
+  ]
+}

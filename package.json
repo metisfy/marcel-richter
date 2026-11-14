@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"tests/*.test.mjs\"",
     "bvv:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/bvv-check.mjs",
-    "bericht": "node scripts/spieltag-bericht.mjs"
+    "bericht": "node scripts/spieltag-bericht.mjs",
+    "bvv:stand": "node scripts/bvv-stand.mjs"
   },
   "engines": {
     "node": ">=24"

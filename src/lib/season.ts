@@ -1,5 +1,8 @@
 import "server-only";
 
+import fs from "node:fs";
+import path from "node:path";
+
 import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { cache } from "react";
 
@@ -22,8 +25,10 @@ import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
  * des Containers da.
  *
  * Schlägt der Abruf der Ligaseite fehl:
- * - beim Build: Die Seite wird ohne Live-Daten gebaut (Hinweis + Link zum
- *   BVV) – ein Ausfall beim Verband soll kein Deployment verhindern.
+ * - beim Build: Die Seite wird mit dem letzten bekannten Stand gebaut
+ *   (content/saison/<saison>.bvv.json, erzeugt mit `npm run bvv:stand`),
+ *   gibt es den nicht, ohne Live-Daten (Hinweis + Link zum BVV) – ein Ausfall
+ *   beim Verband soll kein Deployment verhindern.
  * - im laufenden Betrieb: Der Fehler wird weitergeworfen. Next.js liefert dann
  *   weiter die letzte gute Fassung der Seite aus und versucht es beim
  *   nächsten Aufruf erneut.
@@ -109,9 +114,12 @@ function fetchBvv(url: string, revalidate: number) {
       "user-agent": "Mozilla/5.0 (compatible; spielplan-abruf/1.0)",
     },
     next: { revalidate, tags: ["bvv"] },
-    // Beim Build kürzer warten: lieber ohne Daten bauen (die Seite holt sie
-    // nach dem Start selbst nach) als das Zeitlimit der Pipeline zu reißen.
-    signal: AbortSignal.timeout(isBuild() ? 15_000 : 25_000),
+    // Der Verband antwortet unter Last (samstags) teils erst nach über 30 s.
+    // Beim Build trotzdem begrenzen: lieber mit dem letzten bekannten Stand
+    // bauen (die Seite holt Neues nach dem Start selbst nach) als das
+    // Zeitlimit der Pipeline zu reißen. Im Betrieb läuft der Abruf im
+    // Hintergrund, Besucher sehen solange die letzte Fassung.
+    signal: AbortSignal.timeout(isBuild() ? 60_000 : 90_000),
   });
 }
 
@@ -236,18 +244,32 @@ async function withDetails(season: Season): Promise<Season> {
     .filter(({ fixture }) => fixture.url && (fixture.result || fixture.date.startsWith(nextDay ?? "-")));
 
   let ranking: Season["ranking"] = [];
+  // Fehlt eine Spielseite (Verband überlastet), gelten ihre Angaben aus dem
+  // letzten bekannten Stand – sofern das Spiel dort schon genauso stand.
+  const snapshot = readSnapshot(season.id);
+  const fromSnapshot = (fixture: Fixture): Fixture | undefined => {
+    const known = snapshot?.fixtures.find(
+      (entry) => entry.date === fixture.date && entry.teams.join("|") === fixture.teams.join("|") && entry.result?.join(":") === fixture.result?.join(":"),
+    );
+    return known?.details ? { ...fixture, details: known.details, appearance: known.appearance } : undefined;
+  };
   for (let i = 0; i < pending.length; i += 4) {
     const batch = pending.slice(i, i + 4);
     const details = await Promise.all(batch.map(({ fixture }) => fetchMatchDetail(fixture.url!)));
     batch.forEach(({ index }, position) => {
       const detail = details[position];
-      if (!detail) return;
+      if (!detail) {
+        fixtures[index] = fromSnapshot(fixtures[index]) ?? fixtures[index];
+        return;
+      }
       fixtures[index] = applyDetail(fixtures[index], detail, source);
       // Tabellenverlauf: der längste, den eine Spielseite für uns liefert
       const own = detail.ranking.find((entry) => entry.team === source.team)?.positions ?? [];
       if (own.length > ranking.length) ranking = own;
     });
   }
+
+  if (ranking.length === 0 && snapshot) ranking = snapshot.ranking;
 
   const known = fixtures.filter((fixture) => fixture.appearance);
   // In keinem einzigen Spielbericht: in dieser Saison nicht im Team – dann
@@ -267,6 +289,29 @@ async function withDetails(season: Season): Promise<Season> {
   return { ...season, fixtures, appearances, ranking };
 }
 
+// ---------------------------------------------------------------------------
+// Letzter bekannter Stand (content/saison/<saison>.bvv.json)
+// ---------------------------------------------------------------------------
+
+type Snapshot = Pick<Season, "fixtures" | "matches" | "table" | "standing" | "record" | "appearances" | "ranking"> & { updatedAt: string };
+
+const snapshotFile = (id: string) => path.join(process.cwd(), "content", "saison", `${id}.bvv.json`);
+
+/** Die BVV-Daten einer Saison zum Ablegen (nur Mannschaften, Ergebnisse, eigene Einsätze – keine Namen anderer Spieler). */
+export function toSnapshot(season: Season): Snapshot | undefined {
+  if (!season.source?.updatedAt || season.source.error) return undefined;
+  const { fixtures, matches, table, standing, record, appearances, ranking } = season;
+  return { updatedAt: season.source.updatedAt, fixtures, matches, table, standing, record, appearances, ranking };
+}
+
+function readSnapshot(id: string): Snapshot | undefined {
+  try {
+    return JSON.parse(fs.readFileSync(snapshotFile(id), "utf8")) as Snapshot;
+  } catch {
+    return undefined;
+  }
+}
+
 async function resolve(season: Season): Promise<Season> {
   const { source } = season;
   if (!source) return season;
@@ -277,9 +322,15 @@ async function resolve(season: Season): Promise<Season> {
     const atRuntime = process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD;
     if (atRuntime) throw error;
     const message = error instanceof Error ? `${error.name}: ${error.message}${error.cause ? ` (${String(error.cause)})` : ""}` : String(error);
-    console.warn(`⚠ Spielplan vom BVV nicht geladen, Seite ohne Live-Daten: ${message}`);
     // Grund unsichtbar in der Seite vermerken (data-bvv-error), damit er sich
     // auch ohne Zugriff auf das Build-Log nachvollziehen lässt.
+    const snapshot = readSnapshot(season.id);
+    if (snapshot) {
+      console.warn(`⚠ Spielplan vom BVV nicht geladen, letzter bekannter Stand vom ${snapshot.updatedAt}: ${message}`);
+      const { updatedAt, ...data } = snapshot;
+      return { ...season, ...data, source: { ...source, updatedAt, stale: true, error: message.slice(0, 300) } };
+    }
+    console.warn(`⚠ Spielplan vom BVV nicht geladen, Seite ohne Live-Daten: ${message}`);
     return { ...season, source: { ...source, error: message.slice(0, 300) } };
   }
 }

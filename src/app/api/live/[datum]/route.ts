@@ -24,9 +24,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ dat
 
   // Nur in der Entwicklung zum Testen: LIVE_TEST_TEAM="<Teamname>" npm run dev
   const testTeam = process.env.NODE_ENV === "development" ? process.env.LIVE_TEST_TEAM : undefined;
-  const team = testTeam ?? getSeasons("de")[0]?.source?.team ?? getSite("de").team.name;
+  const source = getSeasons("de")[0]?.source;
+  const team = testTeam ?? source?.team ?? getSite("de").team.name;
   try {
-    const matches = await liveMatchday(team, datum);
+    const matches = await liveMatchday(team, datum, testTeam ? undefined : source?.ticker);
     return Response.json({ matches, updatedAt: Date.now() }, { headers: NO_STORE });
   } catch {
     return Response.json({ matches: [], error: "unavailable" }, { status: 503, headers: NO_STORE });

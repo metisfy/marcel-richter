@@ -7,6 +7,7 @@ import { RankingChart } from "@/components/match";
 import { JsonLd } from "@/components/json-ld";
 import { PageIntro, SectionHead } from "@/components/page-intro";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
+import { getPathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getSite, type Season } from "@/lib/content";
 import { loadSeasons } from "@/lib/season";
@@ -106,7 +107,10 @@ export default async function SeasonPage({ params }: LocaleParams) {
       />
 
       {/* Live-Ticker am Spieltag – unabhängig von den Saisondaten des BVV */}
-      <LiveTodayPanel ownTeam={current.source?.team ?? site.team.name} />
+      <LiveTodayPanel
+        ownTeam={current.source?.team ?? site.team.name}
+        hrefPattern={getPathname({ locale, href: { pathname: "/saison/[datum]", params: { datum: "DATUM" } } })}
+      />
 
       <section aria-labelledby="statistik" className="mb-20">
         <h2 id="statistik" className="sr-only">

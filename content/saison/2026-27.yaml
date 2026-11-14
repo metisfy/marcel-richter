@@ -25,6 +25,10 @@ summary:
 bvv:
   url: https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600
   team: TSV Pfuhl
+  # Liga im BVV-Live-Ticker (bvv.sams-ticker.de) – dort gibt es mehrere
+  # Mannschaften „TSV Pfuhl“ (Damen, Jugend); ohne diese Angabe würden sie
+  # mit angezeigt.
+  ticker: Sch - Bezirksliga Männer
 
 # Eigene Zahlen (optional), erscheinen neben der Bilanz der Mannschaft:
 # stats:

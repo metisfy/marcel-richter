@@ -1,0 +1,1356 @@
+{
+  "updatedAt": "2026-11-14T10:44:07.000Z",
+  "fixtures": [
+    {
+      "date": "2026-10-10 13:00",
+      "number": 5,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TSV Haunstetten II",
+      "home": false,
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:20",
+        "21:25",
+        "17:25",
+        "15:25"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417563",
+      "details": {
+        "referee": "SSV Bobingen",
+        "venue": {
+          "name": "Sporthalle Haunstetten",
+          "street": "Karl-Rommel-Weg 11",
+          "city": "86179 Augsburg",
+          "lat": 48.301001399014616,
+          "lng": 10.897631287033093
+        },
+        "balls": [
+          78,
+          95
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 10
+        }
+      },
+      "appearance": {
+        "status": "played",
+        "libero": false
+      }
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 6,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SSV Bobingen",
+      "home": false,
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "23:25",
+        "22:25",
+        "23:25"
+      ],
+      "outcome": "win",
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417564",
+      "details": {
+        "referee": "TSV Haunstetten II",
+        "venue": {
+          "name": "Sporthalle Haunstetten",
+          "street": "Karl-Rommel-Weg 11",
+          "city": "86179 Augsburg",
+          "lat": 48.301001399014616,
+          "lng": 10.897631287033093
+        },
+        "balls": [
+          93,
+          96
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 10
+        }
+      },
+      "appearance": {
+        "status": "played",
+        "libero": false
+      }
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 22,
+      "teams": [
+        "TSV Nördlingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TSV Nördlingen",
+      "home": false,
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:10",
+        "25:22",
+        "26:24"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417580",
+      "details": {
+        "referee": "TSV Haunstetten II",
+        "venue": {
+          "name": "Schillerhalle",
+          "street": "Schillerstraße 5",
+          "city": "86720 Nördlingen",
+          "lat": 48.85297764614829,
+          "lng": 10.50908370594027
+        },
+        "balls": [
+          76,
+          56
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 10
+        }
+      },
+      "appearance": {
+        "status": "absent",
+        "libero": false
+      }
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 24,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Haunstetten II"
+      ],
+      "own": 0,
+      "opponent": "TSV Haunstetten II",
+      "home": false,
+      "host": "TSV Nördlingen",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "17:25",
+        "25:17",
+        "25:18",
+        "20:25",
+        "10:15"
+      ],
+      "outcome": "loss",
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417582",
+      "details": {
+        "referee": "TSV Nördlingen",
+        "venue": {
+          "name": "Schillerhalle",
+          "street": "Schillerstraße 5",
+          "city": "86720 Nördlingen",
+          "lat": 48.85297764614829,
+          "lng": 10.50908370594027
+        },
+        "balls": [
+          97,
+          100
+        ],
+        "squad": {
+          "listed": 10,
+          "played": 10
+        }
+      },
+      "appearance": {
+        "status": "absent",
+        "libero": false
+      }
+    },
+    {
+      "date": "2026-11-14 14:30",
+      "number": 17,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SSV Bobingen",
+      "home": false,
+      "host": "SSV Bobingen",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417575",
+      "details": {
+        "referee": "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "venue": {
+          "name": "Jahnhalle",
+          "street": "Jahnstraße 13",
+          "city": "86399 Bobingen",
+          "lat": 48.26777915011134,
+          "lng": 10.833818507934552
+        }
+      }
+    },
+    {
+      "date": "2026-11-14 14:30",
+      "number": 18,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "home": false,
+      "host": "SSV Bobingen",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417576",
+      "details": {
+        "referee": "SSV Bobingen",
+        "venue": {
+          "name": "Jahnhalle",
+          "street": "Jahnstraße 13",
+          "city": "86399 Bobingen",
+          "lat": 48.26777915011134,
+          "lng": 10.833818507934552
+        }
+      }
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 41,
+      "teams": [
+        "TSV Krumbach",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TSV Krumbach",
+      "home": false,
+      "host": "TSV Krumbach",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417599"
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 42,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SVS Türkheim II",
+      "home": false,
+      "host": "TSV Krumbach",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417600"
+    },
+    {
+      "date": "2027-01-30 13:00",
+      "number": 46,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "own": 0,
+      "opponent": "VfL Großkötz",
+      "home": true,
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417604"
+    },
+    {
+      "date": "2027-01-30 13:00",
+      "number": 47,
+      "teams": [
+        "TSV Pfuhl",
+        "TV Mering"
+      ],
+      "own": 0,
+      "opponent": "TV Mering",
+      "home": true,
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417605"
+    },
+    {
+      "date": "2027-02-27 13:00",
+      "number": 59,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "SVS Türkheim II",
+      "home": false,
+      "host": "SVS Türkheim II",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417617"
+    },
+    {
+      "date": "2027-02-27 13:00",
+      "number": 60,
+      "teams": [
+        "TV Mering",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "TV Mering",
+      "home": false,
+      "host": "SVS Türkheim II",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417618"
+    },
+    {
+      "date": "2027-03-06 13:00",
+      "number": 61,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Pfuhl"
+      ],
+      "own": 1,
+      "opponent": "VfL Großkötz",
+      "home": false,
+      "host": "VfL Großkötz",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417619"
+    },
+    {
+      "date": "2027-03-06 13:00",
+      "number": 63,
+      "teams": [
+        "TSV Pfuhl",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "own": 0,
+      "opponent": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "home": false,
+      "host": "VfL Großkötz",
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417621"
+    },
+    {
+      "date": "2027-03-13 14:30",
+      "number": 67,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Krumbach"
+      ],
+      "own": 0,
+      "opponent": "TSV Krumbach",
+      "home": true,
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417625"
+    },
+    {
+      "date": "2027-03-13 14:30",
+      "number": 68,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Nördlingen"
+      ],
+      "own": 0,
+      "opponent": "TSV Nördlingen",
+      "home": true,
+      "sets": [],
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417626"
+    }
+  ],
+  "matches": [
+    {
+      "date": "2026-10-10 13:00",
+      "number": 1,
+      "teams": [
+        "VfL Großkötz",
+        "SVS Türkheim II"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "23:25",
+        "21:25",
+        "15:25"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 2,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Nördlingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "19:25",
+        "12:25",
+        "25:19",
+        "18:25"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 3,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Nördlingen"
+      ],
+      "host": "VfL Großkötz",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "17:25",
+        "10:25",
+        "17:25"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 4,
+      "teams": [
+        "TSV Haunstetten II",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        3,
+        2
+      ],
+      "sets": [
+        "25:19",
+        "17:25",
+        "25:22",
+        "18:25",
+        "15:11"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 5,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:20",
+        "21:25",
+        "17:25",
+        "15:25"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 6,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Haunstetten II",
+      "result": [
+        1,
+        3
+      ],
+      "sets": [
+        "25:21",
+        "23:25",
+        "22:25",
+        "23:25"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 7,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TV Mering"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:22",
+        "25:20",
+        "25:11"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 8,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TSV Krumbach"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "22:25",
+        "25:18",
+        "25:20",
+        "25:11"
+      ]
+    },
+    {
+      "date": "2026-10-10 13:00",
+      "number": 9,
+      "teams": [
+        "TV Mering",
+        "TSV Krumbach"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "12:25",
+        "14:25",
+        "23:25"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 10,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Krumbach"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        0,
+        3
+      ],
+      "sets": [
+        "17:25",
+        "22:25",
+        "21:25"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 11,
+      "teams": [
+        "SVS Türkheim II",
+        "SSV Bobingen"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:14",
+        "26:24",
+        "20:25",
+        "25:22"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 12,
+      "teams": [
+        "TSV Krumbach",
+        "SSV Bobingen"
+      ],
+      "host": "SVS Türkheim II",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:22",
+        "25:18",
+        "28:26"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 22,
+      "teams": [
+        "TSV Nördlingen",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:10",
+        "25:22",
+        "26:24"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 23,
+      "teams": [
+        "TSV Nördlingen",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:21",
+        "25:16",
+        "25:12"
+      ]
+    },
+    {
+      "date": "2026-10-24 13:00",
+      "number": 24,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Nördlingen",
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "17:25",
+        "25:17",
+        "25:18",
+        "20:25",
+        "10:15"
+      ]
+    },
+    {
+      "date": "2026-11-14 13:00",
+      "number": 13,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Haunstetten II"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2026-11-14 13:00",
+      "number": 14,
+      "teams": [
+        "SVS Türkheim II",
+        "VfL Großkötz"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2026-11-14 13:00",
+      "number": 15,
+      "teams": [
+        "TSV Haunstetten II",
+        "VfL Großkötz"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2026-11-14 14:30",
+      "number": 16,
+      "teams": [
+        "SSV Bobingen",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-11-14 14:30",
+      "number": 17,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Pfuhl"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-11-14 14:30",
+      "number": 18,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TSV Pfuhl"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-11-21 13:00",
+      "number": 19,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "SVS Türkheim II"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "sets": []
+    },
+    {
+      "date": "2026-11-21 13:00",
+      "number": 20,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TSV Nördlingen"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "sets": []
+    },
+    {
+      "date": "2026-11-21 13:00",
+      "number": 21,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Nördlingen"
+      ],
+      "host": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "sets": []
+    },
+    {
+      "date": "2026-11-28 14:30",
+      "number": 25,
+      "teams": [
+        "SSV Bobingen",
+        "TV Mering"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-11-28 14:30",
+      "number": 26,
+      "teams": [
+        "SSV Bobingen",
+        "SVS Türkheim II"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-11-28 14:30",
+      "number": 27,
+      "teams": [
+        "TV Mering",
+        "SVS Türkheim II"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2026-12-05 14:30",
+      "number": 28,
+      "teams": [
+        "TSV Krumbach",
+        "TV Mering"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2026-12-05 14:30",
+      "number": 29,
+      "teams": [
+        "TSV Krumbach",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2026-12-05 14:30",
+      "number": 30,
+      "teams": [
+        "TV Mering",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2026-12-12 13:00",
+      "number": 31,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Krumbach"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2026-12-12 13:00",
+      "number": 32,
+      "teams": [
+        "VfL Großkötz",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2026-12-12 13:00",
+      "number": 33,
+      "teams": [
+        "TSV Krumbach",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2026-12-19 14:30",
+      "number": 34,
+      "teams": [
+        "TSV Haunstetten II",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2026-12-19 14:30",
+      "number": 35,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Krumbach"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2026-12-19 14:30",
+      "number": 36,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Krumbach"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 37,
+      "teams": [
+        "TSV Nördlingen",
+        "VfL Großkötz"
+      ],
+      "host": "TSV Nördlingen",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 38,
+      "teams": [
+        "TSV Nördlingen",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Nördlingen",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 39,
+      "teams": [
+        "VfL Großkötz",
+        "SSV Bobingen"
+      ],
+      "host": "TSV Nördlingen",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 40,
+      "teams": [
+        "TSV Krumbach",
+        "SVS Türkheim II"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 41,
+      "teams": [
+        "TSV Krumbach",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-01-16 13:00",
+      "number": 42,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-01-23 13:00",
+      "number": 43,
+      "teams": [
+        "TV Mering",
+        "TSV Haunstetten II"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-01-23 13:00",
+      "number": 44,
+      "teams": [
+        "TV Mering",
+        "TSV Nördlingen"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-01-23 13:00",
+      "number": 45,
+      "teams": [
+        "TSV Haunstetten II",
+        "TSV Nördlingen"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-01-30 13:00",
+      "number": 46,
+      "teams": [
+        "TSV Pfuhl",
+        "VfL Großkötz"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    },
+    {
+      "date": "2027-01-30 13:00",
+      "number": 47,
+      "teams": [
+        "TSV Pfuhl",
+        "TV Mering"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    },
+    {
+      "date": "2027-01-30 13:00",
+      "number": 48,
+      "teams": [
+        "VfL Großkötz",
+        "TV Mering"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    },
+    {
+      "date": "2027-02-06 13:00",
+      "number": 49,
+      "teams": [
+        "TV Mering",
+        "TSV Haunstetten II"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-02-06 13:00",
+      "number": 50,
+      "teams": [
+        "TV Mering",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-02-06 13:00",
+      "number": 51,
+      "teams": [
+        "TSV Haunstetten II",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-02-13 13:00",
+      "number": 52,
+      "teams": [
+        "TSV Krumbach",
+        "VfL Großkötz"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-02-13 13:00",
+      "number": 53,
+      "teams": [
+        "TSV Krumbach",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-02-13 13:00",
+      "number": 54,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Haunstetten II"
+      ],
+      "host": "TSV Krumbach",
+      "sets": []
+    },
+    {
+      "date": "2027-02-20 14:30",
+      "number": 55,
+      "teams": [
+        "SSV Bobingen",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2027-02-20 14:30",
+      "number": 56,
+      "teams": [
+        "SSV Bobingen",
+        "TSV Nördlingen"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2027-02-20 14:30",
+      "number": 57,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "TSV Nördlingen"
+      ],
+      "host": "SSV Bobingen",
+      "sets": []
+    },
+    {
+      "date": "2027-02-27 13:00",
+      "number": 58,
+      "teams": [
+        "SVS Türkheim II",
+        "TV Mering"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2027-02-27 13:00",
+      "number": 59,
+      "teams": [
+        "SVS Türkheim II",
+        "TSV Pfuhl"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2027-02-27 13:00",
+      "number": 60,
+      "teams": [
+        "TV Mering",
+        "TSV Pfuhl"
+      ],
+      "host": "SVS Türkheim II",
+      "sets": []
+    },
+    {
+      "date": "2027-03-06 13:00",
+      "number": 61,
+      "teams": [
+        "VfL Großkötz",
+        "TSV Pfuhl"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2027-03-06 13:00",
+      "number": 62,
+      "teams": [
+        "VfL Großkötz",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2027-03-06 13:00",
+      "number": 63,
+      "teams": [
+        "TSV Pfuhl",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "VfL Großkötz",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 64,
+      "teams": [
+        "TV Mering",
+        "SSV Bobingen"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 65,
+      "teams": [
+        "TV Mering",
+        "VfL Großkötz"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 66,
+      "teams": [
+        "SSV Bobingen",
+        "VfL Großkötz"
+      ],
+      "host": "TV Mering",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 70,
+      "teams": [
+        "TSV Haunstetten II",
+        "SG TuS Fürstenfeldbruck / TSG Maisach"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 71,
+      "teams": [
+        "TSV Haunstetten II",
+        "SVS Türkheim II"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 13:00",
+      "number": 72,
+      "teams": [
+        "SG TuS Fürstenfeldbruck / TSG Maisach",
+        "SVS Türkheim II"
+      ],
+      "host": "TSV Haunstetten II",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 14:30",
+      "number": 67,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Krumbach"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 14:30",
+      "number": 68,
+      "teams": [
+        "TSV Pfuhl",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    },
+    {
+      "date": "2027-03-13 14:30",
+      "number": 69,
+      "teams": [
+        "TSV Krumbach",
+        "TSV Nördlingen"
+      ],
+      "host": "TSV Pfuhl",
+      "sets": []
+    }
+  ],
+  "table": [
+    {
+      "position": 1,
+      "team": "TSV Nördlingen",
+      "played": 4,
+      "won": 4,
+      "lost": 0,
+      "points": 12,
+      "sets": "12:1",
+      "balls": "320:223",
+      "own": false
+    },
+    {
+      "position": 2,
+      "team": "TSV Krumbach",
+      "played": 4,
+      "won": 3,
+      "lost": 1,
+      "points": 9,
+      "sets": "10:3",
+      "balls": "302:272",
+      "own": false
+    },
+    {
+      "position": 3,
+      "team": "TSV Pfuhl",
+      "played": 4,
+      "won": 2,
+      "lost": 2,
+      "points": 7,
+      "sets": "8:8",
+      "balls": "344:347",
+      "own": true
+    },
+    {
+      "position": 4,
+      "team": "SG TuS Fürstenfeldbruck / TSG Maisach",
+      "played": 2,
+      "won": 2,
+      "lost": 0,
+      "points": 6,
+      "sets": "6:1",
+      "balls": "172:127",
+      "own": false
+    },
+    {
+      "position": 5,
+      "team": "SVS Türkheim II",
+      "played": 4,
+      "won": 2,
+      "lost": 2,
+      "points": 6,
+      "sets": "6:7",
+      "balls": "275:294",
+      "own": false
+    },
+    {
+      "position": 6,
+      "team": "TSV Haunstetten II",
+      "played": 4,
+      "won": 2,
+      "lost": 2,
+      "points": 4,
+      "sets": "7:10",
+      "balls": "327:369",
+      "own": false
+    },
+    {
+      "position": 7,
+      "team": "SSV Bobingen",
+      "played": 4,
+      "won": 0,
+      "lost": 4,
+      "points": 1,
+      "sets": "4:12",
+      "balls": "346:370",
+      "own": false
+    },
+    {
+      "position": 8,
+      "team": "VfL Großkötz",
+      "played": 2,
+      "won": 0,
+      "lost": 2,
+      "points": 0,
+      "sets": "1:6",
+      "balls": "133:169",
+      "own": false
+    },
+    {
+      "position": 9,
+      "team": "TV Mering",
+      "played": 2,
+      "won": 0,
+      "lost": 2,
+      "points": 0,
+      "sets": "0:6",
+      "balls": "102:150",
+      "own": false
+    }
+  ],
+  "standing": {
+    "position": 3,
+    "teams": 9,
+    "points": 7
+  },
+  "record": {
+    "played": 4,
+    "won": 2,
+    "lost": 2,
+    "sets": "8:8",
+    "balls": "344:347"
+  },
+  "appearances": {
+    "played": 2,
+    "squad": 2,
+    "matches": 4
+  },
+  "ranking": [
+    {
+      "date": "2026-10-10",
+      "position": 3
+    },
+    {
+      "date": "2026-10-24",
+      "position": 3
+    },
+    {
+      "date": "2026-11-14",
+      "position": 3
+    }
+  ]
+}

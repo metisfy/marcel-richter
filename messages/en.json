@@ -121,7 +121,9 @@
     "calendarText": "Every matchday with venue and results – changes arrive automatically.",
     "calendarSubscribe": "Subscribe",
     "calendarGoogle": "Google Calendar",
-    "calendarDownload": "Download .ics"
+    "calendarDownload": "Download .ics",
+    "stale": "The association is not responding right now – last known data from {updated}.",
+    "unavailableShort": "Fixtures unavailable right now."
   },
   "contact": {
     "title": "Contact",
@@ -219,7 +221,7 @@
     "serving": "Serving",
     "showLineup": "Show court & line-up",
     "hideLineup": "Hide court & line-up",
-    "lineupLater": "The line-up appears at the start of the match.",
+    "lineupLater": "Squads and line-ups appear shortly before the start.",
     "events": "Match events",
     "scoresheet": "Official scoresheet (PDF)",
     "startingSix": "Starting line-up, set {set}",
@@ -235,6 +237,16 @@
     "eventMatchWon": "{team} win the match",
     "eventTimeout": "Timeout {team} ({score})",
     "eventSubstitution": "Substitution {team}: {in} for {out}",
-    "follow": "Follow live"
+    "follow": "Follow live",
+    "startsAtShort": "{time}",
+    "today": "TODAY",
+    "toMatchday": "Go to matchday",
+    "kickoffSoon": "Starting any minute",
+    "kickoffInMinutes": "Starts in {minutes} min",
+    "kickoffInHours": "Starts in {hours} h {minutes} min",
+    "showSquad": "Show registered squad",
+    "hideSquad": "Hide squad",
+    "squadTitle": "Registered squad",
+    "squadPending": "Not registered yet."
   }
 }

@@ -663,10 +663,18 @@
     border-radius: 50%;
     background-color: var(--live);
   }
+  .live-badge.is-today {
+    padding: 0 10px;
+    background-color: color-mix(in srgb, var(--accent-bright) 14%, var(--bg));
+    color: var(--accent);
+  }
   .live-card {
     border-color: color-mix(in srgb, var(--live) 45%, var(--line));
   }
   .live-strip {
+    border-color: var(--line);
+  }
+  .live-strip.is-live {
     border-color: color-mix(in srgb, var(--live) 40%, var(--line));
     background-color: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(8px);
@@ -927,7 +935,7 @@
     animation: live-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
   }
   .live-card,
-  .live-strip {
+  .live-strip.is-live {
     animation: live-glow 2.4s ease-in-out infinite;
   }
   .court-player {
