@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import type { Locale } from "@/i18n/routing";
-import type { Fixture, Outcome, Season, TableRow } from "@/lib/content";
+import { berlinToday, type Fixture, type Outcome, type Season, type TableRow } from "@/lib/content";
 import { Link } from "@/i18n/navigation";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
@@ -62,12 +62,8 @@ export async function AppearanceMark({ appearance }: { appearance: NonNullable<F
   if (appearance.status === "squad") {
     return <span className="font-mono text-[11.5px] text-muted">{t("appearanceSquad")}</span>;
   }
-  return (
-    <span className="font-mono text-[12.5px] text-muted">
-      <span aria-hidden="true">–</span>
-      <span className="sr-only">{t("appearanceAbsent")}</span>
-    </span>
-  );
+  // Spiele ohne mich: Feld bleibt leer
+  return null;
 }
 
 /** Satzergebnisse, z. B. „25:21 · 22:25 · 25:19“ */
@@ -98,7 +94,8 @@ export async function FixtureTable({
   const showCompetition = fixtures.some((fixture) => fixture.competition);
   const showAppearance = fixtures.some((fixture) => fixture.appearance);
   // Nächster Spieltag: erstes Spiel ohne Ergebnis und alle weiteren am selben Tag
-  const nextDay = fixtures.find((fixture) => !fixture.result)?.date.slice(0, 10);
+  const today = berlinToday();
+  const nextDay = fixtures.find((fixture) => !fixture.result && fixture.date.slice(0, 10) >= today)?.date.slice(0, 10);
   const places = await Promise.all(fixtures.map(matchPlace));
 
   return (
@@ -190,6 +187,11 @@ export async function FixtureTable({
                         <span aria-hidden="true" className="live-dot" />
                         {t("nextUp")}
                       </span>
+                    </LiveFixtureStatus>
+                  ) : fixture.date.slice(0, 10) < today ? (
+                    // Spieltag vorbei, Ergebnis beim Verband noch nicht da: Endstand vom Ticker
+                    <LiveFixtureStatus datum={fixture.date.slice(0, 10)} teams={fixture.teams}>
+                      <span className="font-mono text-[12.5px] text-muted">{t("resultPending")}</span>
                     </LiveFixtureStatus>
                   ) : (
                     <span className="font-mono text-[12.5px] text-muted">{t("open")}</span>

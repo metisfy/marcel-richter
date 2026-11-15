@@ -307,7 +307,8 @@ function reportDe(day: Matchday, season: Season): Report {
 
   const known = day.fixtures.filter((fixture) => fixture.appearance);
   const playedCount = known.filter((fixture) => fixture.appearance?.status === "played").length;
-  if (known.length > 0) {
+  // Über Spiele ohne mich schreibt der Bericht nichts
+  if (known.some((fixture) => fixture.appearance?.status !== "absent")) {
     paragraphs.push(
       playedCount === known.length
         ? known.length === 2
@@ -315,9 +316,7 @@ function reportDe(day: Matchday, season: Season): Report {
           : "Ich stand auf dem Feld."
         : playedCount > 0
           ? `Ich kam in ${playedCount === 1 ? "einem" : playedCount} der ${known.length === 2 ? "beiden" : known.length} Spiele zum Einsatz.`
-          : known.some((fixture) => fixture.appearance?.status === "squad")
-            ? "Ich war im Kader, kam aber nicht zum Einsatz."
-            : "An diesem Spieltag war ich nicht dabei.",
+          : "Ich war im Kader, kam aber nicht zum Einsatz.",
     );
   }
 
@@ -440,7 +439,8 @@ function reportEn(day: Matchday, season: Season): Report {
 
   const known = day.fixtures.filter((fixture) => fixture.appearance);
   const playedCount = known.filter((fixture) => fixture.appearance?.status === "played").length;
-  if (known.length > 0) {
+  // Über Spiele ohne mich schreibt der Bericht nichts
+  if (known.some((fixture) => fixture.appearance?.status !== "absent")) {
     paragraphs.push(
       playedCount === known.length
         ? known.length === 2
@@ -448,9 +448,7 @@ function reportEn(day: Matchday, season: Season): Report {
           : "I was on court."
         : playedCount > 0
           ? `I played in ${playedCount === 1 ? "one" : playedCount} of the ${known.length === 2 ? "two" : known.length} matches.`
-          : known.some((fixture) => fixture.appearance?.status === "squad")
-            ? "I was in the squad but didn't play."
-            : "I wasn't involved on this matchday.",
+          : "I was in the squad but didn't play.",
     );
   }
 

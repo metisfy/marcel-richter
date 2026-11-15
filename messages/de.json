@@ -116,14 +116,14 @@
     "appearancePlayed": "eingesetzt",
     "appearanceLibero": "Libero",
     "appearanceSquad": "Kader",
-    "appearanceAbsent": "nicht dabei",
     "calendarTitle": "Spielplan im Kalender",
     "calendarText": "Alle Spieltage mit Halle und Ergebnissen – Verschiebungen kommen automatisch an.",
     "calendarSubscribe": "Abonnieren",
     "calendarGoogle": "Google Kalender",
     "calendarDownload": ".ics laden",
     "stale": "Der Verband antwortet gerade nicht – letzter bekannter Stand vom {updated} Uhr.",
-    "unavailableShort": "Spielplan gerade nicht erreichbar."
+    "unavailableShort": "Spielplan gerade nicht erreichbar.",
+    "resultPending": "Ergebnis folgt"
   },
   "contact": {
     "title": "Kontakt",
@@ -185,7 +185,6 @@
     "played": "eingesetzt",
     "libero": "als Libero",
     "squadOnly": "im Kader, nicht eingesetzt",
-    "absent": "nicht dabei",
     "headToHead": "Saisonvergleich",
     "opponent": "Gegner",
     "standing": "Platz {position} von {teams}",
@@ -247,6 +246,7 @@
     "showSquad": "Gemeldeten Kader anzeigen",
     "hideSquad": "Kader ausblenden",
     "squadTitle": "Gemeldeter Kader",
-    "squadPending": "Noch nicht gemeldet."
+    "squadPending": "Noch nicht gemeldet.",
+    "resultPending": "Ergebnis folgt"
   }
 }

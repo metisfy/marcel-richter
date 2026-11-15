@@ -15,7 +15,7 @@ import { routing } from "@/i18n/routing";
 import { ANALYTICS } from "@/lib/analytics";
 import { getSite } from "@/lib/content";
 import { fontVariables } from "@/lib/fonts";
-import { SITE_URL } from "@/lib/site-url";
+import { SITE_URL, SITE_URL_CONFIGURED } from "@/lib/site-url";
 import { siteGraph } from "@/lib/structured-data";
 import { themeInitScript } from "@/lib/theme-script";
 
@@ -34,6 +34,17 @@ export async function generateMetadata({ params }: LocaleParams): Promise<Metada
     authors: [{ name: site.name, url: SITE_URL }],
     creator: site.name,
     formatDetection: { telephone: false, email: false, address: false },
+    // Ohne eigene Domain (GitHub-Variable SITE_URL) zeigten Canonical-Links
+    // auf localhost – dann lieber gar nicht indexieren.
+    robots: SITE_URL_CONFIGURED
+      ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } }
+      : { index: false, follow: false },
+    // Bestätigung für Google Search Console / Bing Webmaster Tools
+    // (GitHub-Variablen GOOGLE_SITE_VERIFICATION, BING_SITE_VERIFICATION)
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+      other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } : undefined,
+    },
   };
 }
 

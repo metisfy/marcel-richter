@@ -37,7 +37,14 @@ ARG GIT_SHA="dev"
 # Optionale Besucherstatistik (leer = aus), siehe src/lib/analytics.ts
 ARG UMAMI_SRC=""
 ARG UMAMI_WEBSITE_ID=""
+ARG GOOGLE_SITE_VERIFICATION=""
+ARG BING_SITE_VERIFICATION=""
+# BVV_SNAPSHOT_WRITE: frisch abgerufene Spielplandaten als „letzten bekannten
+# Stand“ ins Image legen (content/saison/<saison>.bvv.json, src/lib/season.ts)
 ENV NODE_ENV=production \
+    BVV_SNAPSHOT_WRITE=1 \
+    NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${GOOGLE_SITE_VERIFICATION} \
+    NEXT_PUBLIC_BING_SITE_VERIFICATION=${BING_SITE_VERIFICATION} \
     NEXT_TELEMETRY_DISABLED=1 \
     NEXT_PUBLIC_SITE_URL=${SITE_URL} \
     NEXT_PUBLIC_UMAMI_SRC=${UMAMI_SRC} \

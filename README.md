@@ -343,7 +343,7 @@ Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen 
 | Impressum   | `/impressum`           | `/en/legal-notice`         |
 | Datenschutz | `/datenschutz`         | `/en/privacy`              |
 
-Außerdem: `/sitemap.xml`, `/robots.txt`, `/api/health` (Healthcheck), `/og/<sprache>/<seite>`
+Außerdem: `/sitemap.xml`, `/robots.txt`, `/api/health` (Healthcheck), `/api/status` (Datenquellen, siehe „Die Seite aktualisiert sich selbst“), `/api/stand` (Kennung des Datenstands), `/api/live/<datum>` (Live-Ticker), `/og/<sprache>/<seite>`
 (Open-Graph-Bilder). Die Sprache wird nie automatisch umgestellt, `/` ist immer Deutsch. Der
 Umschalter im Kopf führt jeweils zur selben Seite in der anderen Sprache. Die Seite setzt keine
 Cookies.
@@ -480,6 +480,8 @@ Zum **Pushen** des Images braucht es kein eigenes Token. Der Workflow nutzt daf�
 | --- | --- | --- |
 | `SITE_URL` | ✅ | Öffentliche Adresse ohne Schrägstrich am Ende, z. B. `https://www.marcel-richter.de`. Wird ins Image gebaut (Canonical, hreflang, Sitemap, OG-Bilder) und für den Healthcheck genutzt. |
 | `DEPLOY_PATH` | – | Ordner auf dem Server, absolut oder relativ zum Home-Verzeichnis. Standard `marcel-richter` |
+| `GOOGLE_SITE_VERIFICATION` | – | Code aus der Google Search Console (Methode „HTML-Tag“, nur der Wert von `content`) |
+| `BING_SITE_VERIFICATION` | – | Code aus den Bing Webmaster Tools (Meta-Tag `msvalidate.01`, nur der Wert) |
 
 Fehlt ein Pflichtwert, bricht der Deploy-Job mit einer Meldung ab, die genau den fehlenden Wert
 nennt.
@@ -581,6 +583,41 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 - **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
   `engines` in `package.json`.
 
+### Die Seite aktualisiert sich selbst
+
+- **Daten:** Spielplan, Ergebnisse und Tabelle holt der Server beim Verband (Ligaseite höchstens
+  alle 10 Minuten, Spielseiten der letzten Tage alle 15 Minuten) und baut die Seiten danach
+  höchstens alle 5 Minuten neu. Kein Deployment nötig.
+- **Offene Seiten:** Jede Minute fragt der Browser `/api/stand` (ein paar Bytes). Hat sich der
+  Stand geändert (neues Ergebnis, neue Tabelle, neuer Tag, neues Deployment), holt er die Seite
+  neu, ohne Neuladen und ohne die Scrollposition zu verlieren. Am Spieltag läuft zusätzlich der
+  Live-Ticker alle 10 Sekunden; am Tag danach zeigt der Spielplan den Endstand vom Ticker, bis
+  der Verband das Ergebnis einträgt („Ergebnis folgt“ statt „Als Nächstes“).
+- **Wenn der Verband nicht antwortet:** Die Seiten werden trotzdem neu gebaut, mit dem letzten
+  bekannten Stand. Jeder erfolgreiche Abruf wird im Container gespeichert, jeder Docker-Build legt
+  den frischen Stand ins Image.
+- **Prüfen, ob der Server die Quellen erreicht:** `https://<domain>/api/status?pruefen=1` im
+  Browser öffnen. Dort stehen `bvv.lastSuccess` / `bvv.lastFailure` (letzter Abruf),
+  `bvv.lastKnownData` (Stand der Daten) und unter `check` das Ergebnis einer Testabfrage an BVV
+  und Ticker (höchstens einmal pro Minute). Ohne Domain auf dem Server selbst:
+  `curl -s "http://localhost:3100/api/status?pruefen=1"`.
+
+### Suchmaschinen (SEO)
+
+- Jede Seite hat Titel, Beschreibung, Canonical-Link, hreflang (de/en/x-default), Open-Graph- und
+  Twitter-Vorschau mit eigenem Bild (`/og/…`, je Spieltag mit Ergebnis).
+- Strukturierte Daten (schema.org): Person mit Firma und Verein, Website, Profilseite
+  („Über mich“), Spiele als `SportsEvent` mit Halle, Projekte als `CreativeWork`, Brotkrumen
+  (Saison, Spieltage, Projekte, Über mich).
+- `sitemap.xml` (stündlich neu, mit Datum je Spieltag) und `robots.txt`.
+- **Ohne `SITE_URL` wird nichts indexiert** (`noindex`, robots.txt sperrt alles), damit keine
+  Links auf localhost in Suchmaschinen landen. Sobald die Domain als GitHub-Variable gesetzt ist,
+  ist die Seite beim nächsten Deployment freigegeben.
+- **Search Console:** Seite in der [Google Search Console](https://search.google.com/search-console)
+  als URL-Präfix anlegen, Methode „HTML-Tag“, den Code als Variable `GOOGLE_SITE_VERIFICATION`
+  hinterlegen, deployen, bestätigen und dort `https://<domain>/sitemap.xml` einreichen. Für Bing
+  genauso mit `BING_SITE_VERIFICATION` (oder Bing importiert die Seite aus der Search Console).
+
 ### Besucherstatistik (optional, standardmäßig aus)
 
 Für eine Statistik ohne Cookies ist [Umami](https://umami.is) vorbereitet (selbst gehostet). Dafür
@@ -627,11 +664,12 @@ deploy/                  Beispielkonfiguration Nginx
 - [x] Kontakt: `hello@metiscode.com` (wie im Impressum); Profile, Position und Rückennummer bei
       Bedarf in `content/site.yaml` ergänzen. Vereinslogo nur mit Erlaubnis des TSV Pfuhl
 - [x] Porträt (dein Foto von metisone.de) und Projekte (metisone.de + metisCode-Kundenprojekte)
-- [ ] Auf dem Server prüfen, ob der Container `volleyball.bayern` erreicht (siehe oben)
+- [ ] Auf dem Server prüfen, ob der Container BVV und Ticker erreicht: `/api/status?pruefen=1`
 - [ ] `auto-update.sh` per cron einrichten (Abschnitt „Automatisch ausrollen“)
 - [ ] **Impressum und Datenschutz** (Betreiber: metisOne UG, Geschäftsführer Marcel Richter,
       Auslieferung über Cloudflare) rechtlich prüfen lassen
-- [ ] GitHub Secrets und die Variable `SITE_URL` anlegen
+- [ ] GitHub Secrets und die Variable `SITE_URL` anlegen (vorher bleibt die Seite `noindex`)
+- [ ] Google Search Console einrichten (`GOOGLE_SITE_VERIFICATION`), Sitemap einreichen
 - [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
 - [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)
 - [ ] Nach dem ersten Deploy: Lighthouse auf der Live-URL prüfen,

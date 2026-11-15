@@ -8,7 +8,8 @@ import type { LiveEvent, LiveMatch, LivePlayer } from "@/lib/live";
 /*
  * Live-Ticker im Browser. Alle Bausteine einer Seite teilen sich eine Abfrage
  * pro Spieltag (/api/live/<datum>, alle 10 Sekunden, pausiert im
- * Hintergrund-Tab). Abgefragt wird nur am Spieltag selbst.
+ * Hintergrund-Tab). Abgefragt wird am Spieltag selbst und am Tag danach
+ * (Endstand, bis der Verband das Ergebnis einträgt) – dann nur einmal.
  */
 
 const POLL_MS = 10_000;
@@ -25,6 +26,8 @@ type Entry = {
 const store = new Map<string, Entry>();
 
 const todayInBerlin = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
+/** Vortag eines Datums (JJJJ-MM-TT) */
+const dayBefore = (date: string) => new Date(Date.parse(`${date}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
 
 async function poll(datum: string, run: number) {
   const entry = store.get(datum);
@@ -41,6 +44,8 @@ async function poll(datum: string, run: number) {
     }
   }
   if (entry.run !== run || entry.listeners.size === 0) return;
+  // Vergangener Tag: Endstand steht fest, einmal abfragen genügt
+  if (datum < todayInBerlin() && entry.data) return;
   // Wenn alles vorbei ist, seltener nachsehen (Endstand steht fest)
   const done = entry.data?.matches.length && entry.data.matches.every((match) => match.status === "post");
   entry.finishedPolls = done ? entry.finishedPolls + 1 : 0;
@@ -68,20 +73,15 @@ function subscribe(datum: string, listener: () => void) {
   };
 }
 
-const noop = () => () => {};
 const nothing = () => undefined;
 
-/** Ist <datum> heute (deutsche Zeit)? Auf dem Server immer nein. */
-export function useIsToday(datum: string) {
-  return useSyncExternalStore(noop, () => todayInBerlin() === datum, () => false);
-}
-
-/** Live-Daten eines Spieltags – nur am Spieltag selbst, sonst undefined. */
+/** Live-Daten eines Spieltags – am Spieltag selbst und am Tag danach, sonst undefined. */
 export function useLiveMatchday(datum: string): Data | undefined {
-  const isToday = useIsToday(datum);
+  const today = useToday();
+  const active = today !== "" && (datum === today || datum === dayBefore(today));
   // Stabile Funktionen: sonst würde React bei jedem Rendern neu abonnieren
-  const subscribeToDay = useCallback((listener: () => void) => (isToday ? subscribe(datum, listener) : () => {}), [datum, isToday]);
-  const read = useCallback(() => (isToday ? store.get(datum)?.data : undefined), [datum, isToday]);
+  const subscribeToDay = useCallback((listener: () => void) => (active ? subscribe(datum, listener) : () => {}), [datum, active]);
+  const read = useCallback(() => (active ? store.get(datum)?.data : undefined), [datum, active]);
   return useSyncExternalStore(subscribeToDay, read, nothing);
 }
 
@@ -99,13 +99,18 @@ export function LiveBadge({ className = "" }: { className?: string }) {
 
 /**
  * Für Spielplan und Startseite: läuft das Spiel, „LIVE 1:0 · 18:15“, nach dem
- * Spiel der Endstand vom Ticker; sonst das, was ohnehin dort stand.
+ * Spiel der Endstand vom Ticker; ist der Tag vorbei und noch kein Ergebnis
+ * da, „Ergebnis folgt“; sonst das, was ohnehin dort stand.
  */
 export function LiveFixtureStatus({ datum, teams, children }: { datum: string; teams: [string, string]; children?: ReactNode }) {
   const t = useTranslations("live");
+  const today = useToday();
   const data = useLiveMatchday(datum);
   const match = data?.matches.find((entry) => sameTeams(entry, teams));
-  if (!match || match.status === "pre") return <>{children}</>;
+  if (!match || match.status === "pre") {
+    if (today && datum < today) return <span className="font-mono text-[12.5px] text-muted">{t("resultPending")}</span>;
+    return <>{children}</>;
+  }
   return (
     <span className="inline-flex items-center gap-2 whitespace-nowrap" aria-live="polite">
       {match.status === "live" ? <LiveBadge /> : <span className="font-mono text-[11.5px] text-muted">{t("final")}</span>}

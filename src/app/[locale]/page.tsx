@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
 
 import { matchPlace, matchTitle, OutcomeBadge, SetScores } from "@/components/fixtures";
+import { AutoRefresh } from "@/components/auto-refresh";
 import { ArrowRightIcon, CalendarIcon, CheckIcon } from "@/components/icons";
 import { LiveFixtureStatus, LiveTodayStrip } from "@/components/live";
 import { SectionHead } from "@/components/page-intro";
@@ -12,7 +13,7 @@ import { getPathname, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProjects, getSite, lastResult, nextMatchday, ownSets, roleLine, type Season } from "@/lib/content";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
-import { loadCurrentSeason } from "@/lib/season";
+import { loadSeasons, seasonsVersion } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
 
 // Das Saison-Fenster zeigt Live-Daten vom BVV: alle fünf Minuten neu bauen (Daten selbst: Fetch-Cache, siehe src/lib/season.ts)
@@ -184,7 +185,8 @@ export default async function HomePage({ params }: LocaleParams) {
   const t = await getTranslations("home");
   const tPlayer = await getTranslations("player");
   const site = getSite(locale);
-  const season = await loadCurrentSeason(locale);
+  const seasons = await loadSeasons(locale);
+  const season = seasons[0];
 
   const projects = getProjects(locale);
   const featured = [
@@ -207,6 +209,7 @@ export default async function HomePage({ params }: LocaleParams) {
 
   return (
     <>
+      <AutoRefresh version={seasonsVersion(seasons)} locale={locale} />
       {/* Kopf: zentriert wie auf metisone.de */}
       {/* -mt-16/pt-16: Der Kopfbereich reicht unter die (oben durchsichtige)
           Kopfzeile, damit der Farbverlauf bis an den oberen Rand läuft. */}

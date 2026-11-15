@@ -79,6 +79,8 @@ jobs:
             GIT_SHA=${{ github.sha }}
             UMAMI_SRC=${{ vars.UMAMI_SRC }}
             UMAMI_WEBSITE_ID=${{ vars.UMAMI_WEBSITE_ID }}
+            GOOGLE_SITE_VERIFICATION=${{ vars.GOOGLE_SITE_VERIFICATION }}
+            BING_SITE_VERIFICATION=${{ vars.BING_SITE_VERIFICATION }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}

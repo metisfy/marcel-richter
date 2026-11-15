@@ -65,6 +65,7 @@ type Hub = {
   loadedAt: number;
   lastUsed: number;
   loading?: Promise<void>;
+  lastError?: { at: string; message: string };
   socket?: WebSocket;
   idleTimer?: ReturnType<typeof setInterval>;
 };
@@ -134,9 +135,14 @@ async function ensure(team: string, series?: string) {
   hub.lastUsed = Date.now();
   const stale = hub.key !== keyOf(team, series) || !hub.loadedAt || (!hub.socket && Date.now() - hub.loadedAt > 60_000);
   if (stale) {
-    hub.loading ??= loadSnapshot(team, series).finally(() => {
-      hub.loading = undefined;
-    });
+    hub.loading ??= loadSnapshot(team, series)
+      .catch((error: unknown) => {
+        hub.lastError = { at: new Date().toISOString(), message: error instanceof Error ? error.message : String(error) };
+        throw error;
+      })
+      .finally(() => {
+        hub.loading = undefined;
+      });
     await hub.loading;
   }
   openSocket();
@@ -262,6 +268,28 @@ function toLive(match: TickerMatch, state: TickerState | undefined): LiveMatch {
     coaches: [coach(0), coach(1)],
     events: events.slice(-12).reverse(),
     scoresheetUrl: state.finished ? state.scoresheetPdfUrl : undefined,
+  };
+}
+
+/** Erreicht der Server den Ticker? Nur Statuscode und Antwortzeit, ohne den Inhalt zu laden. */
+export async function pingTicker(): Promise<{ ok: boolean; status?: number; ms: number; error?: string }> {
+  const started = Date.now();
+  try {
+    const response = await fetch(REST_URL, { headers: HEADERS, cache: "no-store", signal: AbortSignal.timeout(30_000) });
+    await response.body?.cancel();
+    return { ok: response.ok, status: response.status, ms: Date.now() - started };
+  } catch (error) {
+    return { ok: false, ms: Date.now() - started, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/** Zustand der Verbindung zum Ticker (für /api/status) */
+export function liveStatus() {
+  return {
+    loadedAt: hub.loadedAt ? new Date(hub.loadedAt).toISOString() : undefined,
+    connected: hub.socket?.readyState === 1,
+    matches: hub.matches.size,
+    lastError: hub.lastError,
   };
 }
 

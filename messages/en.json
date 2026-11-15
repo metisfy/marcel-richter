@@ -116,14 +116,14 @@
     "appearancePlayed": "played",
     "appearanceLibero": "Libero",
     "appearanceSquad": "Squad",
-    "appearanceAbsent": "not involved",
     "calendarTitle": "Fixtures in your calendar",
     "calendarText": "Every matchday with venue and results – changes arrive automatically.",
     "calendarSubscribe": "Subscribe",
     "calendarGoogle": "Google Calendar",
     "calendarDownload": "Download .ics",
     "stale": "The association is not responding right now – last known data from {updated}.",
-    "unavailableShort": "Fixtures unavailable right now."
+    "unavailableShort": "Fixtures unavailable right now.",
+    "resultPending": "Result pending"
   },
   "contact": {
     "title": "Contact",
@@ -185,7 +185,6 @@
     "played": "played",
     "libero": "as libero",
     "squadOnly": "in the squad, didn't play",
-    "absent": "not involved",
     "headToHead": "Season head-to-head",
     "opponent": "Opponent",
     "standing": "{position} of {teams}",
@@ -247,6 +246,7 @@
     "showSquad": "Show registered squad",
     "hideSquad": "Hide squad",
     "squadTitle": "Registered squad",
-    "squadPending": "Not registered yet."
+    "squadPending": "Not registered yet.",
+    "resultPending": "Result pending"
   }
 }

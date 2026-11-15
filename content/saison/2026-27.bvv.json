@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-14T10:44:07.000Z",
+  "updatedAt": "2026-11-15T10:48:04.000Z",
   "fixtures": [
     {
       "date": "2026-10-10 13:00",
@@ -196,7 +196,17 @@
       "opponent": "SSV Bobingen",
       "home": false,
       "host": "SSV Bobingen",
-      "sets": [],
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:21",
+        "22:25",
+        "25:15",
+        "25:11"
+      ],
+      "outcome": "loss",
       "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417575",
       "details": {
         "referee": "SG TuS Fürstenfeldbruck / TSG Maisach",
@@ -206,7 +216,19 @@
           "city": "86399 Bobingen",
           "lat": 48.26777915011134,
           "lng": 10.833818507934552
+        },
+        "balls": [
+          97,
+          72
+        ],
+        "squad": {
+          "listed": 7,
+          "played": 7
         }
+      },
+      "appearance": {
+        "status": "absent",
+        "libero": false
       }
     },
     {
@@ -220,7 +242,16 @@
       "opponent": "SG TuS Fürstenfeldbruck / TSG Maisach",
       "home": false,
       "host": "SSV Bobingen",
-      "sets": [],
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:12",
+        "26:24",
+        "25:23"
+      ],
+      "outcome": "loss",
       "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417576",
       "details": {
         "referee": "SSV Bobingen",
@@ -230,7 +261,19 @@
           "city": "86399 Bobingen",
           "lat": 48.26777915011134,
           "lng": 10.833818507934552
+        },
+        "balls": [
+          76,
+          59
+        ],
+        "squad": {
+          "listed": 7,
+          "played": 7
         }
+      },
+      "appearance": {
+        "status": "absent",
+        "libero": false
       }
     },
     {
@@ -245,7 +288,10 @@
       "home": false,
       "host": "TSV Krumbach",
       "sets": [],
-      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417599"
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417599",
+      "details": {
+        "referee": "SVS Türkheim II"
+      }
     },
     {
       "date": "2027-01-16 13:00",
@@ -259,7 +305,10 @@
       "home": false,
       "host": "TSV Krumbach",
       "sets": [],
-      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417600"
+      "url": "https://volleyball.bayern/ergebnisse/erwachsene/schwaben/wettbewerb-44600/spiel-417600",
+      "details": {
+        "referee": "TSV Krumbach"
+      }
     },
     {
       "date": "2027-01-30 13:00",
@@ -658,7 +707,15 @@
         "TSV Haunstetten II"
       ],
       "host": "SVS Türkheim II",
-      "sets": []
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:19",
+        "25:20",
+        "25:23"
+      ]
     },
     {
       "date": "2026-11-14 13:00",
@@ -668,7 +725,15 @@
         "VfL Großkötz"
       ],
       "host": "SVS Türkheim II",
-      "sets": []
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:19",
+        "25:17",
+        "26:24"
+      ]
     },
     {
       "date": "2026-11-14 13:00",
@@ -678,7 +743,17 @@
         "VfL Großkötz"
       ],
       "host": "SVS Türkheim II",
-      "sets": []
+      "result": [
+        2,
+        3
+      ],
+      "sets": [
+        "25:23",
+        "25:16",
+        "19:25",
+        "20:25",
+        "3:15"
+      ]
     },
     {
       "date": "2026-11-14 14:30",
@@ -688,7 +763,15 @@
         "SG TuS Fürstenfeldbruck / TSG Maisach"
       ],
       "host": "SSV Bobingen",
-      "sets": []
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:21",
+        "25:21",
+        "31:29"
+      ]
     },
     {
       "date": "2026-11-14 14:30",
@@ -698,7 +781,16 @@
         "TSV Pfuhl"
       ],
       "host": "SSV Bobingen",
-      "sets": []
+      "result": [
+        3,
+        1
+      ],
+      "sets": [
+        "25:21",
+        "22:25",
+        "25:15",
+        "25:11"
+      ]
     },
     {
       "date": "2026-11-14 14:30",
@@ -708,7 +800,15 @@
         "TSV Pfuhl"
       ],
       "host": "SSV Bobingen",
-      "sets": []
+      "result": [
+        3,
+        0
+      ],
+      "sets": [
+        "25:12",
+        "26:24",
+        "25:23"
+      ]
     },
     {
       "date": "2026-11-21 13:00",
@@ -1235,6 +1335,17 @@
     },
     {
       "position": 2,
+      "team": "SVS Türkheim II",
+      "played": 6,
+      "won": 4,
+      "lost": 2,
+      "points": 12,
+      "sets": "12:7",
+      "balls": "426:416",
+      "own": false
+    },
+    {
+      "position": 3,
       "team": "TSV Krumbach",
       "played": 4,
       "won": 3,
@@ -1245,69 +1356,58 @@
       "own": false
     },
     {
-      "position": 3,
-      "team": "TSV Pfuhl",
-      "played": 4,
-      "won": 2,
-      "lost": 2,
-      "points": 7,
-      "sets": "8:8",
-      "balls": "344:347",
-      "own": true
-    },
-    {
       "position": 4,
       "team": "SG TuS Fürstenfeldbruck / TSG Maisach",
-      "played": 2,
-      "won": 2,
-      "lost": 0,
-      "points": 6,
-      "sets": "6:1",
-      "balls": "172:127",
+      "played": 4,
+      "won": 3,
+      "lost": 1,
+      "points": 9,
+      "sets": "9:4",
+      "balls": "319:267",
       "own": false
     },
     {
       "position": 5,
-      "team": "SVS Türkheim II",
-      "played": 4,
+      "team": "SSV Bobingen",
+      "played": 6,
       "won": 2,
-      "lost": 2,
-      "points": 6,
-      "sets": "6:7",
-      "balls": "275:294",
+      "lost": 4,
+      "points": 7,
+      "sets": "10:13",
+      "balls": "524:513",
       "own": false
     },
     {
       "position": 6,
-      "team": "TSV Haunstetten II",
-      "played": 4,
+      "team": "TSV Pfuhl",
+      "played": 6,
       "won": 2,
-      "lost": 2,
-      "points": 4,
-      "sets": "7:10",
-      "balls": "327:369",
-      "own": false
+      "lost": 4,
+      "points": 7,
+      "sets": "9:14",
+      "balls": "475:520",
+      "own": true
     },
     {
       "position": 7,
-      "team": "SSV Bobingen",
-      "played": 4,
-      "won": 0,
+      "team": "TSV Haunstetten II",
+      "played": 6,
+      "won": 2,
       "lost": 4,
-      "points": 1,
-      "sets": "4:12",
-      "balls": "346:370",
+      "points": 5,
+      "sets": "9:16",
+      "balls": "481:548",
       "own": false
     },
     {
       "position": 8,
       "team": "VfL Großkötz",
-      "played": 2,
-      "won": 0,
-      "lost": 2,
-      "points": 0,
-      "sets": "1:6",
-      "balls": "133:169",
+      "played": 4,
+      "won": 1,
+      "lost": 3,
+      "points": 2,
+      "sets": "4:11",
+      "balls": "297:337",
       "own": false
     },
     {
@@ -1323,21 +1423,21 @@
     }
   ],
   "standing": {
-    "position": 3,
+    "position": 6,
     "teams": 9,
     "points": 7
   },
   "record": {
-    "played": 4,
+    "played": 6,
     "won": 2,
-    "lost": 2,
-    "sets": "8:8",
-    "balls": "344:347"
+    "lost": 4,
+    "sets": "9:14",
+    "balls": "475:520"
   },
   "appearances": {
     "played": 2,
     "squad": 2,
-    "matches": 4
+    "matches": 6
   },
   "ranking": [
     {
@@ -1350,7 +1450,7 @@
     },
     {
       "date": "2026-11-14",
-      "position": 3
+      "position": 6
     }
   ]
 }

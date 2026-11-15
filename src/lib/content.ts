@@ -590,12 +590,18 @@ export const getMatchdayReport = cache((date: string, locale: Locale) => {
   return { ...result.data, body, contentLocale };
 });
 
+/** Heutiges Datum (JJJJ-MM-TT) in deutscher Zeit */
+export const berlinToday = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
+
 /**
  * Nächster Spieltag = alle Spiele ohne Ergebnis am Tag des ersten Spiels ohne
- * Ergebnis (im Volleyball spielt man oft zwei Spiele an einem Spieltag).
+ * Ergebnis ab heute (im Volleyball spielt man oft zwei Spiele an einem
+ * Spieltag). Vergangene Spiele ohne Ergebnis zählen nicht – deren Ergebnis
+ * folgt noch.
  */
 export function nextMatchday(season: Season | undefined): Fixture[] {
-  const first = season?.fixtures.find((fixture) => !fixture.result);
+  const today = berlinToday();
+  const first = season?.fixtures.find((fixture) => !fixture.result && fixture.date.slice(0, 10) >= today);
   if (!season || !first) return [];
   const day = first.date.slice(0, 10);
   return season.fixtures.filter((fixture) => !fixture.result && fixture.date.startsWith(day));

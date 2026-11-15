@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { AppearanceMark, MatchTeams, OutcomeBadge } from "@/components/fixtures";
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, ExternalIcon } from "@/components/icons";
+import { AutoRefresh } from "@/components/auto-refresh";
 import { JsonLd } from "@/components/json-ld";
 import { LiveMatchdayPanel } from "@/components/live";
 import { FormChips, SetBars, SetTable } from "@/components/match";
@@ -22,9 +23,9 @@ import {
   matchStats,
   tableRowOf,
 } from "@/lib/matchday";
-import { loadSeasons } from "@/lib/season";
+import { loadSeasons, seasonsVersion } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
-import { seasonEvents } from "@/lib/structured-data";
+import { breadcrumbs, seasonEvents } from "@/lib/structured-data";
 
 // Ergebnisse, Spielberichte und Tabellenplatz kommen live vom BVV: alle fünf
 // Minuten neu bauen, die Daten selbst liegen im Fetch-Cache (siehe
@@ -144,7 +145,7 @@ async function PlayedMatch({ fixture, season, locale }: { fixture: Fixture; seas
       </dl>
 
       <dl className="divide-y divide-line border-y border-line text-[15px]">
-        {fixture.appearance ? (
+        {fixture.appearance && fixture.appearance.status !== "absent" ? (
           <div className="flex items-center justify-between gap-4 py-3">
             <dt className="text-muted">{t("myAppearance")}</dt>
             <dd className="flex items-center gap-2 text-right font-medium">
@@ -153,9 +154,7 @@ async function PlayedMatch({ fixture, season, locale }: { fixture: Fixture; seas
                 ? fixture.appearance.libero
                   ? null
                   : t("played")
-                : fixture.appearance.status === "squad"
-                  ? t("squadOnly")
-                  : t("absent")}
+                : t("squadOnly")}
             </dd>
           </div>
         ) : null}
@@ -268,6 +267,7 @@ export default async function MatchdayPage({ params }: Props) {
   const { season, day } = found;
 
   const t = await getTranslations("matchday");
+  const tNav = await getTranslations("nav");
   const tSeason = await getTranslations("season");
   const site = getSite(locale);
   const report = matchdayReport(day, season, locale);
@@ -284,7 +284,15 @@ export default async function MatchdayPage({ params }: Props) {
 
   return (
     <div className="container-page">
+      <AutoRefresh version={seasonsVersion(await loadSeasons(locale))} locale={locale} />
       <JsonLd data={seasonEvents(site, { ...season, fixtures: day.fixtures }, locale)} />
+      <JsonLd
+        data={breadcrumbs(locale, [
+          { name: tNav("home"), href: "/" },
+          { name: tNav("season"), href: "/saison" },
+          { name: t("matchdayOf", { date: formatDate(datum, locale) }), href: { pathname: "/saison/[datum]", params: { datum } } },
+        ])}
+      />
 
       <nav aria-label={t("eyebrow")} className="flex items-center justify-between gap-4 pt-8">
         <Link href="/saison" className="inline-flex items-center gap-1.5 font-medium text-muted hover:text-fg">

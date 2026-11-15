@@ -146,3 +146,36 @@ export function projectGraph(project: Project, locale: Locale, labels: { home: s
     ],
   };
 }
+
+type Crumb = { name: string; href: Parameters<typeof localizedUrl>[1] };
+
+/** Brotkrumen (BreadcrumbList) – Suchergebnisse zeigen dann „Home › Saison › …“ */
+export function breadcrumbs(locale: Locale, crumbs: Crumb[]): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: localizedUrl(locale, crumb.href),
+    })),
+  };
+}
+
+/** „Über mich“ als Profilseite der Person (schema.org/ProfilePage) */
+export function profilePage(site: Site, locale: Locale, page: { title: string; description: string }): JsonLd {
+  const url = localizedUrl(locale, "/ueber-mich");
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${url}#profile`,
+    url,
+    name: page.title,
+    description: page.description,
+    inLanguage: locale,
+    mainEntity: { "@id": PERSON_ID },
+    isPartOf: { "@id": WEBSITE_ID },
+    ...(site.portrait ? { primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(site.portrait) } } : {}),
+  };
+}

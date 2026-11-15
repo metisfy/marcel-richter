@@ -10,6 +10,9 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"
 ).replace(/\/+$/, "");
 
+/** Ist eine echte Domain gesetzt? Ohne sie wird die Seite nicht indexiert (robots). */
+export const SITE_URL_CONFIGURED = Boolean(process.env.NEXT_PUBLIC_SITE_URL?.trim());
+
 export function absoluteUrl(pathname: string): string {
   if (/^https?:\/\//.test(pathname)) return pathname;
   return `${SITE_URL}${pathname.startsWith("/") ? "" : "/"}${pathname}`;

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -9,7 +10,7 @@ import { cache } from "react";
 import type { Locale } from "@/i18n/routing";
 
 import { type BvvLeague, type BvvMatch, type BvvMatchDetail, parseBvvLeague, parseBvvMatchDetail } from "./bvv";
-import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
+import { berlinToday, type Fixture, getSeasons, outcomeOf, type Season } from "./content";
 
 /*
  * Saisons mit Live-Daten vom BVV.
@@ -18,25 +19,25 @@ import { type Fixture, getSeasons, outcomeOf, type Season } from "./content";
  * Build statisch erzeugt und danach höchstens alle fünf Minuten im
  * Hintergrund neu gebaut (Incremental Static Regeneration, `export const
  * revalidate = 300` in der jeweiligen page.tsx). Die Abrufe beim Verband
- * liegen getrennt davon im Fetch-Cache: die Ligaseite höchstens einmal pro
- * Stunde, die Spielseiten höchstens alle sechs Stunden – egal wie viele
- * Besucher kommen. Fehlten die Daten beim Build (z. B. weil der Verband
- * GitHub-Server nicht bedient), sind sie so wenige Minuten nach dem Start
- * des Containers da.
+ * liegen getrennt davon im Fetch-Cache: die Ligaseite höchstens alle zehn
+ * Minuten, Spielseiten der letzten Tage alle 15 Minuten, ältere alle sechs
+ * Stunden – egal wie viele Besucher kommen.
  *
- * Schlägt der Abruf der Ligaseite fehl:
- * - beim Build: Die Seite wird mit dem letzten bekannten Stand gebaut
- *   (content/saison/<saison>.bvv.json, erzeugt mit `npm run bvv:stand`),
- *   gibt es den nicht, ohne Live-Daten (Hinweis + Link zum BVV) – ein Ausfall
- *   beim Verband soll kein Deployment verhindern.
- * - im laufenden Betrieb: Der Fehler wird weitergeworfen. Next.js liefert dann
- *   weiter die letzte gute Fassung der Seite aus und versucht es beim
- *   nächsten Aufruf erneut.
- * Fehlt nur eine einzelne Spielseite, fehlen nur deren Angaben.
+ * Jeder erfolgreiche Abruf wird als „letzter bekannter Stand“ gespeichert
+ * (content/saison/<saison>.bvv.json – im Container und beim Docker-Build;
+ * im Repository mit `npm run bvv:stand`). Schlägt ein Abruf fehl, baut die
+ * Seite mit diesem Stand („letzter bekannter Stand vom …“) – beim Build wie im
+ * Betrieb. So wird jede Seite trotzdem regelmäßig neu erzeugt (z. B. wechselt
+ * „Als Nächstes“ nach dem Spieltag auf „Ergebnis folgt“), und neue Daten
+ * erscheinen, sobald der Verband wieder antwortet. Nur wenn es gar keinen
+ * Stand gibt: beim Build ohne Live-Daten (Hinweis + Link zum BVV), im Betrieb
+ * bleibt die letzte Fassung der Seite stehen.
  */
 
-const REVALIDATE_SECONDS = 3600;
-// Spielseiten ändern sich kaum noch (Halle, Spielbericht): seltener abrufen.
+const REVALIDATE_SECONDS = 600;
+// Spielseiten der letzten Tage (Spielbericht, Einsätze kommen nach dem Spiel)
+const RECENT_MATCH_REVALIDATE_SECONDS = 900;
+// Ältere Spielseiten ändern sich kaum noch: seltener abrufen.
 const MATCH_REVALIDATE_SECONDS = 6 * 3600;
 // Abgeschlossene Saisons im Ergebnis-Archiv ändern sich nicht mehr.
 const ARCHIVE_REVALIDATE_SECONDS = 30 * 24 * 3600;
@@ -74,10 +75,18 @@ const markUnreachable = () => {
   unreachableUntil = isBuild() ? Number.POSITIVE_INFINITY : Date.now() + 60_000;
 };
 
+// Zustand für /api/status – über globalThis, weil jede Route ihre eigene Kopie
+// dieses Moduls haben kann.
+type BvvStatus = { lastSuccess?: string; lastFailure?: { at: string; message: string } };
+const shared = globalThis as unknown as { __bvvStatus?: BvvStatus; __bvvLastGood?: Map<string, Snapshot> };
+export const bvvStatus: BvvStatus = (shared.__bvvStatus ??= {});
+const lastGood: Map<string, Snapshot> = (shared.__bvvLastGood ??= new Map());
+
 /** Seite beim BVV abrufen – gemeinsam genutzt, begrenzt, mit einem zweiten Versuch bei Abbruch. */
 function fetchPage(url: string, revalidate: number): Promise<Page> {
   const pending = inFlight.get(url);
   if (pending) return pending;
+  if (process.env.BVV_OFFLINE === "1") return Promise.reject(new Error("BVV_OFFLINE=1"));
   if (Date.now() < unreachableUntil) return Promise.reject(new Error("BVV gerade nicht erreichbar (übersprungen)"));
   const load = async (): Promise<Page> => {
     const response = await fetchBvv(url, revalidate);
@@ -135,9 +144,18 @@ async function fetchLeague(url: string): Promise<{ league: BvvLeague; updatedAt:
   return { league, updatedAt: (Number.isNaN(date.getTime()) ? new Date() : date).toISOString() };
 }
 
-async function fetchMatchDetail(url: string): Promise<BvvMatchDetail | undefined> {
+/** Datum (JJJJ-MM-TT) in deutscher Zeit, `offset` Tage von heute */
+const berlinDay = (offset = 0) =>
+  new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date(Date.now() + offset * 86_400_000));
+
+async function fetchMatchDetail(url: string, date: string): Promise<BvvMatchDetail | undefined> {
   try {
-    const page = await fetchPage(url, isArchive(url) ? ARCHIVE_REVALIDATE_SECONDS : MATCH_REVALIDATE_SECONDS);
+    const revalidate = isArchive(url)
+      ? ARCHIVE_REVALIDATE_SECONDS
+      : date.slice(0, 10) >= berlinDay(-3)
+        ? RECENT_MATCH_REVALIDATE_SECONDS
+        : MATCH_REVALIDATE_SECONDS;
+    const page = await fetchPage(url, revalidate);
     return page.ok ? parseBvvMatchDetail(page.text) : undefined;
   } catch {
     return undefined;
@@ -255,7 +273,7 @@ async function withDetails(season: Season): Promise<Season> {
   };
   for (let i = 0; i < pending.length; i += 4) {
     const batch = pending.slice(i, i + 4);
-    const details = await Promise.all(batch.map(({ fixture }) => fetchMatchDetail(fixture.url!)));
+    const details = await Promise.all(batch.map(({ fixture }) => fetchMatchDetail(fixture.url!, fixture.date)));
     batch.forEach(({ index }, position) => {
       const detail = details[position];
       if (!detail) {
@@ -293,6 +311,11 @@ async function withDetails(season: Season): Promise<Season> {
 // Letzter bekannter Stand (content/saison/<saison>.bvv.json)
 // ---------------------------------------------------------------------------
 
+/** Stand der gespeicherten Daten je Saison (für /api/status) */
+export function snapshotDates(): Record<string, string | undefined> {
+  return Object.fromEntries(getSeasons("de").filter((season) => season.source).map((season) => [season.id, freshest(season.id)?.updatedAt]));
+}
+
 type Snapshot = Pick<Season, "fixtures" | "matches" | "table" | "standing" | "record" | "appearances" | "ranking"> & { updatedAt: string };
 
 const snapshotFile = (id: string) => path.join(process.cwd(), "content", "saison", `${id}.bvv.json`);
@@ -312,24 +335,64 @@ function readSnapshot(id: string): Snapshot | undefined {
   }
 }
 
+/** Jüngster bekannter Stand: aus diesem Prozess, sonst aus der Datei. */
+function freshest(id: string): Snapshot | undefined {
+  const memory = lastGood.get(id);
+  const file = readSnapshot(id);
+  if (!memory) return file;
+  if (!file) return memory;
+  return memory.updatedAt >= file.updatedAt ? memory : file;
+}
+
+const isRuntime = () => process.env.NODE_ENV === "production" && !isBuild();
+const written = new Map<string, string>();
+
+/**
+ * Erfolgreichen Abruf merken – im Speicher und als Datei, im laufenden
+ * Container und beim Docker-Build (BVV_SNAPSHOT_WRITE=1). Lokal (npm run dev,
+ * npm run build) bleibt die Datei im Repository unverändert; dafür gibt es
+ * `npm run bvv:stand`.
+ */
+function remember(season: Season) {
+  const snapshot = toSnapshot(season);
+  if (!snapshot) return;
+  lastGood.set(season.id, snapshot);
+  bvvStatus.lastSuccess = new Date().toISOString();
+  if (!isRuntime() && process.env.BVV_SNAPSHOT_WRITE !== "1") return;
+  const json = `${JSON.stringify(snapshot, null, 2)}\n`;
+  if (written.get(season.id) === json) return;
+  try {
+    const target = snapshotFile(season.id);
+    const temp = `${target}.${process.pid}.tmp`;
+    fs.writeFileSync(temp, json);
+    fs.renameSync(temp, target);
+    written.set(season.id, json);
+  } catch {
+    // nicht beschreibbar – dann eben nur im Speicher
+  }
+}
+
 async function resolve(season: Season): Promise<Season> {
   const { source } = season;
   if (!source) return season;
   try {
     const { league, updatedAt } = await fetchLeague(source.url);
-    return await withDetails(withLeague(season, source, league, updatedAt));
+    const resolved = await withDetails(withLeague(season, source, league, updatedAt));
+    remember(resolved);
+    return resolved;
   } catch (error) {
-    const atRuntime = process.env.NODE_ENV === "production" && process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD;
-    if (atRuntime) throw error;
     const message = error instanceof Error ? `${error.name}: ${error.message}${error.cause ? ` (${String(error.cause)})` : ""}` : String(error);
+    bvvStatus.lastFailure = { at: new Date().toISOString(), message: message.slice(0, 300) };
     // Grund unsichtbar in der Seite vermerken (data-bvv-error), damit er sich
     // auch ohne Zugriff auf das Build-Log nachvollziehen lässt.
-    const snapshot = readSnapshot(season.id);
+    const snapshot = freshest(season.id);
     if (snapshot) {
       console.warn(`⚠ Spielplan vom BVV nicht geladen, letzter bekannter Stand vom ${snapshot.updatedAt}: ${message}`);
       const { updatedAt, ...data } = snapshot;
       return { ...season, ...data, source: { ...source, updatedAt, stale: true, error: message.slice(0, 300) } };
     }
+    // Im Betrieb ohne jeden Stand: Fehler weiterwerfen, die letzte Fassung der Seite bleibt
+    if (isRuntime()) throw error;
     console.warn(`⚠ Spielplan vom BVV nicht geladen, Seite ohne Live-Daten: ${message}`);
     return { ...season, source: { ...source, error: message.slice(0, 300) } };
   }
@@ -340,4 +403,27 @@ export const loadSeasons = cache(async (locale: Locale): Promise<Season[]> => Pr
 
 export async function loadCurrentSeason(locale: Locale): Promise<Season | undefined> {
   return (await loadSeasons(locale))[0];
+}
+
+/**
+ * Kennung des angezeigten Stands: ändert sich mit neuen Ergebnissen, neuer
+ * Tabelle, am nächsten Tag (z. B. „Als Nächstes“ → „Ergebnis folgt“) und mit
+ * jedem Deployment. Offene Seiten vergleichen sie mit /api/stand und laden
+ * nur dann neu (src/components/auto-refresh.tsx).
+ */
+export function seasonsVersion(seasons: Season[]): string {
+  const data = seasons.map(({ id, fixtures, matches, table, standing, record, appearances, ranking }) => ({
+    id,
+    fixtures,
+    matches,
+    table,
+    standing,
+    record,
+    appearances,
+    ranking,
+  }));
+  return createHash("sha1")
+    .update(JSON.stringify([process.env.GIT_SHA ?? "dev", berlinToday(), data]))
+    .digest("hex")
+    .slice(0, 16);
 }

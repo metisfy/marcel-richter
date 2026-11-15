@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { AutoRefresh } from "@/components/auto-refresh";
 import { CalendarLinks } from "@/components/calendar-links";
 import { LiveTodayPanel } from "@/components/live";
 import { FixtureTable, LeagueTable, SourceNote } from "@/components/fixtures";
@@ -10,9 +11,9 @@ import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { getPathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getSite, type Season } from "@/lib/content";
-import { loadSeasons } from "@/lib/season";
+import { loadSeasons, seasonsVersion } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
-import { seasonEvents } from "@/lib/structured-data";
+import { breadcrumbs, seasonEvents } from "@/lib/structured-data";
 
 // Spielplan und Tabelle kommen live vom BVV: alle fünf Minuten neu bauen (Daten selbst: Fetch-Cache, siehe src/lib/season.ts)
 // (siehe src/lib/season.ts). Muss eine Zahl sein, kein Ausdruck.
@@ -86,8 +87,10 @@ async function SeasonFacts({ season }: { season: Season }) {
 export default async function SeasonPage({ params }: LocaleParams) {
   const locale: Locale = await initLocale(params);
   const t = await getTranslations("season");
+  const tNav = await getTranslations("nav");
   const site = getSite(locale);
-  const [current, ...previous] = await loadSeasons(locale);
+  const seasons = await loadSeasons(locale);
+  const [current, ...previous] = seasons;
 
   if (!current) {
     return (
@@ -99,7 +102,14 @@ export default async function SeasonPage({ params }: LocaleParams) {
 
   return (
     <div className="container-page">
+      <AutoRefresh version={seasonsVersion(seasons)} locale={locale} />
       {current.fixtures.length > 0 ? <JsonLd data={seasonEvents(site, current, locale)} /> : null}
+      <JsonLd
+        data={breadcrumbs(locale, [
+          { name: tNav("home"), href: "/" },
+          { name: tNav("season"), href: "/saison" },
+        ])}
+      />
       <PageIntro
         eyebrow={`${site.team.name} · ${current.league}`}
         title={t("heading", { season: current.season })}
