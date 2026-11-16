@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Admin-Ablage (App-Geheimnis, DB-Verbindung) – nie committen
+/data

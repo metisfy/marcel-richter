@@ -25,8 +25,9 @@ Bayerischen Volleyball-Verband.
 5. [GitHub Secrets & Variablen](#github-secrets--variablen)
 6. [Rollback](#rollback)
 7. [Reverse Proxy](#reverse-proxy)
-8. [Technische Hinweise](#technische-hinweise)
-9. [Vor dem Livegang](#vor-dem-livegang)
+8. [Admin-Bereich](#admin-bereich)
+9. [Technische Hinweise](#technische-hinweise)
+10. [Vor dem Livegang](#vor-dem-livegang)
 
 ---
 
@@ -545,6 +546,88 @@ erreichbar ist. Nach einer Änderung `./start.sh` ausführen.
 
 Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel enthalten).
 
+**Admin-Bereich unter `admin.<domain>`:** einen zweiten Proxy Host (bzw. DNS-Eintrag bei
+Cloudflare) für `admin.<domain>` anlegen, der auf **denselben** Container zeigt
+(`http://<Server-IP>:3100`). Die Website erkennt den Admin-Bereich am Host, siehe
+[Admin-Bereich](#admin-bereich).
+
+---
+
+## Admin-Bereich
+
+Ein Login nur für Marcel, gebaut nach dem Muster von t-orga:
+
+| Adresse | Was |
+| --- | --- |
+| `https://admin.<domain>/` | Admin-Bereich (der Pfad `/admin` ist hier unsichtbar) |
+| `http://<Server-IP>:3100/admin` | derselbe Bereich ohne DNS, z. B. für die Einrichtung |
+| `https://<domain>/admin` | gibt es nicht (404), die öffentliche Seite bleibt sauber |
+
+**Inhalt:**
+- **Übersicht:** ungelesene Nachrichten, Mailversand, Sicherheit, Spielplan-Abruf (BVV),
+  Live-Ticker, laufende Version.
+- **Nachrichten:** alles aus dem Kontaktformular mit „Antworten“, gelesen/ungelesen und Löschen.
+  Ein TTL-Index löscht Nachrichten nach 12 Monaten automatisch (steht so in der
+  Datenschutzerklärung).
+- **Einstellungen:** Name/E-Mail, Passwort, zweiter Faktor (TOTP mit QR-Code, 8 Ersatzcodes),
+  Mailversand (SMTP mit Testmail vor dem Speichern), Datenbank prüfen, überall abmelden.
+
+**Datenbank:** MongoDB, im Browser eingerichtet. Es gibt keine `MONGODB_URI` und keine
+Zugangsdaten im Code oder Image. Benötigt wird eine eigene Datenbank (z. B. `marcel_richter`)
+mit einem Benutzer, der darin lesen und schreiben darf:
+
+```js
+// in mongosh, als Admin
+use marcel_richter
+db.createUser({ user: "marcel_richter", pwd: passwordPrompt(), roles: [{ role: "readWrite", db: "marcel_richter" }] })
+```
+
+**Ablage (Volume `marcel-richter-daten` → `/app/data`):** Hier liegt nur, was nicht in die
+Datenbank kann: das App-Geheimnis (signiert Sitzungen, verschlüsselt Passwörter), die
+Datenbankverbindung (Passwort verschlüsselt), der Einrichtungsschlüssel und die Markierung
+„eingerichtet“. `start.sh` legt das Volume an und gibt es dem Benutzer 1000. Geht das Volume
+verloren, ist die Einrichtung weg. Die Daten in MongoDB bleiben, gespeicherte Passwörter von
+Mailversand und 2FA lassen sich aber nicht mehr entschlüsseln.
+
+### Admin-Bereich einrichten (einmalig)
+
+1. Auf dem Server einmal die aktuelle `start.sh` holen. Danach hält sie sich selbst und
+   `docker-compose.yml`/`auto-update.sh` passend zum Commit aktuell:
+
+   ```bash
+   cd ~/websites/intern/marcel-richter
+   curl -fsSLO https://raw.githubusercontent.com/metisfy/marcel-richter/main/start.sh && chmod +x start.sh
+   ./start.sh <commit-sha>
+   ```
+
+2. Am Ende zeigt `start.sh` den **Einrichtungsschlüssel** (auch in `docker logs marcel-richter`).
+3. `http://<Server-IP>:3100/admin` öffnen. Der Assistent fragt nach dem Schlüssel, dann:
+   - **Schritt 1 – MongoDB verbinden:** Server, Port, Benutzer, Passwort, Datenbank,
+     Auth-Datenbank, TLS. „Nur prüfen“ testet Lesen und Schreiben, „Speichern und weiter“
+     speichert die Verbindung.
+   - **Schritt 2 – Zugang anlegen:** Name, E-Mail, Passwort (mindestens 12 Zeichen, Groß- und
+     Kleinbuchstaben, Ziffer). Danach ist man angemeldet und der Assistent ist für immer zu.
+4. Unter **Einstellungen** den zweiten Faktor einschalten und die Ersatzcodes sicher ablegen.
+5. Optional unter **Einstellungen → Mailversand** den SMTP-Zugang eintragen. Gespeichert wird erst
+   nach einer erfolgreichen Testmail.
+
+**Neu einrichten** (z. B. andere Datenbank): `./start.sh --einrichtung-zuruecksetzen`. Das löscht
+Verbindung und Markierung, das App-Geheimnis bleibt. Danach zeigt der Bereich wieder den
+Assistenten mit neuem Schlüssel.
+
+**Sicherheit:**
+- Passwörter als scrypt-Hash; Sitzung als signiertes, `httpOnly`-Cookie für 12 Stunden.
+- Passwortwechsel und „überall abmelden“ machen alle anderen Sitzungen ungültig.
+- Höchstens 5 Fehlversuche je E-Mail und 10 je IP in 15 Minuten.
+- Zweiter Faktor über einen eigenen, 5 Minuten gültigen Zwischenschritt.
+- Jede Seite und jede Aktion prüft die Anmeldung selbst (`src/lib/admin/guard.ts`).
+- Antworten mit `X-Robots-Tag: noindex` und `Cache-Control: private, no-store`.
+- `/admin` steht in `robots.txt` unter `disallow`.
+
+**Lokal:** `npm run dev`, dann http://localhost:3000/admin oder http://admin.localhost:3000/
+(zeigt im Browser von selbst auf 127.0.0.1). Die Ablage liegt dann in `data/` im Projekt (steht
+in `.gitignore`), als Datenbank genügt ein lokales `mongod`.
+
 ---
 
 ## Technische Hinweise
@@ -592,27 +675,30 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 ### Kontaktformular
 
 Das Formular auf `/kontakt` prüft die Eingaben schon im Browser und schickt sie an
-`/api/kontakt`. Der Server stellt die Nachricht per SMTP an `CONTACT_TO` zu. „Antworten“ im
-Mailprogramm geht direkt an den Absender. Gespeichert wird auf dem Webserver nichts, eine
-automatische Bestätigungsmail an die angegebene Adresse gibt es bewusst nicht (sonst ließe sich
-das Formular nutzen, um Mails an fremde Adressen zu schicken).
+`/api/kontakt`. Der Server legt jede Nachricht im Postfach des [Admin-Bereichs](#admin-bereich)
+ab (MongoDB, Löschung nach 12 Monaten) und schickt sie, sofern eingerichtet, zusätzlich per Mail.
+„Antworten“ im Mailprogramm geht direkt an den Absender. Erfolg meldet das Formular, sobald einer
+der beiden Wege geklappt hat. Eine automatische Bestätigungsmail an die angegebene Adresse gibt es
+bewusst nicht (sonst ließe sich das Formular nutzen, um Mails an fremde Adressen zu schicken).
 
 **Spamschutz:** verstecktes Feld (Honeypot), Mindest-Ausfüllzeit von 3 Sekunden,
 Herkunftsprüfung, höchstens 5 Nachrichten je IP in 15 Minuten und 40 pro Stunde insgesamt.
 
-**Ohne Mailzugang** zeigt das Formular nicht „Danke“, sondern öffnet die fertige Nachricht im
-E-Mail-Programm (mit „Text kopieren“ als Ausweg). Dasselbe bietet es an, wenn der Mailserver die
-Nachricht ablehnt. `GET /api/kontakt` zeigt, ob der Versand eingerichtet ist
+**Weder Datenbank noch Mailzugang:** Das Formular zeigt dann nicht „Danke“, sondern öffnet die
+fertige Nachricht im E-Mail-Programm (mit „Text kopieren“ als Ausweg). Dasselbe bietet es an, wenn
+beide Wege scheitern. `GET /api/kontakt` zeigt, ob eine Nachricht ankommen kann
 (`{"available":true}`).
 
-**Einrichten.** Die Zugangsdaten gehören nie ins Image, denn das Image ist öffentlich. Der
-Container liest sie aus der `.env` neben der `docker-compose.yml`:
+**Mailversand einrichten:** am einfachsten im Admin-Bereich unter **Einstellungen →
+Mailversand**. Gespeichert wird in der Datenbank, das Passwort verschlüsselt, und erst nach einer
+erfolgreichen Testmail. Alternativ, mit Vorrang, über Umgebungsvariablen. Die Zugangsdaten gehören
+nie ins Image, denn das Image ist öffentlich. Der Container liest sie aus der `.env` neben der
+`docker-compose.yml`:
 
 - **Mit SSH-Deploy:** Secrets `SMTP_USER`, `SMTP_PASSWORD` und Variable `SMTP_HOST` (optional
   `SMTP_PORT`, `SMTP_FROM`, `CONTACT_TO`) anlegen. Der Workflow schreibt sie bei jedem Deployment
   in die `.env` auf dem Server.
-- **Interner Server ohne SSH** (GitHub erreicht ihn nicht): einmalig die aktuelle
-  `docker-compose.yml` auf den Server kopieren und in der `.env` ergänzen:
+- **Interner Server ohne SSH** (GitHub erreicht ihn nicht): in der `.env` ergänzen:
 
   ```bash
   SMTP_HOST='smtp.example.com'
@@ -688,6 +774,8 @@ public/images/           Bilder
 src/app/[locale]/        Seiten (Ordnernamen = interne deutsche Routen)
 src/app/og/              Open-Graph-Bilder
 src/app/api/health/      Healthcheck
+src/app/api/kontakt/     Kontaktformular (Postfach + Mail)
+src/app/admin/           Admin-Bereich (Assistent, Anmeldung, Übersicht, Nachrichten, Einstellungen)
 src/components/          UI-Komponenten
 src/i18n/                Sprachen, übersetzte Pfade, Navigation
 src/lib/content.ts       Lädt und prüft alle Inhalte
@@ -697,7 +785,8 @@ src/lib/matchday.ts      Spieltage, Statistik je Spiel, automatischer Bericht
 src/lib/live.ts          Live-Ticker (WebSocket zum BVV-Ticker), /api/live/<datum>
 src/components/live.tsx  Live-Anzeige, Feld mit Startaufstellung, Legende
 src/lib/structured-data.ts  schema.org / JSON-LD
-src/proxy.ts             Sprach-Routing
+src/lib/admin/           Admin: Ablage, Sitzung, MongoDB, Zugänge, 2FA, Nachrichten, Mailversand
+src/proxy.ts             Sprach-Routing, Host-Weiche admin.<domain>
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)
 docker-compose.yml       Betrieb auf dem Server
 start.sh                 Ausrollen/Rollback auf dem Server
@@ -721,7 +810,9 @@ deploy/                  Beispielkonfiguration Nginx
       Auslieferung über Cloudflare) rechtlich prüfen lassen
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen (vorher bleibt die Seite `noindex`)
 - [ ] Google Search Console einrichten (`GOOGLE_SITE_VERIFICATION`), Sitemap einreichen
-- [ ] Mailzugang fürs Kontaktformular einrichten (Abschnitt „Kontaktformular“), Testnachricht schicken
+- [ ] Admin-Bereich einrichten (Abschnitt „Admin-Bereich“), zweiten Faktor einschalten
+- [ ] DNS/Proxy für `admin.<domain>` anlegen (gleicher Container)
+- [ ] Mailversand im Admin-Bereich einrichten, Testnachricht über das Formular schicken
 - [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
 - [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)
 - [ ] Nach dem ersten Deploy: Lighthouse auf der Live-URL prüfen,

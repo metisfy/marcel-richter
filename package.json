@@ -17,10 +17,12 @@
     "node": ">=24"
   },
   "dependencies": {
+    "mongodb": "^7.8.0",
     "next": "^16.4.6",
     "next-intl": "^4.15.0",
     "next-mdx-remote": "^6.0.0",
     "nodemailer": "^10.3.1",
+    "qrcode-generator": "^2.0.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "server-only": "^0.0.1",

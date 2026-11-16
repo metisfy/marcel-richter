@@ -66,7 +66,10 @@ ENV NODE_ENV=production \
 
 COPY --from=builder --chown=node:node /app/public ./public
 # Schreibbar für den Bildoptimierungs-Cache (.next/cache/images).
-RUN mkdir .next && chown node:node .next
+# /app/data: Ablage des Admin-Bereichs (App-Geheimnis, DB-Verbindung) – im
+# Betrieb das Volume marcel-richter-daten. Ein leeres Volume übernimmt beim
+# ersten Einhängen Besitzer und Rechte dieses Ordners.
+RUN mkdir .next data && chown node:node .next data && chmod 700 data
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 

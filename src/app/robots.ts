@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
   // sonst zeigten Canonical-Links und Sitemap auf localhost.
   if (!SITE_URL_CONFIGURED) return { rules: [{ userAgent: "*", disallow: "/" }] };
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/", "/admin"] }],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };

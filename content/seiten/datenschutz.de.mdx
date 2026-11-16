@@ -26,8 +26,8 @@ Im Folgenden „wir“ oder „uns“.
 - Schriften, Bilder und Skripte kommen vom eigenen Server. Beim Besuch wird **keine Verbindung
   zu Drittanbietern** wie Google aufgebaut. Einzige Ausnahme ist Cloudflare als Schutz- und
   Auslieferungsdienst (Abschnitt 4).
-- Nachrichten aus dem Kontaktformular kommen per E-Mail bei uns an und werden auf dem Webserver
-  nicht gespeichert (Abschnitt 6).
+- Nachrichten aus dem Kontaktformular speichern wir, bis die Anfrage erledigt ist, höchstens
+  12 Monate (Abschnitt 6).
 
 ## 3. Hosting und Server-Logdateien
 
@@ -87,10 +87,13 @@ Einstellungen Ihres Browsers löschen.
 ## 6. Kontaktformular, E-Mail und Telefon
 
 **Kontaktformular.** Wenn Sie das Kontaktformular nutzen, verarbeiten wir Ihren Namen, Ihre
-E-Mail-Adresse, das gewählte Anliegen und Ihre Nachricht. Die Angaben werden verschlüsselt
-übertragen und vom Webserver sofort als E-Mail an unser Postfach weitergeleitet. Dafür nutzen wir
-den Mailserver unseres E-Mail-Anbieters. Auf dem Webserver selbst werden die Inhalte nicht
-gespeichert. Eine automatische Bestätigungsmail an Ihre Adresse verschicken wir nicht.
+E-Mail-Adresse, das gewählte Anliegen, Ihre Nachricht und den Zeitpunkt des Eingangs. Die Angaben
+werden verschlüsselt übertragen, in unserer Datenbank gespeichert und – sofern eingerichtet – als
+E-Mail an unser Postfach weitergeleitet. Dafür nutzen wir den Mailserver unseres E-Mail-Anbieters.
+Auf die gespeicherten Nachrichten hat nur Marcel Richter über einen passwortgeschützten
+Verwaltungsbereich Zugriff. Wir löschen sie, sobald Ihre Anfrage erledigt ist, spätestens aber
+automatisch nach 12 Monaten. Eine automatische Bestätigungsmail an Ihre Adresse verschicken wir
+nicht.
 
 Zum Schutz vor Spam hält der Webserver Ihre IP-Adresse höchstens 15 Minuten im Arbeitsspeicher,
 um zu zählen, wie viele Nachrichten von ihr kommen. Sie wird nicht auf Datenträgern gespeichert

@@ -1,14 +1,20 @@
 import { hasLocale } from "next-intl";
 
 import { routing } from "@/i18n/routing";
-import { clientIp, mailConfig, sameOrigin, sendContactMail, takeContactSlot } from "@/lib/contact";
-import { type ContactResult, isContactTopic, validateContact } from "@/lib/contact-shared";
+import { setupComplete } from "@/lib/admin/guard";
+import { markMailed, storeMessage } from "@/lib/admin/messages";
+import { clientIp, envMailConfig, mailConfig, sameOrigin, sendContactMail, takeContactSlot } from "@/lib/contact";
+import { type ContactResult, type ContactTopic, isContactTopic, validateContact } from "@/lib/contact-shared";
 
 /*
  * Kontaktformular (src/components/contact-form.tsx).
  *
- * GET  /api/kontakt → { available }  Ist der Mailversand eingerichtet?
+ * GET  /api/kontakt → { available }  Kann eine Nachricht ankommen?
  * POST /api/kontakt                  Nachricht zustellen
+ *
+ * Zugestellt wird doppelt, sobald möglich: ins Postfach des Admin-Bereichs
+ * (Datenbank) und per Mail. Erfolg meldet die API, sobald einer der beiden
+ * Wege geklappt hat. Geht keiner, bietet das Formular das E-Mail-Programm an.
  *
  * POST nimmt JSON (Formular mit JavaScript) und klassische Formulardaten
  * (ohne JavaScript, Antwort dann als Weiterleitung zurück zur Seite).
@@ -25,7 +31,9 @@ const MAX_BODY = 20_000;
 const MIN_FILL_MS = 3_000;
 
 export function GET() {
-  return Response.json({ available: mailConfig() !== null }, { headers: NO_STORE });
+  // Ohne Datenbank kommt der Mailzugang nur aus der Umgebung in Frage
+  const available = setupComplete() || envMailConfig() !== null;
+  return Response.json({ available }, { headers: NO_STORE });
 }
 
 type Payload = {
@@ -101,27 +109,47 @@ export async function POST(request: Request) {
     return respond({ ok: false, reason: "invalid", fields }, 422);
   }
 
-  const config = mailConfig();
-  if (!config) {
-    console.warn("[kontakt] Mailversand nicht eingerichtet (SMTP_HOST/SMTP_USER fehlen) – Nachricht nicht zugestellt");
-    return respond({ ok: false, reason: "unavailable" }, 503);
-  }
-
   if (!takeContactSlot(clientIp(request.headers))) {
     return respond({ ok: false, reason: "rate" }, 429);
   }
 
-  try {
-    await sendContactMail(config, {
-      name: payload.name.trim(),
-      email: payload.email.trim(),
-      topic: payload.topic,
-      message: payload.message,
-      locale,
-    });
-  } catch (error) {
-    // Nur die technische Ursache, keine Formularinhalte im Log.
-    console.error(`[kontakt] Versand fehlgeschlagen: ${error instanceof Error ? error.message : "unbekannt"}`);
+  const message = {
+    name: payload.name.trim(),
+    email: payload.email.trim(),
+    topic: payload.topic as ContactTopic,
+    message: payload.message.trim(),
+    locale,
+  };
+
+  // 1. Ins Postfach des Admin-Bereichs
+  let storedId: string | null = null;
+  if (setupComplete()) {
+    try {
+      storedId = await storeMessage(message);
+    } catch (error) {
+      console.error(`[kontakt] Speichern fehlgeschlagen: ${error instanceof Error ? error.message : "unbekannt"}`);
+    }
+  }
+
+  // 2. Per Mail
+  const config = await mailConfig();
+  let mailed = false;
+  if (config) {
+    try {
+      await sendContactMail(config, message);
+      mailed = true;
+      if (storedId) await markMailed(storedId).catch(() => {});
+    } catch (error) {
+      // Nur die technische Ursache, keine Formularinhalte im Log.
+      console.error(`[kontakt] Versand fehlgeschlagen: ${error instanceof Error ? error.message : "unbekannt"}`);
+    }
+  }
+
+  if (!storedId && !mailed) {
+    if (!config && !setupComplete()) {
+      console.warn("[kontakt] Weder Datenbank noch Mailversand eingerichtet – Nachricht nicht zugestellt");
+      return respond({ ok: false, reason: "unavailable" }, 503);
+    }
     return respond({ ok: false, reason: "failed" }, 502);
   }
 

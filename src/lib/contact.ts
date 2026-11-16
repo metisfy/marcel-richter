@@ -10,33 +10,32 @@ import { SITE_URL, SITE_URL_CONFIGURED } from "@/lib/site-url";
 /*
  * Zustellung des Kontaktformulars per E-Mail (SMTP).
  *
- * Die Zugangsdaten kommen ausschließlich aus der Umgebung des Containers,
- * nie aus dem Code oder dem Image (das Image ist öffentlich):
+ * Woher der Mailzugang kommt (erste Quelle gewinnt):
  *
- *   SMTP_HOST      Mailserver, z. B. smtp.example.com      (Pflicht)
- *   SMTP_PORT      587 (STARTTLS, Standard) oder 465 (TLS)
- *   SMTP_USER      Benutzername beim Mailserver
- *   SMTP_PASSWORD  Passwort dazu
- *   SMTP_FROM      Absenderadresse, Standard: SMTP_USER
- *   CONTACT_TO     Empfänger, Standard: E-Mail aus content/site.yaml
+ *   1. Umgebung des Containers: SMTP_HOST, SMTP_PORT (587/465), SMTP_USER,
+ *      SMTP_PASSWORD, SMTP_FROM (Standard: SMTP_USER), CONTACT_TO
+ *   2. Admin-Bereich → Einstellungen → Mailversand (in der Datenbank,
+ *      Passwort verschlüsselt mit dem App-Geheimnis)
  *
- * Woher sie kommen, steht in der README unter „Kontaktformular“. Fehlt der
- * Zugang, sagt das Formular das ehrlich und bietet das E-Mail-Programm an,
- * statt „Danke“ zu zeigen und die Nachricht zu verwerfen.
+ * Nie aus dem Code oder dem Image (das Image ist öffentlich). Zusätzlich
+ * landet jede Nachricht im Admin-Bereich (src/lib/admin/messages.ts), sobald
+ * die Datenbank eingerichtet ist.
  */
 
-type MailConfig = {
+export type MailConfig = {
   host: string;
   port: number;
   user?: string;
   password?: string;
   from: string;
   to: string;
+  source: "umgebung" | "admin";
 };
 
 const env = (name: string) => process.env[name]?.trim() || undefined;
 
-export function mailConfig(): MailConfig | null {
+/** Mailzugang aus der Umgebung (synchron, ohne Datenbank). */
+export function envMailConfig(): MailConfig | null {
   const host = env("SMTP_HOST");
   const user = env("SMTP_USER");
   const from = env("SMTP_FROM") ?? user;
@@ -49,7 +48,24 @@ export function mailConfig(): MailConfig | null {
     password: env("SMTP_PASSWORD"),
     from,
     to: env("CONTACT_TO") ?? getSite("de").email,
+    source: "umgebung",
   };
+}
+
+/** Wirksamer Mailzugang: Umgebung, sonst Einstellungen aus dem Admin-Bereich. */
+export async function mailConfig(): Promise<MailConfig | null> {
+  const fromEnv = envMailConfig();
+  if (fromEnv) return fromEnv;
+  const { setupComplete } = await import("@/lib/admin/guard");
+  if (!setupComplete()) return null;
+  try {
+    const { mailSettingsFromDatabase } = await import("@/lib/admin/mail-settings");
+    const stored = await mailSettingsFromDatabase();
+    if (!stored) return null;
+    return { ...stored, to: stored.to || getSite("de").email, source: "admin" };
+  } catch {
+    return null;
+  }
 }
 
 /*
@@ -130,6 +146,37 @@ const headerSafe = (value: string, max = 120) => value.replace(/[\r\n\t]+/g, " "
 const escapeHtml = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
+function transportFor(config: Pick<MailConfig, "host" | "port" | "user" | "password">) {
+  return nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    // 465 spricht von Anfang an TLS, 587 wechselt per STARTTLS (dann Pflicht).
+    secure: config.port === 465,
+    // Verschlüsselung erzwingen – außer beim Relay auf demselben Rechner
+    requireTLS: config.port !== 465 && !LOCAL_HOSTS.has(config.host),
+    auth: config.user && config.password ? { user: config.user, pass: config.password } : undefined,
+    // Ohne Zeitlimits hängt das Formular an einem stummen Mailserver minutenlang.
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
+  });
+}
+
+/** Testmail aus dem Admin-Bereich (Einstellungen → Mailversand). */
+export async function sendTestMail(config: Omit<MailConfig, "source">): Promise<void> {
+  const transport = transportFor(config);
+  try {
+    await transport.sendMail({
+      from: { name: `${getSite("de").name} · Website`, address: config.from },
+      to: config.to,
+      subject: "Testmail vom Kontaktformular",
+      text: "Der Mailversand fürs Kontaktformular funktioniert. Nachrichten von der Website kommen ab jetzt an diese Adresse.",
+    });
+  } finally {
+    transport.close();
+  }
+}
+
 export type ContactMessage = {
   name: string;
   email: string;
@@ -172,19 +219,7 @@ export async function sendContactMail(config: MailConfig, message: ContactMessag
     ["Eingang", received],
   ];
 
-  const transport = nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    // 465 spricht von Anfang an TLS, 587 wechselt per STARTTLS (dann Pflicht).
-    secure: config.port === 465,
-    // Verschlüsselung erzwingen – außer beim Relay auf demselben Rechner
-    requireTLS: config.port !== 465 && !LOCAL_HOSTS.has(config.host),
-    auth: config.user && config.password ? { user: config.user, pass: config.password } : undefined,
-    // Ohne Zeitlimits hängt das Formular an einem stummen Mailserver minutenlang.
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 20_000,
-  });
+  const transport = transportFor(config);
 
   try {
     await transport.sendMail({

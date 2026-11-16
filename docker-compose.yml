@@ -10,6 +10,9 @@
 #   ./start.sh <commit-sha>   Fassung ausrollen bzw. zurückrollen
 #   ./start.sh                aktuelle Fassung aus .env neu ziehen und starten
 #
+# start.sh holt sich diese Datei (und sich selbst) passend zum Commit von
+# GitHub – Änderungen hier kommen also mit dem nächsten Deployment an.
+#
 # Logs:     docker compose logs -f web
 # Zustand:  docker compose ps
 
@@ -46,9 +49,15 @@ services:
     #   - traefik.http.routers.marcel-richter.tls.certresolver=letsencrypt
     #   - traefik.http.services.marcel-richter.loadbalancer.server.port=3000
 
-    # Kontaktformular: Zugang zum Mailserver aus der .env neben dieser Datei
-    # (nie ins Image – es ist öffentlich). Ohne SMTP_HOST bietet das Formular
-    # stattdessen das E-Mail-Programm an. Siehe README → „Kontaktformular“.
+    # Admin-Bereich: App-Geheimnis und Datenbankverbindung (im Browser
+    # eingerichtet) liegen auf diesem Volume. start.sh legt es an und gibt es
+    # dem Benutzer 1000. `external`: Ein `docker compose down -v` löscht es nicht.
+    volumes:
+      - marcel-richter-daten:/app/data
+
+    # Kontaktformular, optional: Mailzugang aus der .env neben dieser Datei.
+    # Einfacher ist Admin-Bereich → Einstellungen → Mailversand; die .env hat
+    # Vorrang. Nie ins Image – es ist öffentlich. Siehe README.
     environment:
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
@@ -67,6 +76,11 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  marcel-richter-daten:
+    name: marcel-richter-daten
+    external: true
 
 # networks:
 #   proxy:
