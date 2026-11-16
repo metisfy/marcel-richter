@@ -161,11 +161,16 @@ export async function passwordHashOf(id: string): Promise<string | null> {
   return doc?.passwordHash ?? null;
 }
 
-export async function totpSecretOf(id: string): Promise<{ active: string | null; pending: string | null; backupCodes: string[] }> {
+export async function totpSecretOf(
+  id: string,
+): Promise<{ active: string | null; unreadable: boolean; pending: string | null; backupCodes: string[] }> {
   const _id = objectId(id);
   const doc = _id ? await (await collection()).findOne({ _id }) : null;
+  const active = doc?.totpSecret ? decrypt(doc.totpSecret) : null;
   return {
-    active: doc?.totpSecret ? decrypt(doc.totpSecret) : null,
+    active,
+    // Gespeichert, aber mit einem anderen App-Geheimnis verschlüsselt (Volume verloren)
+    unreadable: Boolean(doc?.totpSecret) && active === null,
     pending: doc?.totpPending ? decrypt(doc.totpPending) : null,
     backupCodes: doc?.backupCodes ?? [],
   };

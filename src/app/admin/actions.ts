@@ -108,6 +108,25 @@ export async function setupDatabase(_: FormState, fd: FormData): Promise<FormSta
   } catch (error) {
     return failure(error, "Die Verbindung ließ sich nicht speichern.");
   }
+
+  // Liegt in der Datenbank schon ein Zugang (z. B. nach verlorenem Volume oder
+  // --einrichtung-zuruecksetzen), ist die Einrichtung damit fertig: anmelden statt neu anlegen.
+  let existing = 0;
+  try {
+    existing = await countAdmins();
+  } catch {
+    existing = 0;
+  }
+  if (existing > 0) {
+    try {
+      finishWizard();
+    } catch (error) {
+      return failure(error, "Die Einrichtung ließ sich nicht abschließen.");
+    }
+    revalidatePath("/admin", "layout");
+    redirect(`${await adminPrefix()}/anmelden?bestehend=1`);
+  }
+
   revalidatePath("/admin", "layout");
   return { success: `${message} Gespeichert.` };
 }
@@ -187,9 +206,15 @@ export async function verifySecondFactor(_: FormState, fd: FormData): Promise<Fo
   if (loginBlocked(ip, `2fa:${id}`)) return { error: "Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen." };
 
   const code = text(fd, "code").trim();
-  const { active, backupCodes } = await totpSecretOf(id);
+  const { active, unreadable, backupCodes } = await totpSecretOf(id);
   let ok = false;
   if (/^\d[\d\s]{5,7}$/.test(code)) {
+    if (unreadable) {
+      return {
+        error:
+          "Der Schlüssel der Authenticator-App wurde mit einem früheren App-Geheimnis gespeichert und ist nicht mehr lesbar (Daten-Volume verloren). Bitte einen Ersatzcode oder Passkey verwenden – danach die App unter Mein Profil neu einrichten.",
+      };
+    }
     ok = Boolean(active && verifyTotp(active, code));
   } else {
     const remaining = redeemBackupCode(backupCodes, code);

@@ -628,7 +628,12 @@ Mailversand und 2FA lassen sich aber nicht mehr entschlüsseln.
 
 **Neu einrichten** (z. B. andere Datenbank): `./start.sh --einrichtung-zuruecksetzen`. Das löscht
 Verbindung und Markierung, das App-Geheimnis bleibt. Danach zeigt der Bereich wieder den
-Assistenten mit neuem Schlüssel.
+Assistenten mit neuem Schlüssel. Findet er in der Datenbank schon einen Zugang, endet er nach
+Schritt 1, und man meldet sich mit dem bisherigen Passwort an.
+
+**Ohne Volume** (alte `docker-compose.yml` auf dem Server) sperrt sich der Assistent und zeigt
+den Befehl, der `start.sh` holt und das Volume einrichtet. Sonst wäre jede Einrichtung beim
+nächsten Deployment wieder weg.
 
 **Sicherheit:**
 - Passwörter als scrypt-Hash; Sitzung als signiertes, `httpOnly`-Cookie für 12 Stunden.

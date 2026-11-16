@@ -25,7 +25,12 @@ export default async function AdminHome() {
     const site = getSite("de");
     return (
       <main className="flex flex-1 justify-center bg-surface px-4 py-12 sm:py-20">
-        <SetupWizard step={databaseConfigured() ? 2 : 1} persistent={dataDirPersistent()} defaults={{ name: site.name, email: site.email }} />
+        <SetupWizard
+          step={databaseConfigured() ? 2 : 1}
+          persistent={dataDirPersistent()}
+          defaults={{ name: site.name, email: site.email }}
+          fixCommand={`cd ~/websites/intern/marcel-richter && curl -fsSLO https://raw.githubusercontent.com/metisfy/marcel-richter/main/start.sh && chmod +x start.sh && ./start.sh ${process.env.GIT_SHA && /^[0-9a-f]{40}$/.test(process.env.GIT_SHA) ? process.env.GIT_SHA : ""}`.trim()}
+        />
       </main>
     );
   }

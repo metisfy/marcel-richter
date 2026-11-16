@@ -17,12 +17,19 @@ export function SetupWizard({
   step,
   persistent,
   defaults,
+  fixCommand,
 }: {
   step: 1 | 2;
   persistent: boolean | null;
   defaults: { name: string; email: string };
+  /** Befehl, der auf dem Server das Daten-Volume einrichtet (start.sh holen und ausführen) */
+  fixCommand: string;
 }) {
   const [key, setKey] = useState("");
+  const [override, setOverride] = useState(false);
+  const [copied, setCopied] = useState(false);
+  // Ohne Volume wäre die Einrichtung beim nächsten Deployment weg – erst das Volume, dann einrichten
+  const blocked = persistent === false && !override;
   const db = useFormAction(setupDatabase);
   const account = useFormAction(setupAdmin);
 
@@ -65,105 +72,137 @@ export function SetupWizard({
       </ol>
 
       {persistent === false ? (
-        <p role="alert" className="mt-6 rounded-xl bg-loss-soft px-4 py-3 text-[15px] font-medium text-loss">
-          Achtung: /app/data liegt nicht auf einem Volume. Die Einrichtung wäre beim nächsten Deployment weg. Bitte zuerst die
-          aktuelle docker-compose.yml und start.sh auf den Server legen und ./start.sh ausführen.
-        </p>
+        <section role="alert" className="mt-6 rounded-2xl border border-loss/30 bg-loss-soft p-5 sm:p-6">
+          <h2 className="font-semibold text-loss">Zuerst das Daten-Volume einrichten</h2>
+          <p className="mt-2 text-[15px]">
+            Dieser Container läuft noch ohne das Volume <code className="font-mono">marcel-richter-daten</code> – auf dem Server
+            liegt noch die alte <code className="font-mono">docker-compose.yml</code>. Alles, was du hier einrichtest, wäre beim
+            nächsten Deployment wieder weg. Einmal auf dem Server ausführen, danach diese Seite neu laden:
+          </p>
+          <pre className="mt-4 overflow-x-auto rounded-xl bg-bg p-4 font-mono text-[13px] leading-relaxed whitespace-pre-wrap break-all">
+            {fixCommand}
+          </pre>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-nav"
+              onClick={() =>
+                navigator.clipboard.writeText(fixCommand).then(
+                  () => setCopied(true),
+                  () => {},
+                )
+              }
+            >
+              {copied ? "Kopiert" : "Befehl kopieren"}
+            </button>
+            {!override ? (
+              <button
+                type="button"
+                className="text-sm text-muted underline underline-offset-2 hover:text-fg"
+                onClick={() => setOverride(true)}
+              >
+                Trotzdem jetzt einrichten
+              </button>
+            ) : null}
+          </div>
+        </section>
       ) : null}
 
-      <section className="card mt-6 p-6 shadow-soft sm:p-8">
-        <label htmlFor="schluessel" className="field-label">
-          Einrichtungsschlüssel
-        </label>
-        <input
-          id="schluessel"
-          value={key}
-          onChange={(event) => setKey(event.target.value)}
-          autoComplete="off"
-          spellCheck={false}
-          placeholder="xxxx-xxxx-xxxx-xxxx"
-          className="field font-mono"
-          aria-describedby="schluessel-hinweis"
-        />
-        <p id="schluessel-hinweis" className="mt-2 text-sm text-muted">
-          Steht am Ende von <code className="font-mono">./start.sh</code> und im Protokoll:{" "}
-          <code className="font-mono">docker logs marcel-richter</code>
-        </p>
+      {blocked ? null : (
+        <section className="card mt-6 p-6 shadow-soft sm:p-8">
+          <label htmlFor="schluessel" className="field-label">
+            Einrichtungsschlüssel
+          </label>
+          <input
+            id="schluessel"
+            value={key}
+            onChange={(event) => setKey(event.target.value)}
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="xxxx-xxxx-xxxx-xxxx"
+            className="field font-mono"
+            aria-describedby="schluessel-hinweis"
+          />
+          <p id="schluessel-hinweis" className="mt-2 text-sm text-muted">
+            Steht am Ende von <code className="font-mono">./start.sh</code> und im Protokoll:{" "}
+            <code className="font-mono">docker logs marcel-richter</code>
+          </p>
 
-        <hr className="my-7 border-line" />
+          <hr className="my-7 border-line" />
 
-        {step === 1 ? (
-          <PendingScope pending={db.pending}>
-            <form key="datenbank" onSubmit={db.onSubmit} className="grid gap-5">
-              <input type="hidden" name="schluessel" value={key} />
-              <div>
-                <h2 className="text-lg font-semibold">1. MongoDB verbinden</h2>
-                <p className="mt-1 text-[15px] text-muted">
-                  Eine eigene Datenbank für die Website (z. B. <code className="font-mono">marcel_richter</code>) mit einem
-                  Benutzer, der darin lesen und schreiben darf.
-                </p>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-[1fr_120px]">
-                <Field label="Server" name="host" placeholder="10.250.1.20 oder mongo.example.com" required />
-                <Field label="Port" name="port" defaultValue={27017} inputMode="numeric" />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Benutzer" name="user" autoComplete="off" />
-                <Field label="Passwort" name="password" type="password" autoComplete="new-password" />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Datenbank" name="database" defaultValue="marcel_richter" required />
-                <Field label="Auth-Datenbank" name="authSource" placeholder="admin" hint="Leer lassen = Standard des Servers" />
-              </div>
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <Checkbox label="TLS verwenden" name="tls" />
-                <Checkbox label="SRV-Adresse (mongodb+srv, z. B. Atlas)" name="srv" />
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <SubmitButton name="intent" value="save">
-                  Speichern und weiter
-                </SubmitButton>
-                <SubmitButton name="intent" value="test" variant="ghost">
-                  Nur prüfen
-                </SubmitButton>
-              </div>
-              <FormMessage state={db.state} />
-            </form>
-          </PendingScope>
-        ) : (
-          <PendingScope pending={account.pending}>
-            <form key="zugang" onSubmit={account.onSubmit} className="grid gap-5">
-              <input type="hidden" name="schluessel" value={key} />
-              <div>
-                <h2 className="text-lg font-semibold">2. Deinen Zugang anlegen</h2>
-                <p className="mt-1 text-[15px] text-muted">
-                  Mindestens 12 Zeichen, Groß- und Kleinbuchstaben und eine Ziffer. Einen zweiten Faktor kannst du danach unter
-                  Einstellungen einschalten.
-                </p>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Name" name="name" defaultValue={defaults.name} autoComplete="name" required />
-                <Field
-                  label="E-Mail-Adresse"
-                  name="email"
-                  type="email"
-                  defaultValue={defaults.email}
-                  autoComplete="username"
-                  required
-                />
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Field label="Passwort" name="password" type="password" autoComplete="new-password" required />
-                <Field label="Passwort wiederholen" name="repeat" type="password" autoComplete="new-password" required />
-              </div>
-              <div>
-                <SubmitButton>Zugang anlegen und anmelden</SubmitButton>
-              </div>
-              <FormMessage state={account.state} />
-            </form>
-          </PendingScope>
-        )}
-      </section>
+          {step === 1 ? (
+            <PendingScope pending={db.pending}>
+              <form key="datenbank" onSubmit={db.onSubmit} className="grid gap-5">
+                <input type="hidden" name="schluessel" value={key} />
+                <div>
+                  <h2 className="text-lg font-semibold">1. MongoDB verbinden</h2>
+                  <p className="mt-1 text-[15px] text-muted">
+                    Eine eigene Datenbank für die Website (z. B. <code className="font-mono">marcel_richter</code>) mit einem
+                    Benutzer, der darin lesen und schreiben darf.
+                  </p>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-[1fr_120px]">
+                  <Field label="Server" name="host" placeholder="10.250.1.20 oder mongo.example.com" required />
+                  <Field label="Port" name="port" defaultValue={27017} inputMode="numeric" />
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Benutzer" name="user" autoComplete="off" />
+                  <Field label="Passwort" name="password" type="password" autoComplete="new-password" />
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Datenbank" name="database" defaultValue="marcel_richter" required />
+                  <Field label="Auth-Datenbank" name="authSource" placeholder="admin" hint="Leer lassen = Standard des Servers" />
+                </div>
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                  <Checkbox label="TLS verwenden" name="tls" />
+                  <Checkbox label="SRV-Adresse (mongodb+srv, z. B. Atlas)" name="srv" />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <SubmitButton name="intent" value="save">
+                    Speichern und weiter
+                  </SubmitButton>
+                  <SubmitButton name="intent" value="test" variant="ghost">
+                    Nur prüfen
+                  </SubmitButton>
+                </div>
+                <FormMessage state={db.state} />
+              </form>
+            </PendingScope>
+          ) : (
+            <PendingScope pending={account.pending}>
+              <form key="zugang" onSubmit={account.onSubmit} className="grid gap-5">
+                <input type="hidden" name="schluessel" value={key} />
+                <div>
+                  <h2 className="text-lg font-semibold">2. Deinen Zugang anlegen</h2>
+                  <p className="mt-1 text-[15px] text-muted">
+                    Mindestens 12 Zeichen, Groß- und Kleinbuchstaben und eine Ziffer. Einen zweiten Faktor kannst du danach unter
+                    Einstellungen einschalten.
+                  </p>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Name" name="name" defaultValue={defaults.name} autoComplete="name" required />
+                  <Field
+                    label="E-Mail-Adresse"
+                    name="email"
+                    type="email"
+                    defaultValue={defaults.email}
+                    autoComplete="username"
+                    required
+                  />
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Passwort" name="password" type="password" autoComplete="new-password" required />
+                  <Field label="Passwort wiederholen" name="repeat" type="password" autoComplete="new-password" required />
+                </div>
+                <div>
+                  <SubmitButton>Zugang anlegen und anmelden</SubmitButton>
+                </div>
+                <FormMessage state={account.state} />
+              </form>
+            </PendingScope>
+          )}
+        </section>
+      )}
     </div>
   );
 }
