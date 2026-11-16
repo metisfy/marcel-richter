@@ -333,6 +333,44 @@
     translate: 4px 0;
   }
 
+  /* Admin-Bereich: Seitenleiste, einklappbar über data-sidebar an <html> */
+  @media (min-width: 768px) {
+    .admin-aside {
+      width: 15.5rem;
+      transition: width 0.2s ease;
+    }
+    [data-sidebar="eingeklappt"] .admin-aside {
+      width: 4.75rem;
+    }
+    /* !important: Tailwind-Klassen wie md:block oder grid stehen in einer späteren Ebene */
+    [data-sidebar="eingeklappt"] .admin-label {
+      display: none !important;
+    }
+    [data-sidebar="eingeklappt"] .admin-dot {
+      display: block !important;
+    }
+    [data-sidebar="eingeklappt"] .admin-navlink {
+      justify-content: center;
+      padding-inline: 0;
+    }
+    [data-sidebar="eingeklappt"] .admin-navlink:hover {
+      translate: none;
+    }
+  }
+  .admin-page {
+    animation: admin-page-in 0.3s ease both;
+  }
+  /* Raster-Spalten nicht durch lange, nicht umbrechende Inhalte aufblähen (Handy) */
+  .admin-page .grid > * {
+    min-width: 0;
+  }
+  @keyframes admin-page-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
   /* Formularfelder (Kontaktformular) */
   .field-label {
     display: block;

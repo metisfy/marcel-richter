@@ -15,21 +15,23 @@ export function LoginForm({ target }: { target: string }) {
   );
 }
 
-export function SecondFactorForm({ target }: { target: string }) {
+export function SecondFactorForm({ target, withApp }: { target: string; withApp: boolean }) {
   return (
     <ActionForm action={verifySecondFactor}>
       <input type="hidden" name="weiter" value={target} />
       <Field
-        label="Code aus der Authenticator-App"
+        label={withApp ? "Code aus der Authenticator-App" : "Ersatzcode"}
         name="code"
         autoComplete="one-time-code"
         inputMode="text"
-        placeholder="123 456"
-        hint="Ohne Telefon: einen der Ersatzcodes (XXXX-XXXX) eingeben."
+        placeholder={withApp ? "123 456" : "XXXX-XXXX"}
+        hint={withApp ? "Ohne Telefon: einen der Ersatzcodes (XXXX-XXXX) eingeben." : "Nur falls der Passkey gerade nicht greifbar ist."}
         required
-        autoFocus
+        autoFocus={withApp}
       />
-      <SubmitButton pendingText="Prüfe …">Bestätigen</SubmitButton>
+      <SubmitButton variant={withApp ? "primary" : "ghost"} pendingText="Prüfe …">
+        Bestätigen
+      </SubmitButton>
     </ActionForm>
   );
 }

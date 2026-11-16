@@ -563,14 +563,26 @@ Ein Login nur für Marcel, gebaut nach dem Muster von t-orga:
 | `http://<Server-IP>:3100/admin` | derselbe Bereich ohne DNS, z. B. für die Einrichtung |
 | `https://<domain>/admin` | gibt es nicht (404), die öffentliche Seite bleibt sauber |
 
-**Inhalt:**
-- **Übersicht:** ungelesene Nachrichten, Mailversand, Sicherheit, Spielplan-Abruf (BVV),
-  Live-Ticker, laufende Version.
-- **Nachrichten:** alles aus dem Kontaktformular mit „Antworten“, gelesen/ungelesen und Löschen.
-  Ein TTL-Index löscht Nachrichten nach 12 Monaten automatisch (steht so in der
-  Datenschutzerklärung).
-- **Einstellungen:** Name/E-Mail, Passwort, zweiter Faktor (TOTP mit QR-Code, 8 Ersatzcodes),
-  Mailversand (SMTP mit Testmail vor dem Speichern), Datenbank prüfen, überall abmelden.
+**Aufbau** (wie das t-orga-Panel): Kopfzeile mit Hell/Dunkel und Profilmenü, links eine
+einklappbare Seitenleiste, gegliedert in drei Gruppen:
+
+| Gruppe | Seite | Inhalt |
+| --- | --- | --- |
+| Überblick | **Dashboard** | Kennzahlen (ungelesene Nachrichten, nächster Spieltag, Tabellenplatz, Einsätze), Status (2FA, Mailversand, Domain, BVV-Daten), neueste Nachrichten |
+| Website | **Nachrichten** | Postfach des Kontaktformulars mit Filter, „Antworten“, gelesen/ungelesen, Löschen; Löschung nach 12 Monaten automatisch |
+| | **Spielbetrieb** | nächster Spieltag, letztes Ergebnis, Saison, Datenquellen (BVV, Ticker); „Jetzt neu abrufen“ holt alles sofort neu vom BVV |
+| | **Inhalte & SEO** | Projekte und Seiten mit Links, Suchmaschinen-Status (Domain, noindex, Search Console, Sitemap) |
+| Einstellungen | **Übersicht** | Kacheln mit Stand auf einen Blick |
+| | **Mailversand** | SMTP mit Testmail vor dem Speichern |
+| | **System** | Datenbank prüfen, Ablage/Volume, Version |
+| | **Mein Profil** | Name/E-Mail, Passwort, Passkeys, Authenticator-App, Ersatzcodes, überall abmelden |
+
+**Zwei-Faktor-Anmeldung:** Passkeys (Face ID, Touch ID, Windows Hello, Fingerabdruck,
+Sicherheitsschlüssel) und/oder Authenticator-App (TOTP). Beim ersten zweiten Faktor gibt es 8
+Ersatzcodes, die nur einmal angezeigt werden. Passkeys gehen nur über **HTTPS mit Domain**
+(`https://admin.<domain>`) oder `localhost`, nicht über die Server-IP. Das ist eine Vorgabe des
+Standards. Die Kennung ist die Domain ohne `admin.`, ein Passkey bleibt also auch bei einem
+anderen Admin-Host gültig.
 
 **Datenbank:** MongoDB **extern** wie bei t-orga (eigener Server, Replica Set oder Atlas mit
 SRV), kein Datenbank-Container. Die Verbindung wird im Browser eingerichtet. Es gibt keine
@@ -609,7 +621,8 @@ Mailversand und 2FA lassen sich aber nicht mehr entschlüsseln.
      speichert die Verbindung.
    - **Schritt 2 – Zugang anlegen:** Name, E-Mail, Passwort (mindestens 12 Zeichen, Groß- und
      Kleinbuchstaben, Ziffer). Danach ist man angemeldet und der Assistent ist für immer zu.
-4. Unter **Einstellungen** den zweiten Faktor einschalten und die Ersatzcodes sicher ablegen.
+4. Unter **Mein Profil** einen Passkey anlegen (über `https://admin.<domain>`) und/oder die
+   Authenticator-App einrichten, die Ersatzcodes sicher ablegen.
 5. Optional unter **Einstellungen → Mailversand** den SMTP-Zugang eintragen. Gespeichert wird erst
    nach einer erfolgreichen Testmail.
 
@@ -621,7 +634,8 @@ Assistenten mit neuem Schlüssel.
 - Passwörter als scrypt-Hash; Sitzung als signiertes, `httpOnly`-Cookie für 12 Stunden.
 - Passwortwechsel und „überall abmelden“ machen alle anderen Sitzungen ungültig.
 - Höchstens 5 Fehlversuche je E-Mail und 10 je IP in 15 Minuten.
-- Zweiter Faktor über einen eigenen, 5 Minuten gültigen Zwischenschritt.
+- Zweiter Faktor (Passkey, App oder Ersatzcode) über einen eigenen, 5 Minuten gültigen
+  Zwischenschritt; Passkey-Aufgaben gelten zwei Minuten und nur einmal.
 - Jede Seite und jede Aktion prüft die Anmeldung selbst (`src/lib/admin/guard.ts`).
 - Antworten mit `X-Robots-Tag: noindex` und `Cache-Control: private, no-store`.
 - `/admin` steht in `robots.txt` unter `disallow`.
@@ -787,7 +801,7 @@ src/lib/matchday.ts      Spieltage, Statistik je Spiel, automatischer Bericht
 src/lib/live.ts          Live-Ticker (WebSocket zum BVV-Ticker), /api/live/<datum>
 src/components/live.tsx  Live-Anzeige, Feld mit Startaufstellung, Legende
 src/lib/structured-data.ts  schema.org / JSON-LD
-src/lib/admin/           Admin: Ablage, Sitzung, MongoDB, Zugänge, 2FA, Nachrichten, Mailversand
+src/lib/admin/           Admin: Ablage, Sitzung, MongoDB, Zugänge, Passkeys/TOTP, Nachrichten, Mailversand, Menü
 src/proxy.ts             Sprach-Routing, Host-Weiche admin.<domain>
 Dockerfile               Multi-Stage-Build (Node LTS Alpine)
 docker-compose.yml       Betrieb auf dem Server

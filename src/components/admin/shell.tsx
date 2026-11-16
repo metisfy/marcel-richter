@@ -1,72 +1,64 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { logout } from "@/app/admin/actions";
-import { ExternalIcon } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme-toggle";
 import type { Admin } from "@/lib/admin/accounts";
 import { adminPrefix } from "@/lib/admin/guard";
 import { countUnread } from "@/lib/admin/messages";
+import { NAVIGATION } from "@/lib/admin/navigation";
 import { SITE_URL, SITE_URL_CONFIGURED } from "@/lib/site-url";
 
-import { AdminNav } from "./nav";
+import { ProfileMenu } from "./profile-menu";
+import { Sidebar } from "./sidebar";
 
-/** Rahmen aller angemeldeten Admin-Seiten: Kopfzeile mit Navigation und Abmelden. */
-export async function AdminShell({ admin, title, children }: { admin: Admin; title: string; children: ReactNode }) {
+const YEAR = new Date().getFullYear();
+
+/**
+ * Rahmen aller angemeldeten Admin-Seiten (wie die „Schale“ bei t-orga):
+ * Kopfzeile mit Bereichsnamen, Hell/Dunkel und Profilmenü, links die
+ * gruppierte Seitenleiste, rechts der Inhalt, unten die Fußzeile.
+ */
+export async function AdminShell({ admin, children }: { admin: Admin; children: ReactNode }) {
   const prefix = await adminPrefix();
   const unread = await countUnread().catch(() => 0);
-  const initials = admin.name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const groups = NAVIGATION.map((group) => ({
+    ...group,
+    items: group.items.map((item) => (item.path === "/nachrichten" && unread > 0 ? { ...item, badge: unread } : item)),
+  }));
+  const siteUrl = SITE_URL_CONFIGURED ? SITE_URL : "/";
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface">
       <header className="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6">
-          <a href={prefix || "/"} className="flex items-center gap-2.5 font-semibold tracking-[-0.01em]">
-            <span aria-hidden="true" className="brand-mark">
+        <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href={prefix || "/"} className="flex min-w-0 items-center gap-2.5">
+            <span aria-hidden="true" className="brand-mark shrink-0">
               MR
             </span>
-            <span className="hidden sm:inline">Admin</span>
-          </a>
-          <AdminNav
-            prefix={prefix}
-            items={[
-              { href: "/", label: "Übersicht" },
-              { href: "/nachrichten", label: "Nachrichten", badge: unread },
-              { href: "/einstellungen", label: "Einstellungen" },
-            ]}
-          />
-          <div className="ml-auto flex items-center gap-2">
-            <a
-              href={SITE_URL_CONFIGURED ? SITE_URL : "/"}
-              target="_blank"
-              rel="noopener"
-              className="icon-btn"
-              title="Website öffnen"
-              aria-label="Website öffnen"
-            >
-              <ExternalIcon width={16} height={16} />
-            </a>
-            <span
-              title={`${admin.name} · ${admin.email}`}
-              className="hidden size-9 place-items-center rounded-full bg-accent-soft font-mono text-[12px] font-medium text-accent sm:grid"
-            >
-              {initials}
+            <span className="min-w-0 leading-tight">
+              <span className="block truncate text-[15px] font-semibold">Marcel Richter</span>
+              <span className="block truncate text-xs text-muted">Admin-Dashboard</span>
             </span>
-            <form action={logout}>
-              <button type="submit" className="btn btn-ghost btn-nav">
-                Abmelden
-              </button>
-            </form>
+          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle label="Hell oder dunkel" />
+            <ProfileMenu name={admin.name} email={admin.email} prefix={prefix} siteUrl={siteUrl} logout={logout} />
           </div>
         </div>
       </header>
-      <main id="inhalt" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-        <h1 className="mb-8 text-[clamp(1.6rem,1.3rem+1.2vw,2.2rem)] leading-tight font-semibold tracking-[-0.02em]">{title}</h1>
-        {children}
-      </main>
+
+      <div className="flex flex-1 flex-col md:flex-row">
+        <Sidebar prefix={prefix} groups={groups} />
+        <main id="inhalt" className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10">
+          <div className="admin-page mx-auto max-w-6xl">{children}</div>
+        </main>
+      </div>
+
+      <footer className="flex flex-wrap justify-between gap-2 border-t border-line bg-bg px-4 py-4 text-xs text-muted sm:px-6">
+        <span>© {YEAR} metisCode · metisOne</span>
+        <span className="font-mono">Version {(process.env.GIT_SHA ?? "dev").slice(0, 7)}</span>
+      </footer>
     </div>
   );
 }

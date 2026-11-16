@@ -1,8 +1,10 @@
 import "../globals.css";
 
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 
+import { SIDEBAR_COLLAPSED, SIDEBAR_COOKIE } from "@/lib/admin/navigation";
 import { fontVariables } from "@/lib/fonts";
 import { themeInitScript } from "@/lib/theme-script";
 
@@ -31,9 +33,11 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  // Eingeklappte Seitenleiste schon beim ersten Zeichnen (kein Aufblitzen)
+  const collapsed = (await cookies()).get(SIDEBAR_COOKIE)?.value === SIDEBAR_COLLAPSED;
   return (
-    <html lang="de" className={fontVariables} suppressHydrationWarning>
+    <html lang="de" className={fontVariables} data-sidebar={collapsed ? SIDEBAR_COLLAPSED : undefined} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

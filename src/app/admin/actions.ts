@@ -1,11 +1,15 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
+import { revalidatePath, updateTag } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
   AccountError,
   activateTotp,
+  activateTotpKeepCodes,
+  addPasskey,
   adminById,
   authenticate,
   bumpGeneration,
@@ -13,8 +17,11 @@ import {
   countAdmins,
   createAdmin,
   disableTotp,
+  passkeysOf,
+  passkeyUsed,
   passwordHashOf,
   recordLogin,
+  removePasskey,
   replaceBackupCodes,
   setPendingTotp,
   totpSecretOf,
@@ -40,6 +47,7 @@ import {
 } from "@/lib/admin/guard";
 import { deleteMailSettings, mailSettingsFromDatabase, saveMailSettings } from "@/lib/admin/mail-settings";
 import { deleteMessage, setRead } from "@/lib/admin/messages";
+import { authenticationOptions, passkeyEnvironment, registrationOptions, verifyAuthentication, verifyRegistration } from "@/lib/admin/passkeys";
 import { finishWizard, setupKeyMatches, wizardDone } from "@/lib/admin/storage";
 import { newBackupCodes, newTotpSecret, redeemBackupCode, verifyTotp } from "@/lib/admin/totp";
 import { sendTestMail } from "@/lib/contact";
@@ -259,11 +267,17 @@ export async function confirmTwoFactor(_: FormState, fd: FormData): Promise<Form
   const { pending } = await totpSecretOf(admin.id);
   if (!pending) return { error: "Bitte die Einrichtung neu starten." };
   if (!verifyTotp(pending, text(fd, "code"))) return { error: "Der Code stimmt nicht. Uhrzeit des Telefons prüfen und den aktuellen Code eingeben." };
+  // Ersatzcodes gibt es nur einmal je Zugang – hat ein Passkey sie schon erzeugt, bleiben sie
+  if (admin.backupCodesLeft > 0) {
+    await activateTotpKeepCodes(admin.id, pending);
+    revalidatePath("/admin", "layout");
+    return { success: "Die Authenticator-App ist eingeschaltet." };
+  }
   const codes = newBackupCodes();
   await activateTotp(admin.id, pending, codes.hashes);
   // Bewusst ohne revalidatePath: Die Seite soll erst neu laden, wenn die
   // Ersatzcodes notiert sind („Notiert“ unter den Codes) – sonst wären sie weg.
-  return { success: "Der zweite Faktor ist eingeschaltet.", codes: codes.plain };
+  return { success: "Die Authenticator-App ist eingeschaltet.", codes: codes.plain };
 }
 
 export async function turnOffTwoFactor(_: FormState, fd: FormData): Promise<FormState> {
@@ -271,7 +285,7 @@ export async function turnOffTwoFactor(_: FormState, fd: FormData): Promise<Form
   if (!(await verifyAdminPassword(admin.id, text(fd, "password")))) return { error: "Das Passwort stimmt nicht." };
   await disableTotp(admin.id);
   revalidatePath("/admin", "layout");
-  return { success: "Der zweite Faktor ist ausgeschaltet." };
+  return { success: "Die Authenticator-App ist ausgeschaltet." };
 }
 
 export async function renewBackupCodes(_: FormState, fd: FormData): Promise<FormState> {
@@ -280,6 +294,103 @@ export async function renewBackupCodes(_: FormState, fd: FormData): Promise<Form
   const codes = newBackupCodes();
   await replaceBackupCodes(admin.id, codes.hashes);
   return { success: "Neue Ersatzcodes – die alten gelten nicht mehr.", codes: codes.plain };
+}
+
+/* --------------------------------- Passkeys ------------------------------- */
+
+const NO_PASSKEY_HOST =
+  "Passkeys gehen nur über HTTPS mit Domain (https://admin.<domain>) oder über localhost – nicht über die Server-IP.";
+
+export async function passkeyRegistrationStart(): Promise<{ options?: string; error?: string }> {
+  const admin = await adminForAction();
+  const env = passkeyEnvironment(await headers());
+  if (!env) return { error: NO_PASSKEY_HOST };
+  const options = await registrationOptions(env, admin, await passkeysOf(admin.id));
+  return { options: JSON.stringify(options) };
+}
+
+export async function passkeyRegistrationFinish(responseJson: string, name: string): Promise<FormState> {
+  const admin = await adminForAction();
+  const env = passkeyEnvironment(await headers());
+  if (!env) return { error: NO_PASSKEY_HOST };
+  let response: RegistrationResponseJSON;
+  try {
+    response = JSON.parse(responseJson) as RegistrationResponseJSON;
+  } catch {
+    return { error: "Die Antwort des Geräts war unlesbar." };
+  }
+  const verified = await verifyRegistration(env, admin.id, response);
+  if (!verified) return { error: "Der Passkey ließ sich nicht bestätigen. Bitte noch einmal versuchen." };
+  await addPasskey(admin.id, { ...verified, name: name.trim().slice(0, 60) || "Passkey", createdAt: new Date() });
+
+  if (admin.backupCodesLeft === 0) {
+    const codes = newBackupCodes();
+    await replaceBackupCodes(admin.id, codes.hashes);
+    // Ohne revalidatePath, bis die Ersatzcodes notiert sind (siehe confirmTwoFactor)
+    return { success: "Passkey angelegt – ab jetzt fragt die Anmeldung danach.", codes: codes.plain };
+  }
+  revalidatePath("/admin", "layout");
+  return { success: "Passkey angelegt." };
+}
+
+export async function deletePasskey(passkeyId: string): Promise<void> {
+  const admin = await adminForAction();
+  await removePasskey(admin.id, passkeyId);
+  revalidatePath("/admin", "layout");
+}
+
+/** Anmeldung, Schritt 2: Aufgabe für den Passkey holen. */
+export async function passkeyLoginStart(): Promise<{ options?: string; error?: string }> {
+  const id = await readTwoFactorStep(passwordHashOf);
+  if (!id) return { error: "Die Anmeldung ist abgelaufen. Bitte noch einmal mit Passwort anmelden." };
+  const env = passkeyEnvironment(await headers());
+  if (!env) return { error: NO_PASSKEY_HOST };
+  const passkeys = await passkeysOf(id);
+  if (passkeys.length === 0) return { error: "Für diesen Zugang ist kein Passkey hinterlegt." };
+  return { options: JSON.stringify(await authenticationOptions(env, id, passkeys)) };
+}
+
+export async function passkeyLoginFinish(responseJson: string, weiter: string): Promise<FormState> {
+  const id = await readTwoFactorStep(passwordHashOf);
+  if (!id) return { error: "Die Anmeldung ist abgelaufen. Bitte noch einmal mit Passwort anmelden." };
+  const env = passkeyEnvironment(await headers());
+  if (!env) return { error: NO_PASSKEY_HOST };
+  const ip = await clientKey();
+  if (loginBlocked(ip, `2fa:${id}`)) return { error: "Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen." };
+
+  let response: AuthenticationResponseJSON;
+  try {
+    response = JSON.parse(responseJson) as AuthenticationResponseJSON;
+  } catch {
+    return { error: "Die Antwort des Geräts war unlesbar." };
+  }
+  const passkey = (await passkeysOf(id)).find((entry) => entry.id === response.id);
+  const result = passkey ? await verifyAuthentication(env, id, response, passkey) : null;
+  if (!passkey || !result) {
+    loginFailed(ip, `2fa:${id}`);
+    return { error: "Der Passkey wurde nicht angenommen. Bitte noch einmal versuchen oder einen Code eingeben." };
+  }
+  await passkeyUsed(id, passkey.id, result.counter);
+
+  const admin = await adminById(id);
+  if (!admin?.active) return { error: "Die Anmeldung ist fehlgeschlagen." };
+  await clearTwoFactorStep();
+  await signIn(admin);
+  await recordLogin(admin.id);
+  const prefix = await adminPrefix();
+  const target = safeTarget(weiter);
+  redirect(target === "/" ? prefix || "/" : `${prefix}${target}`);
+}
+
+/* -------------------------------- Spielbetrieb ---------------------------- */
+
+/** Spielplan, Tabelle und Spielberichte sofort neu beim BVV abrufen. */
+export async function refreshSeasonData(): Promise<FormState> {
+  await adminForAction();
+  // Abrufe beim BVV tragen das Tag „bvv“ (src/lib/season.ts); die öffentlichen Seiten erzeugen sich neu
+  updateTag("bvv");
+  revalidatePath("/", "layout");
+  return { success: "Neu abgerufen – die Website zeigt ab sofort den aktuellen Stand." };
 }
 
 /* --------------------------------- Mailversand ---------------------------- */

@@ -4,10 +4,12 @@ import { ObjectId } from "mongodb";
 
 import { burnPasswordCheck, decrypt, encrypt, hashPassword, verifyPassword } from "./crypto";
 import { database } from "./db";
+import type { StoredPasskey } from "./passkeys";
 
 /*
  * Admin-Zugänge in der Sammlung `admins`. Passwörter nur als scrypt-Hash,
- * der TOTP-Schlüssel verschlüsselt, Ersatzcodes nur als Hash.
+ * der TOTP-Schlüssel verschlüsselt, Ersatzcodes nur als Hash, von Passkeys
+ * nur der öffentliche Schlüssel.
  */
 
 type AdminDoc = {
@@ -24,7 +26,10 @@ type AdminDoc = {
   totpPending?: string;
   totpSince?: Date;
   backupCodes?: string[];
+  passkeys?: StoredPasskey[];
 };
+
+export type PasskeyInfo = { id: string; name: string; createdAt: Date; lastUsedAt?: Date };
 
 export type Admin = {
   id: string;
@@ -34,8 +39,12 @@ export type Admin = {
   gen: number;
   createdAt: Date;
   lastLoginAt?: Date;
+  /** Irgendein zweiter Faktor aktiv (App oder Passkey) */
   twoFactor: boolean;
-  twoFactorSince?: Date;
+  /** Authenticator-App aktiv */
+  totp: boolean;
+  totpSince?: Date;
+  passkeys: PasskeyInfo[];
   backupCodesLeft: number;
 };
 
@@ -51,8 +60,10 @@ const toAdmin = (doc: AdminDoc): Admin => ({
   gen: doc.gen ?? 0,
   createdAt: doc.createdAt,
   lastLoginAt: doc.lastLoginAt,
-  twoFactor: Boolean(doc.totpSecret),
-  twoFactorSince: doc.totpSince,
+  twoFactor: Boolean(doc.totpSecret) || (doc.passkeys?.length ?? 0) > 0,
+  totp: Boolean(doc.totpSecret),
+  totpSince: doc.totpSince,
+  passkeys: (doc.passkeys ?? []).map(({ id, name, createdAt, lastUsedAt }) => ({ id, name, createdAt, lastUsedAt })),
   backupCodesLeft: doc.backupCodes?.length ?? 0,
 });
 
@@ -174,9 +185,52 @@ export async function activateTotp(id: string, secret: string, backupCodeHashes:
   );
 }
 
+export async function activateTotpKeepCodes(id: string, secret: string): Promise<void> {
+  const _id = objectId(id);
+  if (!_id) return;
+  await (await collection()).updateOne({ _id }, { $set: { totpSecret: encrypt(secret), totpSince: new Date() }, $unset: { totpPending: "" } });
+}
+
+/** App ausschalten; Ersatzcodes bleiben, solange noch ein Passkey da ist. */
 export async function disableTotp(id: string): Promise<void> {
   const _id = objectId(id);
-  if (_id) await (await collection()).updateOne({ _id }, { $unset: { totpSecret: "", totpPending: "", totpSince: "", backupCodes: "" } });
+  if (!_id) return;
+  const coll = await collection();
+  const doc = await coll.findOne({ _id }, { projection: { passkeys: 1 } });
+  const unset: Record<string, ""> = { totpSecret: "", totpPending: "", totpSince: "" };
+  if (!doc?.passkeys?.length) unset.backupCodes = "";
+  await coll.updateOne({ _id }, { $unset: unset });
+}
+
+/* --------------------------------- Passkeys ------------------------------- */
+
+export async function passkeysOf(id: string): Promise<StoredPasskey[]> {
+  const _id = objectId(id);
+  const doc = _id ? await (await collection()).findOne({ _id }, { projection: { passkeys: 1 } }) : null;
+  return doc?.passkeys ?? [];
+}
+
+export async function addPasskey(id: string, passkey: StoredPasskey): Promise<void> {
+  const _id = objectId(id);
+  if (_id) await (await collection()).updateOne({ _id }, { $push: { passkeys: passkey } });
+}
+
+/** Passkey entfernen; ist danach kein zweiter Faktor mehr da, fallen auch die Ersatzcodes weg. */
+export async function removePasskey(id: string, passkeyId: string): Promise<void> {
+  const _id = objectId(id);
+  if (!_id) return;
+  const coll = await collection();
+  const doc = await coll.findOneAndUpdate({ _id }, { $pull: { passkeys: { id: passkeyId } } }, { returnDocument: "after" });
+  if (doc && !doc.totpSecret && !doc.passkeys?.length) await coll.updateOne({ _id }, { $unset: { backupCodes: "" } });
+}
+
+export async function passkeyUsed(id: string, passkeyId: string, counter: number): Promise<void> {
+  const _id = objectId(id);
+  if (!_id) return;
+  await (await collection()).updateOne(
+    { _id, "passkeys.id": passkeyId },
+    { $set: { "passkeys.$.counter": counter, "passkeys.$.lastUsedAt": new Date() } },
+  );
 }
 
 export async function replaceBackupCodes(id: string, hashes: string[]): Promise<void> {

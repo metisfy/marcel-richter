@@ -74,7 +74,9 @@ export function FormMessage({ state }: { state: FormState }) {
 
 function BackupCodes({ codes }: { codes: string[] }) {
   const [copied, setCopied] = useState(false);
+  const [done, setDone] = useState(false);
   const router = useRouter();
+  if (done) return null;
   return (
     <div className="rounded-xl border border-line bg-surface p-4">
       <p className="text-[15px] font-semibold">Ersatzcodes – jetzt sicher aufbewahren</p>
@@ -95,7 +97,14 @@ function BackupCodes({ codes }: { codes: string[] }) {
       >
         {copied ? "Kopiert" : "Alle kopieren"}
       </button>
-      <button type="button" className="btn btn-primary btn-nav mt-3 ml-2" onClick={() => router.refresh()}>
+      <button
+        type="button"
+        className="btn btn-primary btn-nav mt-3 ml-2"
+        onClick={() => {
+          setDone(true);
+          router.refresh();
+        }}
+      >
         Notiert
       </button>
     </div>
