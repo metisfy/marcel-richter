@@ -5,7 +5,7 @@ import { berlinToday, type Fixture, type Outcome, type Season, type TableRow } f
 import { Link } from "@/i18n/navigation";
 import { formatDate, formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 
-import { CheckIcon, ChevronRightIcon } from "./icons";
+import { CheckIcon, ChevronRightIcon, CloseIcon } from "./icons";
 import { LiveFixtureStatus } from "./live";
 
 const OUTCOME_STYLE: Record<Outcome, string> = {
@@ -46,7 +46,7 @@ export async function OutcomeBadge({ outcome }: { outcome: Outcome }) {
   );
 }
 
-/** Eigener Einsatz laut Spielbericht: grünes Häkchen, „Kader“ oder Strich */
+/** Eigener Einsatz laut Spielbericht: grünes Häkchen (eingesetzt) oder rotes X (nicht eingesetzt) */
 export async function AppearanceMark({ appearance }: { appearance: NonNullable<Fixture["appearance"]> }) {
   const t = await getTranslations("season");
   if (appearance.status === "played") {
@@ -59,11 +59,16 @@ export async function AppearanceMark({ appearance }: { appearance: NonNullable<F
       </span>
     );
   }
-  if (appearance.status === "squad") {
-    return <span className="font-mono text-[11.5px] text-muted">{t("appearanceSquad")}</span>;
-  }
-  // Spiele ohne mich: Feld bleibt leer
-  return null;
+  // Nicht eingesetzt – egal ob im Kader oder nicht im Spielbericht: rotes X ohne weiteren Text
+  const label = appearance.status === "squad" ? t("appearanceSquad") : t("appearanceNotPlayed");
+  return (
+    <span className="inline-flex items-center text-loss" title={label}>
+      <span aria-hidden="true" className="grid size-5 place-items-center rounded-full bg-loss-soft">
+        <CloseIcon width={11} height={11} strokeWidth={3} />
+      </span>
+      <span className="sr-only">{label}</span>
+    </span>
+  );
 }
 
 /** Satzergebnisse, z. B. „25:21 · 22:25 · 25:19“ */

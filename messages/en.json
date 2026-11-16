@@ -40,8 +40,8 @@
     "projectsHeading": "Projects",
     "allProjects": "All projects",
     "contactHeading": "Contact",
-    "contactText": "Email works best. I usually reply within a few days.",
-    "contactCta": "Other ways to reach me",
+    "contactText": "Write to me via the contact form or directly by email. I usually reply within a few days.",
+    "contactCta": "Send a message",
     "aboutEyebrow": "About me",
     "aboutLink": "More about me",
     "projectsTitle": "What I'm working on.",
@@ -115,7 +115,8 @@
     "appearanceColumn": "Played",
     "appearancePlayed": "played",
     "appearanceLibero": "Libero",
-    "appearanceSquad": "Squad",
+    "appearanceSquad": "in the squad, didn't play",
+    "appearanceNotPlayed": "didn't play",
     "calendarTitle": "Fixtures in your calendar",
     "calendarText": "Every matchday with venue and results – changes arrive automatically.",
     "calendarSubscribe": "Subscribe",
@@ -127,13 +128,75 @@
   },
   "contact": {
     "title": "Contact",
-    "description": "Email address, company, profiles and club.",
-    "lead": "Email is the quickest way.",
-    "email": "Email",
+    "description": "Contact form, email address, company, profiles and club of Marcel Richter.",
+    "lead": "Write to me via the form or directly by email. I usually reply within a few days.",
+    "email": "Email directly",
     "profiles": "Profiles",
     "team": "Club",
     "teamLink": "Club website",
-    "company": "Company"
+    "company": "Company",
+    "form": {
+      "heading": "Send a message",
+      "name": "Name",
+      "namePlaceholder": "First and last name",
+      "email": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "emailHint": "That's where my reply goes.",
+      "topic": "What's it about?",
+      "topics": {
+        "project": "Project & collaboration",
+        "volleyball": "Volleyball & club",
+        "other": "Something else"
+      },
+      "message": "Message",
+      "messagePlaceholder": "Tell me briefly what it's about.",
+      "count": "{count} / {max}",
+      "privacy": "I only use your details to reply to you. More in the <link>privacy policy</link>.",
+      "submit": "Send message",
+      "sending": "Sending …",
+      "submitMail": "Open in email app",
+      "mailModeNote": "Submitting opens your email app with the message ready to send.",
+      "summary": "Please check the highlighted fields.",
+      "errors": {
+        "name": {
+          "required": "Please enter your name.",
+          "tooShort": "The name is too short.",
+          "tooLong": "The name is too long (at most {max} characters)."
+        },
+        "email": {
+          "required": "Please enter your email address.",
+          "invalidEmail": "This email address doesn't look complete.",
+          "tooLong": "The email address is too long (at most {max} characters)."
+        },
+        "topic": {
+          "required": "Please choose what it's about."
+        },
+        "message": {
+          "required": "Please write a message.",
+          "tooShort": "Please write a little more (at least {min} characters).",
+          "tooLong": "The message is too long (at most {max} characters)."
+        }
+      },
+      "sentTitle": "Thank you, {name}!",
+      "sentText": "Your message has arrived. I'll get back to you as soon as possible, the reply goes to {email}.",
+      "sentAgain": "Write another message",
+      "sentNoJs": "Thank you! Your message has arrived. I'll get back to you as soon as possible.",
+      "failedNoJs": "Unfortunately your message couldn't be sent. Please email me directly.",
+      "unavailableTitle": "Direct sending isn't possible right now",
+      "unavailableText": "Your message isn't lost: open it, ready to go, in your email app and send it from there.",
+      "failedTitle": "That didn't work",
+      "failedText": "The mail server didn't accept the message. Try again in a moment or open it in your email app.",
+      "rateTitle": "Too many messages right now",
+      "rateText": "A lot of messages just came from this connection. Please try again later or email me directly.",
+      "networkTitle": "No connection",
+      "networkText": "The message didn't reach the server. Check your internet connection and try again.",
+      "openMail": "Open in email app",
+      "copy": "Copy text",
+      "copied": "Copied",
+      "retry": "Send again",
+      "mailSubject": "Contact via the website: {topic}",
+      "mailOpened": "Your email app should now open with the message ready. If it doesn't, copy the text and write directly to {email}."
+    }
   },
   "footer": {
     "legal": "Legal notice",
@@ -184,7 +247,6 @@
     "myAppearance": "My appearance",
     "played": "played",
     "libero": "as libero",
-    "squadOnly": "in the squad, didn't play",
     "headToHead": "Season head-to-head",
     "opponent": "Opponent",
     "standing": "{position} of {teams}",

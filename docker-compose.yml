@@ -46,6 +46,17 @@ services:
     #   - traefik.http.routers.marcel-richter.tls.certresolver=letsencrypt
     #   - traefik.http.services.marcel-richter.loadbalancer.server.port=3000
 
+    # Kontaktformular: Zugang zum Mailserver aus der .env neben dieser Datei
+    # (nie ins Image – es ist öffentlich). Ohne SMTP_HOST bietet das Formular
+    # stattdessen das E-Mail-Programm an. Siehe README → „Kontaktformular“.
+    environment:
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      CONTACT_TO: ${CONTACT_TO:-}
+
     # Den Healthcheck bringt das Image mit (Dockerfile → /api/health).
     security_opt:
       - no-new-privileges:true

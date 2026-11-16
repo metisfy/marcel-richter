@@ -229,6 +229,35 @@ jobs:
           scp -q docker-compose.yml start.sh auto-update.sh "deploy-target:$DEPLOY_PATH/"
           ssh deploy-target "chmod +x '$DEPLOY_PATH/start.sh' '$DEPLOY_PATH/auto-update.sh'"
 
+      # Kontaktformular: Mailzugang aus Secrets/Variablen in die .env auf dem
+      # Server schreiben (docker-compose.yml reicht ihn an den Container).
+      # Ohne Variable SMTP_HOST bleibt die .env unverändert.
+      - name: Mailzugang fürs Kontaktformular hinterlegen
+        if: steps.config.outputs.enabled == 'true' && vars.SMTP_HOST != ''
+        env:
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+          SMTP_FROM: ${{ vars.SMTP_FROM }}
+          CONTACT_TO: ${{ vars.CONTACT_TO }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          lines=""
+          for key in SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASSWORD SMTP_FROM CONTACT_TO; do
+            value="${!key}"
+            [ -n "$value" ] || continue
+            case "$value" in
+              *"'"* | *$'\n'*)
+                echo "::error title=$key ungültig::$key darf weder ' noch Zeilenumbrüche enthalten."
+                exit 1
+                ;;
+            esac
+            lines+="$key='$value'"$'\n'
+          done
+          # Über stdin, damit das Passwort weder in der Prozessliste noch im Log steht.
+          printf '%s' "$lines" | ssh deploy-target "set -e; cd '$DEPLOY_PATH'; umask 077; touch .env; { grep -vE '^(SMTP_HOST|SMTP_PORT|SMTP_USER|SMTP_PASSWORD|SMTP_FROM|CONTACT_TO)=' .env || true; cat; } > .env.neu; mv .env.neu .env"
+          echo "✓ Mailzugang in $DEPLOY_PATH/.env hinterlegt"
+
       - name: Server an ghcr.io anmelden
         if: steps.config.outputs.enabled == 'true'
         env:

@@ -203,9 +203,9 @@ stats:                                   # optional, eigene Zahlen als zusätzli
   letztes Spiel, nächster Spieltag und Tabellenplatz.
 - **Meine Einsätze:** Für jedes gespielte Spiel liest die Website zusätzlich den Spielbericht
   (Spielerliste mit „eingesetzt“ und „Libero“) und sucht dort den eigenen Namen. Daraus entstehen
-  die Kachel „Meine Einsätze“, die Spalte „Einsatz“ im Spielplan (✓ eingesetzt, „Kader“ = im
-  Bericht, aber nicht eingesetzt, – = nicht im Bericht) und die Angabe in der Leiste auf der
-  Startseite. Gesucht wird nach `name` aus `site.yaml` (letztes Wort = Nachname); weicht die
+  die Kachel „Meine Einsätze“, die Spalte „Einsatz“ im Spielplan (grünes ✓ = eingesetzt, rotes
+  ✗ = nicht eingesetzt, egal ob im Kader oder nicht im Bericht) und die Angabe in der Leiste auf
+  der Startseite. Gesucht wird nach `name` aus `site.yaml` (letztes Wort = Nachname); weicht die
   Schreibweise im Spielbericht ab, in der Saisondatei angeben:
   `bvv: { …, player: { lastName: Richter, firstName: Marcel } }`. Spielberichte werden höchstens
   alle sechs Stunden neu abgerufen; ist einer nicht erreichbar, fehlt nur die Angabe zu diesem
@@ -343,7 +343,7 @@ Alternativtext (`alt`, `coverAlt`, `portraitAlt`), der beschreibt, was zu sehen 
 | Impressum   | `/impressum`           | `/en/legal-notice`         |
 | Datenschutz | `/datenschutz`         | `/en/privacy`              |
 
-Außerdem: `/sitemap.xml`, `/robots.txt`, `/api/health` (Healthcheck), `/api/status` (Datenquellen, siehe „Die Seite aktualisiert sich selbst“), `/api/stand` (Kennung des Datenstands), `/api/live/<datum>` (Live-Ticker), `/og/<sprache>/<seite>`
+Außerdem: `/sitemap.xml`, `/robots.txt`, `/api/health` (Healthcheck), `/api/status` (Datenquellen, siehe „Die Seite aktualisiert sich selbst“), `/api/stand` (Kennung des Datenstands), `/api/kontakt` (Kontaktformular), `/api/live/<datum>` (Live-Ticker), `/og/<sprache>/<seite>`
 (Open-Graph-Bilder). Die Sprache wird nie automatisch umgestellt, `/` ist immer Deutsch. Der
 Umschalter im Kopf führt jeweils zur selben Seite in der anderen Sprache. Die Seite setzt keine
 Cookies.
@@ -470,6 +470,8 @@ Secrets, nie im Code. Nicht geheime Einstellungen sind Variablen.
 | `SSH_PORT` | – | SSH-Port, Standard `22` |
 | `GHCR_TOKEN` | bei privatem Paket | Personal Access Token (classic) mit nur **`read:packages`**. Damit meldet sich der Server bei ghcr.io an. |
 | `GHCR_USER` | – | GitHub-Benutzer zum Token, Standard ist der Repo-Besitzer |
+| `SMTP_USER` | fürs Kontaktformular | Benutzername beim Mailserver |
+| `SMTP_PASSWORD` | fürs Kontaktformular | Passwort dazu |
 
 Zum **Pushen** des Images braucht es kein eigenes Token. Der Workflow nutzt dafür das automatische
 `GITHUB_TOKEN`.
@@ -482,6 +484,10 @@ Zum **Pushen** des Images braucht es kein eigenes Token. Der Workflow nutzt daf�
 | `DEPLOY_PATH` | – | Ordner auf dem Server, absolut oder relativ zum Home-Verzeichnis. Standard `marcel-richter` |
 | `GOOGLE_SITE_VERIFICATION` | – | Code aus der Google Search Console (Methode „HTML-Tag“, nur der Wert von `content`) |
 | `BING_SITE_VERIFICATION` | – | Code aus den Bing Webmaster Tools (Meta-Tag `msvalidate.01`, nur der Wert) |
+| `SMTP_HOST` | fürs Kontaktformular | Mailserver, z. B. `smtp.example.com`. Ohne ihn schreibt der Workflow keinen Mailzugang auf den Server. |
+| `SMTP_PORT` | – | `587` (STARTTLS, Standard) oder `465` (TLS) |
+| `SMTP_FROM` | – | Absenderadresse, Standard ist `SMTP_USER` |
+| `CONTACT_TO` | – | Empfänger der Nachrichten, Standard ist `email` aus `content/site.yaml` |
 
 Fehlt ein Pflichtwert, bricht der Deploy-Job mit einer Meldung ab, die genau den fehlenden Wert
 nennt.
@@ -583,6 +589,51 @@ Der Proxy sollte `X-Forwarded-Proto` und `X-Forwarded-Host` setzen (im Beispiel 
 - **Node.js-Version** an drei Stellen: `.nvmrc` (lokal und CI), `Dockerfile` (`NODE_VERSION`) und
   `engines` in `package.json`.
 
+### Kontaktformular
+
+Das Formular auf `/kontakt` prüft die Eingaben schon im Browser und schickt sie an
+`/api/kontakt`. Der Server stellt die Nachricht per SMTP an `CONTACT_TO` zu. „Antworten“ im
+Mailprogramm geht direkt an den Absender. Gespeichert wird auf dem Webserver nichts, eine
+automatische Bestätigungsmail an die angegebene Adresse gibt es bewusst nicht (sonst ließe sich
+das Formular nutzen, um Mails an fremde Adressen zu schicken).
+
+**Spamschutz:** verstecktes Feld (Honeypot), Mindest-Ausfüllzeit von 3 Sekunden,
+Herkunftsprüfung, höchstens 5 Nachrichten je IP in 15 Minuten und 40 pro Stunde insgesamt.
+
+**Ohne Mailzugang** zeigt das Formular nicht „Danke“, sondern öffnet die fertige Nachricht im
+E-Mail-Programm (mit „Text kopieren“ als Ausweg). Dasselbe bietet es an, wenn der Mailserver die
+Nachricht ablehnt. `GET /api/kontakt` zeigt, ob der Versand eingerichtet ist
+(`{"available":true}`).
+
+**Einrichten.** Die Zugangsdaten gehören nie ins Image, denn das Image ist öffentlich. Der
+Container liest sie aus der `.env` neben der `docker-compose.yml`:
+
+- **Mit SSH-Deploy:** Secrets `SMTP_USER`, `SMTP_PASSWORD` und Variable `SMTP_HOST` (optional
+  `SMTP_PORT`, `SMTP_FROM`, `CONTACT_TO`) anlegen. Der Workflow schreibt sie bei jedem Deployment
+  in die `.env` auf dem Server.
+- **Interner Server ohne SSH** (GitHub erreicht ihn nicht): einmalig die aktuelle
+  `docker-compose.yml` auf den Server kopieren und in der `.env` ergänzen:
+
+  ```bash
+  SMTP_HOST='smtp.example.com'
+  SMTP_PORT='587'
+  SMTP_USER='hello@metiscode.com'
+  SMTP_PASSWORD='…'
+  ```
+
+  Danach `chmod 600 .env && ./start.sh`. Werte in einfachen Anführungszeichen, damit `$` oder
+  `#` im Passwort nicht ausgewertet werden.
+
+Prüfen: `curl -s localhost:3100/api/kontakt` → `{"available":true}`, dann eine Testnachricht
+über das Formular schicken. Schlägt der Versand fehl, steht der Grund (ohne Formularinhalte) in
+`docker compose logs web` unter `[kontakt]`.
+
+Lokal testen ohne echten Mailserver: Mailpit starten
+(`docker run --rm -p 8025:8025 -p 1025:1025 axllent/mailpit`), in `.env.local`
+`SMTP_HOST=127.0.0.1`, `SMTP_PORT=1025`, `SMTP_FROM=test@localhost` setzen und die Mails unter
+http://localhost:8025 ansehen. Bei `localhost` wird ausnahmsweise unverschlüsselt gesendet, sonst
+ist TLS Pflicht.
+
 ### Die Seite aktualisiert sich selbst
 
 - **Daten:** Spielplan, Ergebnisse und Tabelle holt der Server beim Verband (Ligaseite höchstens
@@ -670,6 +721,7 @@ deploy/                  Beispielkonfiguration Nginx
       Auslieferung über Cloudflare) rechtlich prüfen lassen
 - [ ] GitHub Secrets und die Variable `SITE_URL` anlegen (vorher bleibt die Seite `noindex`)
 - [ ] Google Search Console einrichten (`GOOGLE_SITE_VERIFICATION`), Sitemap einreichen
+- [ ] Mailzugang fürs Kontaktformular einrichten (Abschnitt „Kontaktformular“), Testnachricht schicken
 - [ ] Reverse Proxy mit HTTPS einrichten, DNS auf den Server zeigen lassen
 - [ ] Ruleset für `main` anlegen (Merge nur bei grünen Checks)
 - [ ] Nach dem ersten Deploy: Lighthouse auf der Live-URL prüfen,

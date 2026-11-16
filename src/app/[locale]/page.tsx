@@ -356,13 +356,13 @@ export default async function HomePage({ params }: LocaleParams) {
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-[17px] leading-relaxed text-muted">{t("contactText")}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <a href={`mailto:${site.email}`} className="btn btn-primary">
-            {t("ctaMail")}
-            <ArrowRightIcon width={17} height={17} />
-          </a>
-          <Link href="/kontakt" className="btn btn-ghost">
+          <Link href="/kontakt" className="btn btn-primary">
             {t("contactCta")}
+            <ArrowRightIcon width={17} height={17} />
           </Link>
+          <a href={`mailto:${site.email}`} className="btn btn-ghost">
+            {t("ctaMail")}
+          </a>
         </div>
       </section>
     </>

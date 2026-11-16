@@ -145,16 +145,12 @@ async function PlayedMatch({ fixture, season, locale }: { fixture: Fixture; seas
       </dl>
 
       <dl className="divide-y divide-line border-y border-line text-[15px]">
-        {fixture.appearance && fixture.appearance.status !== "absent" ? (
+        {fixture.appearance ? (
           <div className="flex items-center justify-between gap-4 py-3">
             <dt className="text-muted">{t("myAppearance")}</dt>
             <dd className="flex items-center gap-2 text-right font-medium">
               <AppearanceMark appearance={fixture.appearance} />
-              {fixture.appearance.status === "played"
-                ? fixture.appearance.libero
-                  ? null
-                  : t("played")
-                : t("squadOnly")}
+              {fixture.appearance.status === "played" ? (fixture.appearance.libero ? null : t("played")) : null}
             </dd>
           </div>
         ) : null}

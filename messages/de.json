@@ -40,8 +40,8 @@
     "projectsHeading": "Projekte",
     "allProjects": "Alle Projekte",
     "contactHeading": "Kontakt",
-    "contactText": "Am besten per Mail. Ich antworte meistens innerhalb von ein paar Tagen.",
-    "contactCta": "Weitere Kontaktwege",
+    "contactText": "Schreib mir über das Kontaktformular oder direkt per E-Mail. Ich antworte meistens innerhalb von ein paar Tagen.",
+    "contactCta": "Nachricht schreiben",
     "aboutEyebrow": "Über mich",
     "aboutLink": "Mehr über mich",
     "projectsTitle": "Woran ich arbeite.",
@@ -115,7 +115,8 @@
     "appearanceColumn": "Einsatz",
     "appearancePlayed": "eingesetzt",
     "appearanceLibero": "Libero",
-    "appearanceSquad": "Kader",
+    "appearanceSquad": "im Kader, nicht eingesetzt",
+    "appearanceNotPlayed": "nicht eingesetzt",
     "calendarTitle": "Spielplan im Kalender",
     "calendarText": "Alle Spieltage mit Halle und Ergebnissen – Verschiebungen kommen automatisch an.",
     "calendarSubscribe": "Abonnieren",
@@ -127,13 +128,75 @@
   },
   "contact": {
     "title": "Kontakt",
-    "description": "E-Mail-Adresse, Unternehmen, Profile und Verein.",
-    "lead": "Am schnellsten per E-Mail.",
-    "email": "E-Mail",
+    "description": "Kontaktformular, E-Mail-Adresse, Unternehmen, Profile und Verein von Marcel Richter.",
+    "lead": "Schreib mir über das Formular oder direkt per E-Mail. Ich antworte meistens innerhalb von ein paar Tagen.",
+    "email": "Direkt per E-Mail",
     "profiles": "Profile",
     "team": "Verein",
     "teamLink": "Website des Vereins",
-    "company": "Unternehmen"
+    "company": "Unternehmen",
+    "form": {
+      "heading": "Nachricht schreiben",
+      "name": "Name",
+      "namePlaceholder": "Vor- und Nachname",
+      "email": "E-Mail-Adresse",
+      "emailPlaceholder": "name@beispiel.de",
+      "emailHint": "Dorthin geht meine Antwort.",
+      "topic": "Worum geht es?",
+      "topics": {
+        "project": "Projekt & Zusammenarbeit",
+        "volleyball": "Volleyball & Verein",
+        "other": "Etwas anderes"
+      },
+      "message": "Nachricht",
+      "messagePlaceholder": "Erzähl kurz, worum es geht.",
+      "count": "{count} / {max}",
+      "privacy": "Deine Angaben nutze ich nur, um dir zu antworten. Mehr dazu in der <link>Datenschutzerklärung</link>.",
+      "submit": "Nachricht senden",
+      "sending": "Wird gesendet …",
+      "submitMail": "Im E-Mail-Programm öffnen",
+      "mailModeNote": "Beim Absenden öffnet sich dein E-Mail-Programm mit der fertigen Nachricht.",
+      "summary": "Bitte prüf die markierten Felder.",
+      "errors": {
+        "name": {
+          "required": "Bitte gib deinen Namen an.",
+          "tooShort": "Der Name ist zu kurz.",
+          "tooLong": "Der Name ist zu lang (höchstens {max} Zeichen)."
+        },
+        "email": {
+          "required": "Bitte gib deine E-Mail-Adresse an.",
+          "invalidEmail": "Diese E-Mail-Adresse sieht nicht vollständig aus.",
+          "tooLong": "Die E-Mail-Adresse ist zu lang (höchstens {max} Zeichen)."
+        },
+        "topic": {
+          "required": "Bitte wähl aus, worum es geht."
+        },
+        "message": {
+          "required": "Bitte schreib eine Nachricht.",
+          "tooShort": "Bitte schreib etwas mehr (mindestens {min} Zeichen).",
+          "tooLong": "Die Nachricht ist zu lang (höchstens {max} Zeichen)."
+        }
+      },
+      "sentTitle": "Danke, {name}!",
+      "sentText": "Deine Nachricht ist angekommen. Ich melde mich so bald wie möglich bei dir, die Antwort geht an {email}.",
+      "sentAgain": "Weitere Nachricht schreiben",
+      "sentNoJs": "Danke! Deine Nachricht ist angekommen. Ich melde mich so bald wie möglich bei dir.",
+      "failedNoJs": "Deine Nachricht konnte leider nicht gesendet werden. Bitte schreib mir direkt per E-Mail.",
+      "unavailableTitle": "Gerade kein direkter Versand möglich",
+      "unavailableText": "Deine Nachricht ist nicht verloren: Öffne sie fertig ausgefüllt in deinem E-Mail-Programm und schick sie von dort ab.",
+      "failedTitle": "Das hat leider nicht geklappt",
+      "failedText": "Der Mailserver hat die Nachricht nicht angenommen. Versuch es gleich noch einmal oder öffne sie in deinem E-Mail-Programm.",
+      "rateTitle": "Gerade zu viele Nachrichten",
+      "rateText": "Von diesem Anschluss kamen eben sehr viele Nachrichten. Bitte versuch es später noch einmal oder schreib direkt per E-Mail.",
+      "networkTitle": "Keine Verbindung",
+      "networkText": "Die Nachricht ist nicht beim Server angekommen. Prüf deine Internetverbindung und versuch es noch einmal.",
+      "openMail": "Im E-Mail-Programm öffnen",
+      "copy": "Text kopieren",
+      "copied": "Kopiert",
+      "retry": "Erneut senden",
+      "mailSubject": "Kontakt über die Website: {topic}",
+      "mailOpened": "Dein E-Mail-Programm sollte sich jetzt mit der fertigen Nachricht öffnen. Falls nicht, kopier den Text und schreib direkt an {email}."
+    }
   },
   "footer": {
     "legal": "Impressum",
@@ -184,7 +247,6 @@
     "myAppearance": "Mein Einsatz",
     "played": "eingesetzt",
     "libero": "als Libero",
-    "squadOnly": "im Kader, nicht eingesetzt",
     "headToHead": "Saisonvergleich",
     "opponent": "Gegner",
     "standing": "Platz {position} von {teams}",
