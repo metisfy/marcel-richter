@@ -572,8 +572,10 @@ Ein Login nur für Marcel, gebaut nach dem Muster von t-orga:
 - **Einstellungen:** Name/E-Mail, Passwort, zweiter Faktor (TOTP mit QR-Code, 8 Ersatzcodes),
   Mailversand (SMTP mit Testmail vor dem Speichern), Datenbank prüfen, überall abmelden.
 
-**Datenbank:** MongoDB, im Browser eingerichtet. Es gibt keine `MONGODB_URI` und keine
-Zugangsdaten im Code oder Image. Benötigt wird eine eigene Datenbank (z. B. `marcel_richter`)
+**Datenbank:** MongoDB **extern** wie bei t-orga (eigener Server, Replica Set oder Atlas mit
+SRV), kein Datenbank-Container. Die Verbindung wird im Browser eingerichtet. Es gibt keine
+`MONGODB_URI` und keine Zugangsdaten im Code oder Image. Der Datenbankserver muss vom Container
+aus erreichbar sein (Firewall/IP-Freigabe, bei Atlas die IP des Servers freigeben). Benötigt wird eine eigene Datenbank (z. B. `marcel_richter`)
 mit einem Benutzer, der darin lesen und schreiben darf:
 
 ```js
