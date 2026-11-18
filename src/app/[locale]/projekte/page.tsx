@@ -4,6 +4,7 @@ import { PageIntro } from "@/components/page-intro";
 import { ProjectCard } from "@/components/project-card";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { getProjects, getSite } from "@/lib/content";
+import { projectVisible } from "@/lib/website-settings";
 import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: LocaleParams) {
@@ -22,7 +23,8 @@ export async function generateMetadata({ params }: LocaleParams) {
 export default async function ProjectsPage({ params }: LocaleParams) {
   const locale = await initLocale(params);
   const t = await getTranslations("projects");
-  const projects = getProjects(locale);
+  // Im Admin-Bereich versteckte Projekte erscheinen nicht
+  const projects = getProjects(locale).filter((project) => projectVisible(project.slug));
 
   return (
     <div className="container-page">

@@ -3,7 +3,7 @@ import type { AdminIconName } from "@/components/admin/icons";
 /*
  * Menü des Admin-Bereichs, logisch gruppiert (wie bei t-orga):
  *
- *   Überblick      – was gerade los ist
+ *   Überblick      – was gerade los ist (Dashboard, Besucherstatistik)
  *   Website        – was Besucher sehen und schicken
  *   Einstellungen  – wie der Bereich arbeitet, und das eigene Konto
  *
@@ -28,7 +28,10 @@ export type NavGroup = { title: string; items: NavItem[] };
 export const NAVIGATION: NavGroup[] = [
   {
     title: "Überblick",
-    items: [{ path: "/", label: "Dashboard", icon: "dashboard", exact: true }],
+    items: [
+      { path: "/", label: "Dashboard", icon: "dashboard", exact: true },
+      { path: "/besucher", label: "Besucher", icon: "chart" },
+    ],
   },
   {
     title: "Website",

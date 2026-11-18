@@ -7,11 +7,13 @@ import { Badge, type BadgeTone, Panel, PageHead, StatTile, formatDateTime } from
 import { databaseConfigured } from "@/lib/admin/db";
 import { adminPrefix, requireAdmin, setupComplete } from "@/lib/admin/guard";
 import { countUnread, listMessages } from "@/lib/admin/messages";
+import { statisticsReport } from "@/lib/admin/statistics";
 import { dataDirPersistent, wizardDone } from "@/lib/admin/storage";
-import { mailConfig } from "@/lib/contact";
+import { mailStatus } from "@/lib/contact";
 import { getSite, lastResult, nextMatchday } from "@/lib/content";
 import { loadCurrentSeason } from "@/lib/season";
 import { SITE_URL, SITE_URL_CONFIGURED } from "@/lib/site-url";
+import { websiteSettings } from "@/lib/website-settings";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -37,12 +39,14 @@ export default async function AdminHome() {
 
   const admin = await requireAdmin("/");
   const prefix = await adminPrefix();
-  const [unread, latest, mail, season] = await Promise.all([
+  const [unread, latest, mail, season, visits] = await Promise.all([
     countUnread().catch(() => null),
     listMessages(5).catch(() => []),
-    mailConfig(),
+    mailStatus(),
     loadCurrentSeason("de").catch(() => undefined),
+    statisticsReport(7).catch(() => null),
   ]);
+  const indexed = SITE_URL_CONFIGURED && websiteSettings().indexing;
   const next = nextMatchday(season);
   const last = lastResult(season);
   const dataTone: BadgeTone = !season?.source ? "neutral" : season.source.stale || !season.source.updatedAt ? "warn" : "good";
@@ -61,16 +65,21 @@ export default async function AdminHome() {
     },
     {
       label: "Mailversand",
-      text: mail ? `Nachrichten gehen an ${mail.to}` : "Nachrichten landen nur im Postfach hier",
-      tone: mail ? "good" : "warn",
-      status: mail ? "eingerichtet" : "fehlt",
+      text:
+        mail.state === "umgebung" || mail.state === "admin"
+          ? `Nachrichten gehen an ${mail.to}`
+          : mail.state === "unlesbar"
+            ? "Passwort nicht mehr lesbar – bitte neu eingeben"
+            : "Nachrichten landen nur im Postfach hier",
+      tone: mail.state === "umgebung" || mail.state === "admin" ? "good" : mail.state === "unlesbar" ? "bad" : "warn",
+      status: mail.state === "umgebung" || mail.state === "admin" ? "eingerichtet" : mail.state === "unlesbar" ? "Passwort fehlt" : "fehlt",
       href: `${prefix}/einstellungen/mailversand`,
     },
     {
       label: "Domain & Suchmaschinen",
-      text: SITE_URL_CONFIGURED ? SITE_URL.replace(/^https?:\/\//, "") : "Ohne Domain bleibt die Seite für Google gesperrt",
-      tone: SITE_URL_CONFIGURED ? "good" : "warn",
-      status: SITE_URL_CONFIGURED ? "freigegeben" : "noindex",
+      text: indexed ? SITE_URL.replace(/^https?:\/\//, "") : "Für Google & Co. gesperrt (Regler unter Inhalte & SEO)",
+      tone: indexed ? "good" : "warn",
+      status: indexed ? "öffentlich" : "noindex",
       href: `${prefix}/inhalte#seo`,
     },
     {
@@ -96,6 +105,13 @@ export default async function AdminHome() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
+          icon="chart"
+          value={visits?.totals.visitors ?? "–"}
+          label="Besucher (7 Tage)"
+          hint={visits ? `${visits.totals.views} Seitenaufrufe · heute ${visits.today.views}` : "Statistik nicht verfügbar"}
+          href={`${prefix}/besucher`}
+        />
+        <StatTile
           icon="inbox"
           value={unread ?? "–"}
           label="Ungelesene Nachrichten"
@@ -114,13 +130,6 @@ export default async function AdminHome() {
           value={season?.standing ? `${season.standing.position}.` : "–"}
           label="Tabellenplatz"
           hint={season?.standing ? `von ${season.standing.teams}${season.standing.points !== undefined ? ` · ${season.standing.points} Punkte` : ""}` : season?.league}
-          href={`${prefix}/spielbetrieb`}
-        />
-        <StatTile
-          icon="volleyball"
-          value={season?.appearances?.played ?? "–"}
-          label="Meine Einsätze"
-          hint={season?.appearances ? `in ${season.appearances.matches} Spielen · ${season.season}` : season?.season}
           href={`${prefix}/spielbetrieb`}
         />
       </div>

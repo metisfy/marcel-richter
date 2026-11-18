@@ -12,6 +12,8 @@
  * Bewusst ohne Node-APIs – diese Datei lädt auch der Proxy.
  */
 
+import { SITE_HOST, SITE_URL_CONFIGURED } from "@/lib/site-url";
+
 export const ADMIN_SEGMENT = "/admin";
 
 /** Host-Kopf normalisieren: Port weg, klein. Hinter einem Reverse Proxy zählt der weitergereichte Host. */
@@ -26,15 +28,8 @@ export function isAdminHost(host: string): boolean {
 
 /** Die öffentliche Website (mit und ohne www) – dort gibt es keinen Admin-Bereich. */
 export function isPublicHost(host: string): boolean {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) return false;
-  try {
-    const site = new URL(configured).hostname.toLowerCase();
-    const bare = site.replace(/^www\./, "");
-    return host === site || host === bare || host === `www.${bare}`;
-  } catch {
-    return false;
-  }
+  if (!SITE_URL_CONFIGURED) return false;
+  return host === SITE_HOST || host === `www.${SITE_HOST}`;
 }
 
 /** Link-Präfix im Admin-Bereich: leer auf dem Admin-Host, sonst das Segment. */
@@ -42,14 +37,7 @@ export function adminPrefixFor(host: string): string {
   return isAdminHost(host) ? "" : ADMIN_SEGMENT;
 }
 
-/** Wo der Admin-Bereich öffentlich liegt, z. B. https://admin.marcel-richter.de */
+/** Wo der Admin-Bereich öffentlich liegt: https://admin.marcel-richter.com.au */
 export function adminUrl(): string | null {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!configured) return null;
-  try {
-    const url = new URL(configured);
-    return `${url.protocol}//admin.${url.hostname.replace(/^www\./, "")}`;
-  } catch {
-    return null;
-  }
+  return SITE_URL_CONFIGURED ? `https://admin.${SITE_HOST}` : null;
 }

@@ -481,7 +481,7 @@ Zum **Pushen** des Images braucht es kein eigenes Token. Der Workflow nutzt daf�
 
 | Name | Pflicht | Inhalt |
 | --- | --- | --- |
-| `SITE_URL` | ✅ | Öffentliche Adresse ohne Schrägstrich am Ende, z. B. `https://www.marcel-richter.de`. Wird ins Image gebaut (Canonical, hreflang, Sitemap, OG-Bilder) und für den Healthcheck genutzt. |
+| `SITE_URL` | – | Öffentliche Adresse ohne Schrägstrich am Ende. Standard im Code: `https://marcel-richter.com.au` (`src/lib/site-url.ts`). Nur setzen, um sie zu überschreiben; für den Healthcheck beim SSH-Deploy nötig. |
 | `DEPLOY_PATH` | – | Ordner auf dem Server, absolut oder relativ zum Home-Verzeichnis. Standard `marcel-richter` |
 | `GOOGLE_SITE_VERIFICATION` | – | Code aus der Google Search Console (Methode „HTML-Tag“, nur der Wert von `content`) |
 | `BING_SITE_VERIFICATION` | – | Code aus den Bing Webmaster Tools (Meta-Tag `msvalidate.01`, nur der Wert) |
@@ -568,12 +568,13 @@ einklappbare Seitenleiste, gegliedert in drei Gruppen:
 
 | Gruppe | Seite | Inhalt |
 | --- | --- | --- |
-| Überblick | **Dashboard** | Kennzahlen (ungelesene Nachrichten, nächster Spieltag, Tabellenplatz, Einsätze), Status (2FA, Mailversand, Domain, BVV-Daten), neueste Nachrichten |
+| Überblick | **Dashboard** | Kennzahlen (Besucher, ungelesene Nachrichten, nächster Spieltag, Tabellenplatz), Status (2FA, Mailversand, Suchmaschinen, BVV-Daten), neueste Nachrichten |
+| | **Besucher** | eigene Besucherstatistik ohne Cookies, Regler an/aus |
 | Website | **Nachrichten** | Postfach des Kontaktformulars mit Filter, „Antworten“, gelesen/ungelesen, Löschen; Löschung nach 12 Monaten automatisch |
 | | **Spielbetrieb** | nächster Spieltag, letztes Ergebnis, Saison, Datenquellen (BVV, Ticker); „Jetzt neu abrufen“ holt alles sofort neu vom BVV |
-| | **Inhalte & SEO** | Projekte und Seiten mit Links, Suchmaschinen-Status (Domain, noindex, Search Console, Sitemap) |
+| | **Inhalte & SEO** | Regler je Projekt (sichtbar/versteckt), Regler Suchmaschinen (öffentlich/gesperrt), Search Console, Sitemap, robots.txt |
 | Einstellungen | **Übersicht** | Kacheln mit Stand auf einen Blick |
-| | **Mailversand** | SMTP mit Testmail vor dem Speichern |
+| | **Mailversand** | Stand mit Grund (Server-Umgebung, Einstellungen, Passwort nicht lesbar), SMTP mit Testmail vor dem Speichern |
 | | **System** | Datenbank prüfen, Ablage/Volume, Version |
 | | **Mein Profil** | Name/E-Mail, Passwort, Passkeys, Authenticator-App, Ersatzcodes, überall abmelden |
 
@@ -767,24 +768,41 @@ ist TLS Pflicht.
 - Strukturierte Daten (schema.org): Person mit Firma und Verein, Website, Profilseite
   („Über mich“), Spiele als `SportsEvent` mit Halle, Projekte als `CreativeWork`, Brotkrumen
   (Saison, Spieltage, Projekte, Über mich).
-- `sitemap.xml` (stündlich neu, mit Datum je Spieltag) und `robots.txt`.
-- **Ohne `SITE_URL` wird nichts indexiert** (`noindex`, robots.txt sperrt alles), damit keine
-  Links auf localhost in Suchmaschinen landen. Sobald die Domain als GitHub-Variable gesetzt ist,
-  ist die Seite beim nächsten Deployment freigegeben.
+- Domain: **`https://marcel-richter.com.au`** (Standard in `src/lib/site-url.ts`, überschreibbar
+  mit der Variable `SITE_URL`).
+- `sitemap.xml` (stündlich neu, mit Datum je Spieltag, ohne versteckte Projekte) und `robots.txt`
+  (bei jedem Abruf neu; auf `admin.` sperrt sie alles).
+- **Regler „Suchmaschinen“** im Admin-Bereich (Inhalte & SEO): aus → robots.txt sperrt alles,
+  jede Seite trägt `noindex`, und der Proxy setzt zusätzlich `X-Robots-Tag: noindex`. Wirkt
+  sofort, auch auf Seiten, die noch aus dem Build stammen.
+- **Regler je Projekt:** versteckte Projekte fehlen in Listen und Sitemap, ihre Seite gibt 404.
+  Die Schalter liegen in `data/website.json` auf dem Volume (`src/lib/website-settings.ts`).
+  Weichen sie vom Standard ab, erzeugt der Server nach jedem Start einmal alle Seiten neu.
+- Lokal (`NEXT_PUBLIC_SITE_URL=http://localhost:3000`) wird nie indexiert.
 - **Search Console:** Seite in der [Google Search Console](https://search.google.com/search-console)
   als URL-Präfix anlegen, Methode „HTML-Tag“, den Code als Variable `GOOGLE_SITE_VERIFICATION`
   hinterlegen, deployen, bestätigen und dort `https://<domain>/sitemap.xml` einreichen. Für Bing
   genauso mit `BING_SITE_VERIFICATION` (oder Bing importiert die Seite aus der Search Console).
 
-### Besucherstatistik (optional, standardmäßig aus)
+### Besucherstatistik
 
-Für eine Statistik ohne Cookies ist [Umami](https://umami.is) vorbereitet (selbst gehostet). Dafür
-in GitHub unter Settings → Variables `UMAMI_SRC` (z. B. `https://statistik.example.com/script.js`)
-und `UMAMI_WEBSITE_ID` setzen. Beim nächsten Build werden dann das Skript geladen, die
-Content-Security-Policy erweitert und in der Datenschutzerklärung der Abschnitt „13.
-Besucherstatistik“ eingeblendet (`<Tracking />` und `<Besucherstatistik />` in den MDX-Dateien).
-**Vorher rechtlich prüfen lassen:** Auch eine Statistik ohne Cookies liest Informationen vom Gerät
-(Bildschirmgröße, Sprache); ob dafür nach § 25 TDDDG eine Einwilligung nötig ist, ist umstritten.
+Eigene Statistik ohne Cookies und ohne Drittanbieter, Auswertung im Admin-Bereich unter
+**Besucher** (Seitenaufrufe je Tag, Besucher, beliebteste Seiten, Herkunft, Geräte). An- und
+abschalten lässt sie sich dort mit einem Regler. Die Datenschutzerklärung passt sich an
+(`<Tracking />`, `<Besucherstatistik />`).
+
+- `src/components/visit-beacon.tsx` meldet jeden Seitenaufruf, auch Wechsel innerhalb der Seite,
+  per `sendBeacon` an `POST /api/besuch`. Bei „Do Not Track“ oder „Global Privacy Control“ meldet
+  er nichts.
+- `src/lib/visits.ts` filtert Bots, bildet für die Besucherzählung eine Prüfsumme aus IP,
+  User-Agent und einem täglich neuen Zufallswert (nur im Arbeitsspeicher) und sammelt die Aufrufe.
+- `src/lib/admin/statistics.ts` schreibt alle 15 Sekunden Tagessummen nach MongoDB (`statistik`,
+  zwei Jahre). Die Prüfsummen (`statistik_besucher`) löschen sich nach 48 Stunden.
+- Die IP-Adresse wird nicht gespeichert. **Rechtlich prüfen lassen**, ob für das Skript nach
+  § 25 TDDDG eine Einwilligung nötig ist. Bei cookielosen Zählern ist das umstritten.
+
+Optional zusätzlich [Umami](https://umami.is) (selbst gehostet): Variablen `UMAMI_SRC` und
+`UMAMI_WEBSITE_ID` setzen.
 
 ### Projektstruktur
 

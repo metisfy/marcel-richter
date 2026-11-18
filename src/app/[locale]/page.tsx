@@ -12,6 +12,7 @@ import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { getPathname, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProjects, getSite, lastResult, nextMatchday, ownSets, roleLine, type Season } from "@/lib/content";
+import { projectVisible } from "@/lib/website-settings";
 import { formatShortDate, formatTime, toIsoBerlin } from "@/lib/format";
 import { loadSeasons, seasonsVersion } from "@/lib/season";
 import { pageMetadata } from "@/lib/seo";
@@ -188,7 +189,8 @@ export default async function HomePage({ params }: LocaleParams) {
   const seasons = await loadSeasons(locale);
   const season = seasons[0];
 
-  const projects = getProjects(locale);
+  // Im Admin-Bereich versteckte Projekte erscheinen nicht
+  const projects = getProjects(locale).filter((project) => projectVisible(project.slug));
   const featured = [
     ...projects.filter((project) => project.featured),
     ...projects.filter((project) => !project.featured),

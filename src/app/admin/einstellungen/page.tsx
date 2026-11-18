@@ -4,7 +4,7 @@ import { AdminShell } from "@/components/admin/shell";
 import { Badge, PageHead, SettingsTile } from "@/components/admin/ui";
 import { adminPrefix, requireAdmin } from "@/lib/admin/guard";
 import { dataDirPersistent } from "@/lib/admin/storage";
-import { mailConfig } from "@/lib/contact";
+import { mailStatus } from "@/lib/contact";
 
 export const metadata: Metadata = { title: "Einstellungen" };
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Einstellungen" };
 export default async function SettingsOverview() {
   const admin = await requireAdmin("/einstellungen");
   const prefix = await adminPrefix();
-  const mail = await mailConfig();
+  const mail = await mailStatus();
   const persistent = dataDirPersistent();
 
   return (
@@ -25,7 +25,15 @@ export default async function SettingsOverview() {
             icon="mail"
             title="Mailversand"
             text="SMTP-Zugang, damit Nachrichten aus dem Kontaktformular auch per Mail ankommen."
-            status={mail ? <Badge tone="good">eingerichtet</Badge> : <Badge tone="warn">fehlt</Badge>}
+            status={
+              mail.state === "umgebung" || mail.state === "admin" ? (
+                <Badge tone="good">eingerichtet</Badge>
+              ) : mail.state === "unlesbar" ? (
+                <Badge tone="bad">Passwort neu eingeben</Badge>
+              ) : (
+                <Badge tone="warn">fehlt</Badge>
+              )
+            }
           />
           <SettingsTile
             href={`${prefix}/einstellungen/system`}

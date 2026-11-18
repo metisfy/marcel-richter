@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/json-ld";
 import { RevealObserver } from "@/components/reveal-observer";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { VisitBeacon } from "@/components/visit-beacon";
 import { initLocale, type LocaleParams } from "@/i18n/locale";
 import { routing } from "@/i18n/routing";
 import { ANALYTICS } from "@/lib/analytics";
@@ -18,6 +19,7 @@ import { fontVariables } from "@/lib/fonts";
 import { SITE_URL, SITE_URL_CONFIGURED } from "@/lib/site-url";
 import { siteGraph } from "@/lib/structured-data";
 import { themeInitScript } from "@/lib/theme-script";
+import { websiteSettings } from "@/lib/website-settings";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -36,7 +38,9 @@ export async function generateMetadata({ params }: LocaleParams): Promise<Metada
     formatDetection: { telephone: false, email: false, address: false },
     // Ohne eigene Domain (GitHub-Variable SITE_URL) zeigten Canonical-Links
     // auf localhost – dann lieber gar nicht indexieren.
-    robots: SITE_URL_CONFIGURED
+    // Schalter „Suchmaschinen“ im Admin-Bereich; zusätzlich setzt der Proxy
+    // bei „aus“ X-Robots-Tag: noindex für jede Antwort (src/proxy.ts)
+    robots: SITE_URL_CONFIGURED && websiteSettings().indexing
       ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } }
       : { index: false, follow: false },
     // Bestätigung für Google Search Console / Bing Webmaster Tools
@@ -82,6 +86,7 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <JsonLd data={siteGraph(site, locale)} />
         <RevealObserver />
+        <VisitBeacon />
         {/* Besucherstatistik nur, wenn beim Build eingeschaltet (src/lib/analytics.ts) */}
         {ANALYTICS ? (
           <Script src={ANALYTICS.src} data-website-id={ANALYTICS.websiteId} data-do-not-track="true" strategy="afterInteractive" />

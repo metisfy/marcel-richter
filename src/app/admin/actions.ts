@@ -51,7 +51,8 @@ import { authenticationOptions, passkeyEnvironment, registrationOptions, verifyA
 import { finishWizard, setupKeyMatches, wizardDone } from "@/lib/admin/storage";
 import { newBackupCodes, newTotpSecret, redeemBackupCode, verifyTotp } from "@/lib/admin/totp";
 import { sendTestMail } from "@/lib/contact";
-import { getSite } from "@/lib/content";
+import { getProjects, getSite } from "@/lib/content";
+import { updateWebsiteSettings, websiteSettings } from "@/lib/website-settings";
 
 export type FormState = { error?: string; success?: string; codes?: string[] };
 
@@ -405,6 +406,33 @@ export async function passkeyLoginFinish(responseJson: string, weiter: string): 
   const prefix = await adminPrefix();
   const target = safeTarget(weiter);
   redirect(target === "/" ? prefix || "/" : `${prefix}${target}`);
+}
+
+/* ------------------------------ Website-Schalter -------------------------- */
+
+async function applyWebsiteSettings(change: Parameters<typeof updateWebsiteSettings>[0]): Promise<void> {
+  await adminForAction();
+  await updateWebsiteSettings(change);
+  // Alle öffentlichen Seiten, Sitemap und robots.txt beim nächsten Aufruf neu
+  revalidatePath("/", "layout");
+  revalidatePath("/sitemap.xml");
+}
+
+/** Suchmaschinen an/aus (robots.txt, noindex, X-Robots-Tag) */
+export async function setIndexing(on: boolean): Promise<void> {
+  await applyWebsiteSettings({ indexing: on });
+}
+
+export async function setStatistics(on: boolean): Promise<void> {
+  await applyWebsiteSettings({ statistics: on });
+}
+
+export async function setProjectVisible(slug: string, visible: boolean): Promise<void> {
+  if (!getProjects("de").some((project) => project.slug === slug)) throw new Error("Unbekanntes Projekt.");
+  const hidden = new Set(websiteSettings().hiddenProjects);
+  if (visible) hidden.delete(slug);
+  else hidden.add(slug);
+  await applyWebsiteSettings({ hiddenProjects: [...hidden] });
 }
 
 /* -------------------------------- Spielbetrieb ---------------------------- */

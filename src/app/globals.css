@@ -20,6 +20,7 @@
   --accent-bright: #4f7dff;
   --accent-2: #7c6cf5;
   --accent-soft: #eef3ff;
+  --chart: #3a63d9;
   --btn: #3a63d9;
   --btn-hover: #2f53bf;
   --care: #2fa98c;
@@ -44,6 +45,7 @@
     --accent: #7d9bff;
     --accent-2: #8f82f7;
     --accent-soft: #182033;
+    --chart: #4f7dff;
     --win: #5fd3a6;
     --live: #ff6369;
     --live-text: #ff8a80;
@@ -65,6 +67,7 @@
   --accent: #7d9bff;
   --accent-2: #8f82f7;
   --accent-soft: #182033;
+  --chart: #4f7dff;
   --win: #5fd3a6;
   --live: #ff6369;
   --live-text: #ff8a80;
@@ -86,6 +89,7 @@
   --color-accent-bright: var(--accent-bright);
   --color-accent-2: var(--accent-2);
   --color-accent-soft: var(--accent-soft);
+  --color-chart: var(--chart);
   --color-care: var(--care);
   --color-win: var(--win);
   --color-win-soft: var(--win-soft);

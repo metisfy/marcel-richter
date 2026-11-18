@@ -3,6 +3,7 @@ import createMiddleware from "next-intl/middleware";
 
 import { routing } from "./i18n/routing";
 import { ADMIN_SEGMENT, hostFrom, isAdminHost, isPublicHost } from "./lib/admin/hosts";
+import { websiteSettings } from "./lib/website-settings";
 
 // Ordnet jede Anfrage einer Sprache zu und schreibt die öffentlichen,
 // übersetzten Pfade intern auf die Ordnerstruktur um
@@ -16,6 +17,12 @@ const intl = createMiddleware(routing);
  *   <server-ip>:3100/admin/…    → src/app/admin/…           (Segment sichtbar)
  *   <öffentliche Domain>/admin  → 404 der Website
  *
+ * Und die Schalter aus dem Admin-Bereich (src/lib/website-settings.ts), die
+ * hier bei jedem Aufruf wirken – unabhängig davon, wann eine Seite zuletzt
+ * erzeugt wurde:
+ *   - versteckte Projekte → 404
+ *   - Suchmaschinen aus   → X-Robots-Tag: noindex
+ *
  * Verbindlich geprüft wird die Anmeldung erst in den Seiten und Aktionen
  * (src/lib/admin/guard.ts) – der Proxy entscheidet nur über den Weg.
  */
@@ -24,6 +31,11 @@ function adminResponse(response: NextResponse): NextResponse {
   response.headers.set("X-Robots-Tag", "noindex, nofollow");
   response.headers.set("Cache-Control", "private, no-store");
   return response;
+}
+
+/** Projekt-Slug aus /projekte/<slug> bzw. /en/projects/<slug> */
+function projectSlug(path: string): string | null {
+  return path.match(/^\/(?:de\/)?projekte\/([^/]+)\/?$/)?.[1] ?? path.match(/^\/en\/projects\/([^/]+)\/?$/)?.[1] ?? null;
 }
 
 export default function proxy(request: NextRequest) {
@@ -41,7 +53,19 @@ export default function proxy(request: NextRequest) {
 
   if (inSegment && !isPublicHost(host)) return adminResponse(NextResponse.next());
 
-  return intl(request);
+  const settings = websiteSettings();
+
+  // Versteckte Projekte gibt es öffentlich nicht – auch nicht über einen alten Link
+  const slug = projectSlug(path);
+  if (slug && settings.hiddenProjects.includes(slug)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${path.startsWith("/en/") ? "en" : "de"}/projekte/__nicht-vorhanden`;
+    return NextResponse.rewrite(url);
+  }
+
+  const response = intl(request);
+  if (!settings.indexing) response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
 }
 
 export const config = {

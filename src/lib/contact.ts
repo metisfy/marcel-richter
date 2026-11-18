@@ -68,6 +68,36 @@ export async function mailConfig(): Promise<MailConfig | null> {
   }
 }
 
+export type MailStatus =
+  | { state: "umgebung"; to: string; host: string }
+  | { state: "admin"; to: string; host: string }
+  /** Im Admin-Bereich gespeichert, aber das Passwort ist mit einem früheren App-Geheimnis verschlüsselt */
+  | { state: "unlesbar"; host: string }
+  | { state: "fehlt" };
+
+/** Welche SMTP-Variablen kommen im Container an? (nur Namen, nie Werte) */
+export function envMailVariables(): string[] {
+  return ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD", "SMTP_FROM", "CONTACT_TO"].filter((name) => env(name));
+}
+
+/** Wie steht es um den Mailversand – mit Grund, falls er nicht geht. */
+export async function mailStatus(): Promise<MailStatus> {
+  const fromEnv = envMailConfig();
+  if (fromEnv) return { state: "umgebung", to: fromEnv.to, host: fromEnv.host };
+  const { setupComplete } = await import("@/lib/admin/guard");
+  if (!setupComplete()) return { state: "fehlt" };
+  try {
+    const { mailSettingsFromDatabase, storedMailSettings } = await import("@/lib/admin/mail-settings");
+    const stored = await storedMailSettings();
+    if (!stored) return { state: "fehlt" };
+    const usable = await mailSettingsFromDatabase();
+    if (!usable) return { state: "unlesbar", host: stored.host };
+    return { state: "admin", to: usable.to || getSite("de").email, host: usable.host };
+  } catch {
+    return { state: "fehlt" };
+  }
+}
+
 /*
  * Einfache Bremse gegen Massenversand: je Absender-IP höchstens 5 Nachrichten
  * in 15 Minuten, insgesamt höchstens 40 pro Stunde. Die IP liegt nur im
